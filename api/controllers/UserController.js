@@ -6,7 +6,6 @@ const UserController = () => {
   const register = async (req, res) => {
     const { body } = req;
 
-    if (body.password === body.password2) {
       try {
         const user = await User.create({
           full_name: body.full_name,
@@ -32,7 +31,6 @@ const UserController = () => {
         console.log(err);
         return res.status(500).json({ msg: 'Internal server error' });
       }
-    }
 
     return res.status(400).json({ msg: 'Bad Request: Passwords don\'t match' });
   };

@@ -21,9 +21,9 @@
     "drop-sqlite-db": "shx rm ./db/database.sqlite",
     "lint": "eslint ./api/. ./config/. ./test/.",
     "prepush": "npm test",
-    "pretest": "npm run lint",
+    "pretes": "npm run lint",
     "production": "cross-env NODE_ENV=production node ./api/api.js",
-    "test": "npm run create-sqlite-db; cross-env NODE_ENV=testing jest --coverage; npm run drop-sqlite-db",
+    "test": "cross-env NODE_ENV=testing jest --coverage",
     "test-ci": "jest --coverage --forceExit"
   },
   "jest": {

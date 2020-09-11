@@ -20,10 +20,15 @@ test('User | create', async () => {
     .post('/public/user')
     .set('Accept', /json/)
     .send({
-      email: 'martin@mail.com',
-      password: 'securepassword',
-      password2: 'securepassword',
-    })
+      "full_name": "Rime",
+      "username": "rime",
+      "designation": "Boss",
+      "user_mobile": "8299213792",
+      "password": "Alfanzo@001",
+      "password2": "Alfanzo@001",
+      "permissions": {"Admin": true, "Employee": false},
+      "is_active": true
+  })
     .expect(200);
 
   expect(res.body.user).toBeTruthy();
@@ -38,17 +43,23 @@ test('User | create', async () => {
 
 test('User | login', async () => {
   const user = await User.create({
-    email: 'martin@mail.com',
-    password: 'securepassword',
-  });
+    "full_name": "Rime",
+    "username": "rime",
+    "designation": "Boss",
+    "user_mobile": "8299213792",
+    "password": "Alfanzo@001",
+    "password2": "Alfanzo@001",
+    "permissions": {"Admin": true, "Employee": false},
+    "is_active": true
+});
 
   const res = await request(api)
     .post('/public/login')
     .set('Accept', /json/)
     .send({
-      email: 'martin@mail.com',
-      password: 'securepassword',
-    })
+      "username": "rime",
+      "password": "Alfanzo@001"
+  })
     .expect(200);
 
   expect(res.body.token).toBeTruthy();
