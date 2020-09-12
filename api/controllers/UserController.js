@@ -14,7 +14,7 @@ const UserController = () => {
           designation: body.designation,
           user_mobile: body.user_mobile,
           password: body.password,
-          permissions: body.permissions,
+          permissions: JSON.parse(body.permissions),
           is_active: body.is_active
         });
         const token = authService().issue({
