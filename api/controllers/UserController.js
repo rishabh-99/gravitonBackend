@@ -7,6 +7,7 @@ const UserController = () => {
     const { body } = req;
 
       try {
+        // Permissions ko obj me convert krna h
         const user = await User.create({
           full_name: body.full_name,
           username: body.username,
