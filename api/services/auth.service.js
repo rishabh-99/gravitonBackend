@@ -8,8 +8,8 @@ const encryptSecret = process.env.NODE_ENV === 'production' ? process.env.ENCRYP
 
 const authService = () => {
   const issue = (payload) => {
-    const encryptedPayload = CryptoJS.AES.encrypt(JSON.stringify(payload), encryptSecret, { padding: CryptoJS.pad.NoPadding}).toString()
-    const dec = CryptoJS.AES.decrypt(jwt.decode(token).encryptedPayload, encryptSecret, { padding: CryptoJS.pad.NoPadding}).toString(CryptoJS.enc.Utf8);
+    const encryptedPayload = CryptoJS.AES.encrypt(JSON.stringify(payload), encryptSecret, { padding: CryptoJS.pad.Pkcs7}).toString()
+    const dec = CryptoJS.AES.decrypt(jwt.decode(token).encryptedPayload, encryptSecret, { padding: CryptoJS.pad.Pkcs7}).toString(CryptoJS.enc.Utf8);
     console.log(dec)
     return jwt.sign({encryptedPayload}, jwtSecret, {
       expiresIn: 120
@@ -17,7 +17,7 @@ const authService = () => {
 
   };
   const verify = (token, cb) => {
-    const dec = CryptoJS.AES.decrypt(jwt.decode(token).encryptedPayload, encryptSecret, { padding: CryptoJS.pad.NoPadding}).toString(CryptoJS.enc.Utf8);
+    const dec = CryptoJS.AES.decrypt(jwt.decode(token).encryptedPayload, encryptSecret, { padding: CryptoJS.pad.Pkcs7}).toString(CryptoJS.enc.Utf8);
     console.log(dec)
     return jwt.verify(token, jwtSecret, {}, cb)
   };
