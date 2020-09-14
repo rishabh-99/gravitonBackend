@@ -1,8 +1,7 @@
 const publicRoutes = {
-  'POST /user': 'UserController.register',
-  'POST /register': 'UserController.register', // alias for POST /user
-  'POST /login': 'UserController.login',
-  'POST /validate': 'UserController.validate',
+  'POST /register': 'LoginController.register', // alias for POST /Login
+  'POST /login': 'LoginController.login',
+  'POST /validate': 'LoginController.validate',
 };
 
 module.exports = publicRoutes;

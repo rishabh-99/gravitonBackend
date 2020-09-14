@@ -1,4 +1,4 @@
-const User = require('../models/User');
+const User = require('../models/Login');
 const authService = require('../services/auth.service');
 const bcryptService = require('../services/bcrypt.service');
 
@@ -14,16 +14,16 @@ const UserController = () => {
           designation: body.designation,
           user_mobile: body.user_mobile,
           password: body.password,
-          permissions: JSON.parse(body.permissions),
+          permissions: JSON.parse(body.permissions),   
           is_active: body.is_active
         });
         const token = authService().issue({
-          id: user.id,
+          user_id: user.user_id,
           full_name: user.full_name,
           username: user.username,
           designation: user.designation,
           user_mobile: user.user_mobile,
-          permissions: user.permissions,
+          permissions: JSON.stringify(user.permissions),
           is_active: user.is_active
         });
 
@@ -52,12 +52,12 @@ const UserController = () => {
 
         if (bcryptService().comparePassword(password, user.password)) {
           const token = authService().issue({
-            id: user.id,
+            user_id: user.user_id,
             full_name: user.full_name,
             username: user.username,
             designation: user.designation,
             user_mobile: user.user_mobile,
-            permissions: user.permissions,
+            permissions: JSON.stringify(user.permissions),
             is_active: user.is_active
           });
 
