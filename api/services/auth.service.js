@@ -5,13 +5,13 @@ const CryptoJS = require("crypto-js");
 const jwtSecret = process.env.NODE_ENV === 'production' ? process.env.JWT_SECRET : '78uighjfyuyu97puoiohgf879';
 const encryptSecret = process.env.NODE_ENV === 'production' ? process.env.ENCRYPT_SECRET : 'b14ca5898a4e4133bbce2ea2315a1916';
 
-
+var iv = CryptoJS.enc.Utf8.parse(encryptSecret); 
 const authService = () => {
   const issue = (payload) => {
     console.log('AAA')
-    const encryptedPayload = CryptoJS.AES.encrypt(JSON.stringify(payload), encryptSecret, { padding: CryptoJS.pad.Pkcs7 , mode: CryptoJS.mode.CBC }).toString()
+    const encryptedPayload = CryptoJS.AES.encrypt(JSON.stringify(payload), encryptSecret, { padding: CryptoJS.pad.Pkcs7 , mode: CryptoJS.mode.CBC, iv:iv }).toString()
     console.log('AAA')
-    const dec = CryptoJS.AES.decrypt(encryptedPayload, encryptSecret, { padding: CryptoJS.pad.Pkcs7 , mode: CryptoJS.mode.CBC }).toString(CryptoJS.enc.Utf8);
+    const dec = CryptoJS.AES.decrypt(encryptedPayload, encryptSecret, { padding: CryptoJS.pad.Pkcs7 , mode: CryptoJS.mode.CBC, iv:iv }).toString(CryptoJS.enc.Utf8);
     console.log(dec)
     return jwt.sign({encryptedPayload}, jwtSecret, {
       expiresIn: 120
