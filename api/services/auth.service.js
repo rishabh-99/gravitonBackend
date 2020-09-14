@@ -5,8 +5,8 @@ const CryptoJS = require("crypto-js");
 const jwtSecret = process.env.NODE_ENV === 'production' ? process.env.JWT_SECRET : '78uighjfyuyu97puoiohgf879';
 const encryptSecret = process.env.NODE_ENV === 'production' ? process.env.ENCRYPT_SECRET : 'b14ca5898a4e4133bbce2ea2315a1916';
 
-var key = CryptoJS.enc.Utf8.parse('8080808080808080');  
-var iv = CryptoJS.enc.Utf8.parse('8080808080808080'); 
+var key = CryptoJS.enc.Utf8.parse('b14ca5898a4e4133bbce2ea2315a1916');  
+var iv = CryptoJS.enc.Utf8.parse('b14ca5898a4e4133'); 
 const authService = () => {
   const issue = (payload) => {
     console.log('AAA')
