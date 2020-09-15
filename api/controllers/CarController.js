@@ -29,8 +29,8 @@ const CarController = () => {
                     'gurantor_mobile': body.gurantorModel.gurantor_mobile,
                     'gurantor_relation': body.gurantorModel.gurantor_relation,
                     'gurantortype_id': body.gurantorModel.gurantortype_id,
-                    'gurantor_realtedpan': body.gurantorModel.document_pan,
-                    'gurantor_realtedaadhar': body.gurantorModel.document_aadhar,
+                    'gurantor_realtedpan': body.gurantorModel.gurantor_realtedpan,
+                    'gurantor_realtedaadhar': body.gurantorModel.gurantor_realtedaadhar,
         
                 });
 
@@ -56,8 +56,8 @@ const CarController = () => {
                     'applicant_maritalstatusid': body.applicantModel.applicant_maritalstatusid,
                     'applicant_casteid': body.applicantModel.applicant_casteid,
                     'applicant_categoryid': body.applicantModel.applicant_categoryid,
-                    'applicant_pan': body.applicantModel.document_pan,
-                    'applicant_aadhar': body.applicantModel.document_aadhar
+                    'applicant_pan': body.applicantModel.applicant_pan,
+                    'applicant_aadhar': body.applicantModel.applicant_aadhar
                 });
 
                 const account = await Account.create({
@@ -65,8 +65,8 @@ const CarController = () => {
                     'account_ifsc': body.accountModel.account_ifsc,
                     'account_number': body.accountModel.account_number,
                     'account_inhandsalary': body.accountModel.account_inhandsalary,
-                    'account_realtedpan': body.accountModel.document_pan,
-                    'account_realtedaadhar': body.accountModel.document_aadhar
+                    'account_realtedpan': body.accountModel.account_realtedpan,
+                    'account_realtedaadhar': body.accountModel.account_realtedaadhar
                 });
                 var loans = []
                 for (var i = 0; i < body.loanModel.length; i++) {
@@ -77,8 +77,8 @@ const CarController = () => {
                         'loan_emi': body.loanModel[i].loanEMI,
                         'loan_closuredate': body.loanModel[i].closureDate,
                         'loan_type': body.loanModel[i].loanType,
-                        'account_realtedpan': body.documentModel.document_pan,
-                        'account_realtedaadhar': body.documentModel.document_aadhar
+                        'account_realtedpan': body.loanModel[i].account_realtedpan,
+                        'account_realtedaadhar': body.loanModel[i].account_realtedaadhar
                     }));
                 }
 
