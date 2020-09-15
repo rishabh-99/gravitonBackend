@@ -2,7 +2,7 @@ const User = require('../models/Login');
 const authService = require('../services/auth.service');
 const bcryptService = require('../services/bcrypt.service');
 
-const UserController = () => {
+const LoginController = () => {
   const register = async (req, res) => {
     const { body } = req;
 
@@ -106,4 +106,4 @@ const UserController = () => {
   };
 };
 
-module.exports = UserController;
+module.exports = LoginController;
