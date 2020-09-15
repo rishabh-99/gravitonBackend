@@ -17,17 +17,8 @@ const LoginController = () => {
           permissions: JSON.parse(body.permissions),   
           is_active: body.is_active
         });
-        const token = authService().issue({
-          user_id: user.user_id,
-          full_name: user.full_name,
-          username: user.username,
-          designation: user.designation,
-          user_mobile: user.user_mobile,
-          permissions: JSON.stringify(user.permissions),
-          is_active: user.is_active
-        });
 
-        return res.status(200).json({ token });
+        return res.status(200).json({ msg: 'User created successfully!!' });
       } catch (err) {
         console.log(err);
         return res.status(500).json({ msg: 'Internal server error' });
