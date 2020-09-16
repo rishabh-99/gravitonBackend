@@ -31,7 +31,7 @@ const CarController = () => {
                     'gurantortype_id': body.gurantorModel.gurantortype_id,
                     'gurantor_realtedpan': body.gurantorModel.gurantor_realtedpan,
                     'gurantor_realtedaadhar': body.gurantorModel.gurantor_realtedaadhar,
-        
+
                 });
 
                 const applicant = await Applicant.create({
@@ -70,8 +70,8 @@ const CarController = () => {
                 });
                 var loans = []
                 for (var i = 0; i < body.loanModel.length; i++) {
-                   
-                   loans.push(await Loan.create({
+
+                    loans.push(await Loan.create({
                         'loan_bankname': body.loanModel[i].bankName,
                         'loan_amount': body.loanModel[i].loanAmount,
                         'loan_emi': body.loanModel[i].loanEMI,
@@ -82,9 +82,9 @@ const CarController = () => {
                     }));
                 }
 
-                return {document, gurantor, applicant, account, loans};
+                return { document, gurantor, applicant, account, loans };
             });
-            console.log({result})
+            console.log({ result })
             return res.status(200).json({ msg: 'CAR created Successfully' })
         } catch (err) {
             console.log(err);
@@ -92,11 +92,43 @@ const CarController = () => {
         }
     };
 
-    const getAll = async (req, res) => {
+    const get = async (req, res) => {
+        const { body } = req;
+        const aadhar = body.aadhar.toString();
         try {
-            const users = await User.findAll();
 
-            return res.status(200).json({ users });
+            const document = await Document.findAll({
+                where: {
+                    'document_aadhar': aadhar
+                }
+            });
+
+            const gurantor = await Gurantor.findAll({
+                where: {
+                    'gurantor_realtedaadhar': aadhar
+                }
+            });
+
+            const applicant = await Applicant.findAll({
+                where: {
+                    'applicant_aadhar': aadhar
+                }
+            });
+
+            const account = await Account.findAll({
+                where: {
+                    'account_realtedaadhar': aadhar
+                }
+            });
+            const loans = await Loan.findAll({
+                where: {
+                    'account_realtedaadhar': aadhar
+                }
+            })
+
+            // return {document, gurantor, applicant, account, loans};
+
+            return res.status(200).json({ document, gurantor, applicant, account, loans });
         } catch (err) {
             console.log(err);
             return res.status(500).json({ msg: 'Internal server error' });
@@ -106,7 +138,7 @@ const CarController = () => {
 
     return {
         register,
-        getAll,
+        get,
     };
 };
 
