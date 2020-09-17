@@ -16,7 +16,7 @@ const authService = () => {
       padding: CryptoJS.pad.Pkcs7
     }).toString();
     return jwt.sign({ encryptedPayload: encryptedPayload }, jwtSecret, {
-      expiresIn: 1200
+      expiresIn: 86400
     })
 
   };
