@@ -71,15 +71,17 @@ const CarController = () => {
                 var loans = []
                 for (var i = 0; i < body.loanModel.length; i++) {
 
-                    loans.push(await Loan.create({
-                        'loan_bankname': body.loanModel[i].loan_bankname,
-                        'loan_amount': body.loanModel[i].loan_amount,
-                        'loan_emi': body.loanModel[i].loan_emi,
-                        'loan_closuredate': body.loanModel[i].loan_closuredate,
-                        'loan_type': body.loanModel[i].loan_type,
-                        'account_realtedpan': body.loanModel[i].account_realtedpan,
-                        'account_realtedaadhar': body.loanModel[i].account_realtedaadhar
-                    }, { transaction: t }));
+                    loans.push(
+                        await Loan.create({
+                            'loan_bankname': body.loanModel[i].loan_bankname,
+                            'loan_amount': body.loanModel[i].loan_amount,
+                            'loan_emi': body.loanModel[i].loan_emi,
+                            'loan_closuredate': body.loanModel[i].loan_closuredate,
+                            'loan_type': body.loanModel[i].loan_type,
+                            'account_realtedpan': body.loanModel[i].account_realtedpan,
+                            'account_realtedaadhar': body.loanModel[i].account_realtedaadhar
+                        }, { transaction: t })
+                    );
                 }
 
                 return { document, gurantor, applicant, account, loans };
@@ -97,30 +99,30 @@ const CarController = () => {
         const aadhar = body.aadhar.toString();
         try {
 
-            const document = await Document.findAll({
+            const documentModel = await Document.findAll({
                 where: {
                     'document_aadhar': aadhar
                 }
             });
 
-            const gurantor = await Gurantor.findAll({
+            const gurantorModel = await Gurantor.findAll({
                 where: {
                     'gurantor_realtedaadhar': aadhar
                 }
             });
 
-            const applicant = await Applicant.findAll({
+            const applicantModel = await Applicant.findAll({
                 where: {
                     'applicant_aadhar': aadhar
                 }
             });
 
-            const account = await Account.findAll({
+            const accountModel = await Account.findAll({
                 where: {
                     'account_realtedaadhar': aadhar
                 }
             });
-            const loans = await Loan.findAll({
+            const loanModel = await Loan.findAll({
                 where: {
                     'account_realtedaadhar': aadhar
                 }
@@ -128,7 +130,7 @@ const CarController = () => {
 
             // return {document, gurantor, applicant, account, loans};
 
-            return res.status(200).json({ document, gurantor, applicant, account, loans });
+            return res.status(200).json({ documentModel, gurantorModel, applicantModel, accountModel, loanModel });
         } catch (err) {
             console.log(err);
             return res.status(500).json({ msg: err });
