@@ -72,11 +72,11 @@ const CarController = () => {
                 for (var i = 0; i < body.loanModel.length; i++) {
 
                     loans.push(await Loan.create({
-                        'loan_bankname': body.loanModel[i].bankName,
-                        'loan_amount': body.loanModel[i].loanAmount,
-                        'loan_emi': body.loanModel[i].loanEMI,
-                        'loan_closuredate': body.loanModel[i].closureDate,
-                        'loan_type': body.loanModel[i].loanType,
+                        'loan_bankname': body.loanModel[i].loan_bankname,
+                        'loan_amount': body.loanModel[i].loan_amount,
+                        'loan_emi': body.loanModel[i].loan_emi,
+                        'loan_closuredate': body.loanModel[i].loan_closuredate,
+                        'loan_type': body.loanModel[i].loan_type,
                         'account_realtedpan': body.loanModel[i].account_realtedpan,
                         'account_realtedaadhar': body.loanModel[i].account_realtedaadhar
                     }, { transaction: t }));
