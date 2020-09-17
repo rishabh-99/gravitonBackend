@@ -19,7 +19,7 @@ const CarController = () => {
                     'document_remark': body.documentModel.document_remark,
                     'document_id': body.documentModel.document_id,
                     'progress_id': body.documentModel.progress_id
-                });
+                }, { transaction: t });
 
                 const gurantor = await Gurantor.create({
                     'gurantor_firstname': body.gurantorModel.gurantor_firstname,
@@ -32,7 +32,7 @@ const CarController = () => {
                     'gurantor_realtedpan': body.gurantorModel.gurantor_realtedpan,
                     'gurantor_realtedaadhar': body.gurantorModel.gurantor_realtedaadhar,
 
-                });
+                }, { transaction: t });
 
                 const applicant = await Applicant.create({
                     'applicant_firstname': body.applicantModel.applicant_firstname,
@@ -58,7 +58,7 @@ const CarController = () => {
                     'applicant_categoryid': body.applicantModel.applicant_categoryid,
                     'applicant_pan': body.applicantModel.applicant_pan,
                     'applicant_aadhar': body.applicantModel.applicant_aadhar
-                });
+                }, { transaction: t });
 
                 const account = await Account.create({
                     'account_bankname': body.accountModel.account_bankname,
@@ -67,7 +67,7 @@ const CarController = () => {
                     'account_inhandsalary': body.accountModel.account_inhandsalary,
                     'account_realtedpan': body.accountModel.account_realtedpan,
                     'account_realtedaadhar': body.accountModel.account_realtedaadhar
-                });
+                }, { transaction: t });
                 var loans = []
                 for (var i = 0; i < body.loanModel.length; i++) {
 
@@ -79,7 +79,7 @@ const CarController = () => {
                         'loan_type': body.loanModel[i].loanType,
                         'account_realtedpan': body.loanModel[i].account_realtedpan,
                         'account_realtedaadhar': body.loanModel[i].account_realtedaadhar
-                    }));
+                    }, { transaction: t }));
                 }
 
                 return { document, gurantor, applicant, account, loans };
@@ -88,7 +88,7 @@ const CarController = () => {
             return res.status(200).json({ msg: 'CAR created Successfully' })
         } catch (err) {
             console.log(err);
-            return res.status(500).json({ msg: 'Internal server error' });
+            return res.status(500).json({ msg: err });
         }
     };
 
@@ -131,7 +131,7 @@ const CarController = () => {
             return res.status(200).json({ document, gurantor, applicant, account, loans });
         } catch (err) {
             console.log(err);
-            return res.status(500).json({ msg: 'Internal server error' });
+            return res.status(500).json({ msg: err });
         }
     };
 
