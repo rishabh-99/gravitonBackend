@@ -95,8 +95,8 @@ const CarController = () => {
     };
 
     const get = async (req, res) => {
-        const { body } = req;
-        const aadhar = body.aadhar.toString();
+        // const { body } = req;
+        const aadhar = req.query.aadhar
         try {
 
             const documentModel = await Document.findAll({
@@ -137,10 +137,53 @@ const CarController = () => {
         }
     };
 
+    const getAadharList = async (req, res) => {
+        try {
+            const Aadhar = await Document.findAll({
+                attributes: ['document_aadhar']
+            })
+                .then(document => document.map(document => document.document_pan));
+            console.log(Aadhar)
+            return res.status(200).json(Aadhar)
+        } catch (err) {
+            return res.status(500).json({ msg: err });
+        }
+    };
+
+    const getPanList = async (req, res) => {
+        try {
+            const Pan = await Document.findAll({
+                attributes: ['document_pan'],
+
+            })
+                .then(document => document.map(document => document.document_pan));
+            console.log(typeof(Pan))
+            res.status(200).send(Pan)
+        } catch (err) {
+            return res.status(500).json({ msg: err });
+        }
+    };
+
+    const getFnameAndAadhar = async (req, res) => {
+        try {
+            const NameWithAadhar = await Applicant.findAll({
+                attributes: ['applicant_aadhar', 'applicant_firstname'],
+
+            })
+                .then(applicant => applicant.map(applicant => `${applicant.applicant_aadhar} : ${applicant.applicant_firstname}`));
+            console.log(NameWithAadhar)
+            res.status(200).send(NameWithAadhar)
+        } catch (err) {
+            return res.status(500).json({ msg: err });
+        }
+    };
 
     return {
         register,
         get,
+        getAadharList,
+        getPanList,
+        getFnameAndAadhar
     };
 };
 

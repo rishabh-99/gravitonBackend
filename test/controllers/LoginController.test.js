@@ -39,23 +39,14 @@ test('Login | create', async () => {
     })
     .expect(200);
   console.log(res.body)
-  expect(res.body.token).toBeTruthy();
+  expect(res.body.msg).toBe('User created successfully!!');
 
-  const payload = JSON.parse(CryptoJS.AES.decrypt(jwt.decode(res.body.token).encryptedPayload, key, {
-    keySize: 128 / 8,
-    iv: iv,
-    mode: CryptoJS.mode.CBC,
-    padding: CryptoJS.pad.Pkcs7
-  }).toString(CryptoJS.enc.Utf8));
-  console.log(payload)
-  console.log(payload)
   const login = await Login.findOne({
     where: {
-      username: payload.username,
+      username: 'rimet',
     }
   })
-  expect(login.user_id).toBe(payload.user_id);
-  expect(login.username).toBe(payload.username);
+  expect(login.full_name).toBe('Rime');
 
   await login.destroy();
 });
