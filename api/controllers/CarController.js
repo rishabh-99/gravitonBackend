@@ -3,7 +3,15 @@ const Gurantor = require('../models/Gurantor');
 const Applicant = require('../models/Applicant');
 const Account = require('../models/Account');
 const Loan = require('../models/Loan');
+const MaritalStatus = require('../models/MaritalStatus');
+const Acquaintance = require('../models/Acquaintance');
+const Caste = require('../models/Caste');
+const Category = require('../models/Category');
+const Gurantortype = require('../models/Gurantortype');
+const Documenttype = require('../models/Documenttype');
+
 const sequelize = require('../../config/database');
+// InhandSalary ko parse krke bhejna h
 
 const CarController = () => {
     const register = async (req, res) => {
@@ -142,9 +150,9 @@ const CarController = () => {
             const Aadhar = await Document.findAll({
                 attributes: ['document_aadhar']
             })
-                .then(document => document.map(document => document.document_pan));
+                .then(document => document.map(document => document.document_aadhar));
             console.log(Aadhar)
-            return res.status(200).json(Aadhar)
+            return res.status(200).send({Aadhar})
         } catch (err) {
             return res.status(500).json({ msg: err });
         }
@@ -178,12 +186,29 @@ const CarController = () => {
         }
     };
 
+    const getComboBoxData = async (req, res) => {
+        try {
+            const MaritalStatusModel = await MaritalStatus.findAll();
+            const AcquaintanceModel = await Acquaintance.findAll();
+            const CasteModel = await Caste.findAll();
+            const CategoryModel = await Category.findAll();
+            const GurantortypeModel = await Gurantortype.findAll();
+            const LoanModel = await Loan.findAll();
+            const DocumenttypeModel = await Documenttype.findAll();
+
+            res.status(200).send({ MaritalStatusModel, AcquaintanceModel, CasteModel, CategoryModel, GurantortypeModel, LoanModel, DocumenttypeModel })
+        } catch (err) {
+            return res.status(500).json({ msg: err });
+        }
+    };
+
     return {
         register,
         get,
         getAadharList,
         getPanList,
-        getFnameAndAadhar
+        getFnameAndAadhar,
+        getComboBoxData
     };
 };
 
