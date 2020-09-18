@@ -9,6 +9,7 @@ const Caste = require('../models/Caste');
 const Category = require('../models/Category');
 const Gurantortype = require('../models/Gurantortype');
 const Documenttype = require('../models/Documenttype');
+const Loantype = require('../models/Loantype');
 
 const sequelize = require('../../config/database');
 // InhandSalary ko parse krke bhejna h
@@ -193,10 +194,10 @@ const CarController = () => {
             const CasteModel = await Caste.findAll();
             const CategoryModel = await Category.findAll();
             const GurantortypeModel = await Gurantortype.findAll();
-            const LoanModel = await Loan.findAll();
+            const LoantypeModel = await Loantype.findAll();
             const DocumenttypeModel = await Documenttype.findAll();
 
-            res.status(200).send({ MaritalStatusModel, AcquaintanceModel, CasteModel, CategoryModel, GurantortypeModel, LoanModel, DocumenttypeModel })
+            res.status(200).send({ MaritalStatusModel, AcquaintanceModel, CasteModel, CategoryModel, GurantortypeModel, LoantypeModel, DocumenttypeModel })
         } catch (err) {
             return res.status(500).json({ msg: err });
         }
