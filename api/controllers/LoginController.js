@@ -79,7 +79,11 @@ const LoginController = () => {
 
   const getAll = async (req, res) => {
     try {
-      const users = await User.findAll();
+      const users = await User.findAll({
+        where: {
+          is_active: true
+        }
+      });
 
       return res.status(200).json({ users });
     } catch (err) {
