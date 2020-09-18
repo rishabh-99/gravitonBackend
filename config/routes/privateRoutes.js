@@ -7,7 +7,8 @@ const privateRoutes = {
   'GET /CAR/getAllAadhar': 'CarController.getAadharList',
   'GET /CAR/getAllPan': 'CarController.getPanList',
   'GET /CAR/getFnameWithAadhar': 'CarController.getFnameAndAadhar',
-  'GET /CAR/getComboBoxData': 'CarController.getComboBoxData'
+  'GET /CAR/getComboBoxData': 'CarController.getComboBoxData',
+  'POST /User/disableUser': 'LoginController.disableUser'
   // 'POST /createUserProfile': 'UserProfileController.create',
   // 'GET /userProfiles': 'UserProfileController.getAll'
 };

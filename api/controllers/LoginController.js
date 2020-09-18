@@ -6,23 +6,23 @@ const LoginController = () => {
   const register = async (req, res) => {
     const { body } = req;
 
-      try {
-        // Permissions ko obj me convert krna h
-        const user = await User.create({
-          full_name: body.full_name,
-          username: body.username,
-          designation: body.designation,
-          user_mobile: body.user_mobile,
-          password: body.password,
-          permissions: JSON.parse(body.permissions),   
-          is_active: body.is_active
-        });
+    try {
+      // Permissions ko obj me convert krna h
+      const user = await User.create({
+        full_name: body.full_name,
+        username: body.username,
+        designation: body.designation,
+        user_mobile: body.user_mobile,
+        password: body.password,
+        permissions: JSON.parse(body.permissions),
+        is_active: body.is_active
+      });
 
-        return res.status(200).json({ msg: 'User created successfully!!' });
-      } catch (err) {
-        console.log(err);
-        return res.status(500).json({ msg: 'Internal server error' });
-      }
+      return res.status(200).json({ msg: 'User created successfully!!' });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({ msg: 'Internal server error' });
+    }
   };
 
   const login = async (req, res) => {
@@ -88,12 +88,28 @@ const LoginController = () => {
     }
   };
 
+  const disableUser = async (req, res) => {
+    try {
+      const user_id = req.query.user_id
+      const user = await User.findByPk(user_id)
+      await user.update({
+        is_active: false
+      })
+
+      res.status(200).json({ msg: 'User disabled successfully!' });
+    } catch (err) {
+
+      res.status(500).json({ msg: err })
+    }
+  };
+
 
   return {
     register,
     login,
     validate,
     getAll,
+    disableUser
   };
 };
 

@@ -178,7 +178,7 @@ const CarController = () => {
                 attributes: ['applicant_aadhar', 'applicant_firstname'],
 
             })
-                .then(applicant => applicant.map(applicant => `${applicant.applicant_aadhar} : ${applicant.applicant_firstname}`));
+                .then(applicant => applicant.map(applicant => `${applicant.applicant_firstname} : ${applicant.applicant_aadhar}`));
             console.log(NameWithAadhar)
             res.status(200).send(NameWithAadhar)
         } catch (err) {
