@@ -95,13 +95,32 @@ const LoginController = () => {
 
   const disableUser = async (req, res) => {
     try {
-      const user_id = req.query.user_id
-      const user = await User.findByPk(user_id)
-      await user.update({
-        is_active: false
-      })
+      const username = req.query.username;
+      const password = req.query.password;
 
-      res.status(200).json({ msg: 'User disabled successfully!' });
+      const admin = await User
+        .findOne({
+          where: {
+            username,
+            is_active: true
+          },
+        });
+      if (!admin) {
+        return res.status(400).json({ msg: 'Bad Request: Admin not found' });
+      }
+
+      if (bcryptService().comparePassword(password, admin.password)) {
+        const user_id = req.query.user_id
+
+        const user = await User.findByPk(user_id)
+        await user.update({
+          is_active: false
+        })
+
+        return res.status(200).json({ msg: 'User disabled successfully!' });
+      }
+
+      return res.status(401).json({ msg: 'Unauthorized' });
     } catch (err) {
 
       res.status(500).json({ msg: err })
