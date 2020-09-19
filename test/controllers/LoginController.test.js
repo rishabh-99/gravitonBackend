@@ -114,3 +114,38 @@ test('Login | get all (auth)', async () => {
 
   await login.destroy();
 });
+
+test('Login | DisableUser (auth)', async () => {
+  const login = await Login.create({
+    "full_name": "Rime",
+    "username": "rimet",
+    "designation": "Boss",
+    "user_mobile": "8299213792",
+    "password": "Alfanzo@001",
+    "password2": "Alfanzo@001",
+    "permissions": "{\"Admin\": true, \"Employee\": false}",
+    "is_active": true
+  });
+
+  const res = await request(api)
+    .post('/public/login')
+    .set('Accept', /json/)
+    .send({
+      username: 'rimet',
+      password: 'Alfanzo@001',
+    })
+    .expect(200);
+
+  expect(res.body.token).toBeTruthy();
+
+  const res2 = await request(api)
+    .post(`/private/User/disableUser?user_id=${login.user_id}`)
+    .set('Accept', /json/)
+    .set('Authorization', `Bearer ${res.body.token}`)
+    .set('Content-Type', 'application/json')
+    .expect(200);
+
+  expect(res2.body.msg).toBe('User disabled successfully!');
+
+  await login.destroy();
+});

@@ -153,7 +153,7 @@ const CarController = () => {
             })
                 .then(document => document.map(document => document.document_aadhar));
             console.log(Aadhar)
-            return res.status(200).send({Aadhar})
+            return res.status(200).send(Aadhar)
         } catch (err) {
             return res.status(500).json({ msg: err });
         }

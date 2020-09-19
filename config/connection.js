@@ -7,11 +7,11 @@ const development = {
 };
 
 const testing = {
-  database: 'databasename',
-  username: 'username',
-  password: 'password',
-  host: 'localhost',
-  dialect: 'sqlite' || 'mysql' || 'postgres',
+  database: 'demo2',
+  username: 'postgres',
+  password: 'postgres',
+  host: 'mydb.ctmbums33jwn.ap-south-1.rds.amazonaws.com',
+  dialect: 'postgres',
 };
 
 const production = {
