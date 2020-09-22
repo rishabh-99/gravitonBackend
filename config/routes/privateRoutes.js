@@ -12,6 +12,7 @@ const privateRoutes = {
   'GET /CAR/getAllPan': 'CarController.getPanList',
   'GET /CAR/getFnameWithAadhar': 'CarController.getFnameAndAadhar',
   'GET /CAR/getComboBoxData': 'CarController.getComboBoxData',
+  'GET /CAR/getCountOfKyc': 'CarController.getCountOfKyc',
 
   'POST /CAR/create': 'CarController.register'
 

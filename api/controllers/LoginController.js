@@ -2,7 +2,6 @@ const User = require('../models/Login');
 const authService = require('../services/auth.service');
 const bcryptService = require('../services/bcrypt.service');
 
-// TODO : Login for is_active user only
 const LoginController = () => {
   const register = async (req, res) => {
     const { body } = req;

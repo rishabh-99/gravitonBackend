@@ -110,7 +110,7 @@ test('Login | get all (auth)', async () => {
     .expect(200);
 
   expect(res2.body.users).toBeTruthy();
-  expect(res2.body.users.length).toBe(1);
+  expect(res2.body.users.length).toBeGreaterThanOrEqual(1);
 
   await login.destroy();
 });
@@ -139,7 +139,7 @@ test('Login | DisableUser (auth)', async () => {
   expect(res.body.token).toBeTruthy();
 
   const res2 = await request(api)
-    .post(`/private/User/disableUser?user_id=${login.user_id}`)
+    .post(`/private/User/disableUser?user_id=${login.user_id}&username=rimet&password=Alfanzo@001`)
     .set('Accept', /json/)
     .set('Authorization', `Bearer ${res.body.token}`)
     .set('Content-Type', 'application/json')

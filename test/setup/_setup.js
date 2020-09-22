@@ -5,6 +5,11 @@ const mapRoutes = require('express-routes-mapper');
 const config = require('../../config/');
 const database = require('../../config/database');
 const auth = require('../../api/policies/auth.policy');
+const Loan = require('../../api/models/Loan');
+const Account = require('../../api/models/Account');
+const Applicant = require('../../api/models/Applicant');
+const Gurantor = require('../../api/models/Gurantor');
+const Document = require('../../api/models/Document');
 
 const beforeAction = async () => {
   const testapp = express();
@@ -20,7 +25,22 @@ const beforeAction = async () => {
 
 
   await database.authenticate();
-  await database.drop();
+  await Loan.destroy({
+    where: {},
+  });
+  await Account.destroy({
+    where: {},
+  });
+  await Applicant.destroy({
+    where: {},
+  });
+  await Gurantor.destroy({
+    where: {},
+  });
+  await Document.destroy({
+    where: {},
+  })
+  // await database.drop({force: true});
   await database.sync().then(() => console.log('Connection to the database has been established successfully'));
 
   return testapp;

@@ -10,13 +10,15 @@ const Category = require('../models/Category');
 const Gurantortype = require('../models/Gurantortype');
 const Documenttype = require('../models/Documenttype');
 const Loantype = require('../models/Loantype');
+const User_kyc_log = require('../models/User_kyc_log');
+
 
 const sequelize = require('../../config/database');
-// InhandSalary ko parse krke bhejna h
 
 const CarController = () => {
     const register = async (req, res) => {
         const { body } = req;
+        const user_id = req.query.user_id
         try {
             // Permissions ko obj me convert krna h
             const result = await sequelize.transaction(async (t) => {
@@ -93,8 +95,37 @@ const CarController = () => {
                     );
                 }
 
+                var today = new Date();
+                var dd = today.getDate();
+
+                var mm = today.getMonth() + 1;
+                var yyyy = today.getFullYear();
+                if (dd < 10) {
+                    dd = '0' + dd;
+                }
+
+                if (mm < 10) {
+                    mm = '0' + mm;
+                }
+
+                // today = dd + '-' + mm + '-' + yyyy;
+                today = yyyy + '-' + mm + '-' + dd;
+                console.log(today);
+
+
+
+                const log = await User_kyc_log.create({
+                    'user_id': user_id,
+                    'related_aadhar': body.documentModel.document_aadhar,
+                    'related_pan': body.documentModel.document_pan,
+                    'kyc_date': today
+                }, { transaction: t })
+
+
                 return { document, gurantor, applicant, account, loans };
             });
+
+
             console.log({ result })
             return res.status(200).json({ msg: 'CAR created Successfully' })
         } catch (err) {
@@ -166,7 +197,7 @@ const CarController = () => {
 
             })
                 .then(document => document.map(document => document.document_pan));
-            console.log(typeof(Pan))
+            console.log(typeof (Pan))
             res.status(200).send(Pan)
         } catch (err) {
             return res.status(500).json({ msg: err });
@@ -203,13 +234,44 @@ const CarController = () => {
         }
     };
 
+    const getCountOfKyc = async (req, res) => {
+        try {
+            var today = new Date();
+            var dd = today.getDate();
+
+            var mm = today.getMonth() + 1;
+            var yyyy = today.getFullYear();
+            if (dd < 10) {
+                dd = '0' + dd;
+            }
+
+            if (mm < 10) {
+                mm = '0' + mm;
+            }
+
+            // today = dd + '-' + mm + '-' + yyyy;
+            today = yyyy + '-' + mm + '-' + dd;
+            const count = await User_kyc_log.count({
+                where: {
+                    'user_id': req.query.user_id,
+                    'kyc_date': today
+                }
+            })
+
+            res.status(200).send({count})
+        } catch (err) {
+            return res.status(500).json({ msg: err });
+        }
+    };
+
     return {
         register,
         get,
         getAadharList,
         getPanList,
         getFnameAndAadhar,
-        getComboBoxData
+        getComboBoxData,
+        getCountOfKyc
     };
 };
 
