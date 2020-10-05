@@ -14,6 +14,7 @@ const User_kyc_log = require('../models/User_kyc_log');
 
 
 const sequelize = require('../../config/database');
+const Borrower_incredo_details = require('../models/Borrower_incredo_details');
 
 const CarController = () => {
     const register = async (req, res) => {
@@ -264,6 +265,20 @@ const CarController = () => {
         }
     };
 
+    const insertBorrowerDetails = async (req, res) => {
+        try {
+            
+            await Borrower_incredo_details.create({
+                'borrower_id': req.body.borrower_id,
+                'borrower_details': req.body.borrower_details
+            })
+
+            res.status(200).send({msg:'Successfull'})
+        } catch (err) {
+            return res.status(500).json({ msg: err });
+        }
+    };
+
     return {
         register,
         get,
@@ -271,7 +286,8 @@ const CarController = () => {
         getPanList,
         getFnameAndAadhar,
         getComboBoxData,
-        getCountOfKyc
+        getCountOfKyc,
+        insertBorrowerDetails
     };
 };
 

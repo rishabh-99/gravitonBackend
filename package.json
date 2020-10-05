@@ -1,16 +1,8 @@
 {
   "name": "express-rest-api-boilerplate",
   "version": "0.0.0",
-  "author": "Lukas Aichbauer <l.aichbauer@gmail.com>",
+  "author": "Rishabh",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/aichbauer/express-rest-api-boilerplate.git"
-  },
-  "homepage": "https://github.com/aichbauer/express-rest-api-boilerplate#readme",
-  "bugs": {
-    "url": "https://github.com/aichbauer/express-rest-api-boilerplate/issues"
-  },
   "scripts": {
     "prestart": "npm run drop-sqlite-db || true",
     "start": "npm run nodemon",
@@ -41,7 +33,7 @@
     "core-js": "^2.6.9",
     "cors": "^2.8.4",
     "crypto-js": "^4.0.0",
-    "express": "^4.16.3",
+    "express": "^4.17.1",
     "express-routes-mapper": "^1.0.2",
     "helmet": "^3.12.0",
     "jose": "^2.0.1",
@@ -60,6 +52,7 @@
     "husky": "^0.14.3",
     "jest": "^24.8.0",
     "nodemon": "^1.17.3",
+    "serverless-offline": "^6.8.0",
     "shx": "^0.2.2",
     "supertest": "^3.0.0"
   }

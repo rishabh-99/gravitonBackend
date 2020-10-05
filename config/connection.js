@@ -2,7 +2,7 @@ const development = {
   database: 'demo',
   username: 'postgres',
   password: 'postgres',
-  host: 'mydb.ctmbums33jwn.ap-south-1.rds.amazonaws.com',
+  host: 'localhost',
   dialect: 'postgres',
 };
 
