@@ -1,10 +1,25 @@
+/*
+File Description: Defining the Loan model and creating the Schema  table for 
+same with respective fields 
+Author: Rishabh Merhotra 
+*/
+//importing the sequelize package
 const Sequelize = require('sequelize');
+//importing the configurations of the database
 const sequelize = require('../../config/database');
 
 const tableName = 'loan';
 
+//defining a loan schema for the loan model 
 const Loan = sequelize.define('loan',
 {
+      /* giving the content type : "".
+      setting allowNull to false will add NOT NULL to the column,
+      Auto-increment mamkes the iterations with columns in db
+      primary-key is used to hook to the feild
+       */
+
+
     loan_id: {
       autoIncrement: true,
       type: Sequelize.INTEGER,
@@ -31,6 +46,7 @@ const Loan = sequelize.define('loan',
       type: Sequelize.INTEGER,
       allowNull: false,
       references: {
+        // Refering to other tables and generating a key 
         model: {
           tableName: 'loantype',
         },
@@ -61,5 +77,5 @@ const Loan = sequelize.define('loan',
 Loan.removeAttribute('id');
 // eslint-disable-next-line
 
-
+// exporting the whole module 
 module.exports = Loan;

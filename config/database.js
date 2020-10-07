@@ -1,4 +1,6 @@
+// importing the sequelize package 
 const Sequelize = require('sequelize');
+// importing the path for connections 
 const path = require('path');
 
 const connection = require('./connection');
@@ -8,6 +10,7 @@ let database;
 switch (process.env.NODE_ENV) {
   case 'production':
     database = new Sequelize(
+      // in case of production environment
       connection.production.database,
       connection.production.username,
       connection.production.password, {
@@ -23,6 +26,7 @@ switch (process.env.NODE_ENV) {
     break;
   case 'testing':
     database = new Sequelize(
+      // in case of testing environment
       connection.testing.database,
       connection.testing.username,
       connection.testing.password, {
@@ -48,9 +52,11 @@ switch (process.env.NODE_ENV) {
           min: 0,
           idle: 10000,
         },
+        // its prefered to make the storage as cwd for development sites
         storage: path.join(process.cwd(), 'db', 'database.sqlite'),
       },
     );
 }
 
+// exporting the database
 module.exports = database;

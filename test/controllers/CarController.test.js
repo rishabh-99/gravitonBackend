@@ -1,9 +1,17 @@
+/*
+File Description: Tests for the car controllers using the models 
+Author: Rishabh Merhotra 
+*/
+
+// importing the super test for unit-testing the api 
 const request = require('supertest');
 const {
+  // calling the functions from the setup file
   beforeAction,
   afterAction,
 } = require('../setup/_setup');
 
+// Importing all the models from the models folder 
 const Document = require('../../api/models/Document');
 const Gurantor = require('../../api/models/Gurantor');
 const Applicant = require('../../api/models/Applicant');
@@ -18,8 +26,9 @@ const Documenttype = require('../../api/models/Documenttype');
 const Loantype = require('../../api/models/Loantype');
 const Login = require('../../api/models/Login');
 
-
+// Importing the crypto-js package for the encryption techniques 
 const CryptoJS = require("crypto-js");
+// Jwt for verification of tokenizing 
 const jwt = require('jsonwebtoken');
 
 let api;
@@ -27,7 +36,8 @@ let login
 
 beforeAll(async () => {
   api = await beforeAction();
-
+ // beforeAction called => 
+  // creating a user using Login details  
   login = await Login.create({
     "full_name": "Rime",
     "username": "rimet",
@@ -41,13 +51,22 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+
+  // we destroy the login to keep the db clean for all the tests
   await login.destroy();
 
   afterAction();
 });
 
 test('CAR | Create (auth)', async () => {
+/**
+ * creating a car authenticaion test 
+ * @constructor- After Authenticatoin
+ * @param {respones} api to request 
+ * @param {token}- token verification for authencticatoin 
+ */
 
+    // post request to login and authenticate
   const res = await request(api)
     .post('/public/login')
     .set('Accept', /json/)
@@ -55,11 +74,21 @@ test('CAR | Create (auth)', async () => {
       username: 'rimet',
       password: 'Alfanzo@001',
     })
+    // 200 for ok! 
     .expect(200);
-
+     // tobeTruthy returns only if true.
+     // here verifying the token to be true 
   expect(res.body.token).toBeTruthy();
 
   const res2 = await request(api)
+  /**
+ * Creating a car after getting documents 
+ * @constructor
+ * @param {response} api - 
+ * @param private post request with all document details into the database 
+ * and car gets created 
+ */
+  // making a private post request using Bearer Tokens and Authorizing later 
     .post('/private/CAR/create')
     .set('Accept', /json/)
     .set('Authorization', `Bearer ${res.body.token}`)
@@ -122,15 +151,17 @@ test('CAR | Create (auth)', async () => {
       "loanModel": []
     })
     .expect(200);
-
+  // we expect the msg to be Truthy 
   expect(res2.body.msg).toBeTruthy();
+  // expecting it to be successfull 
   expect(res2.body.msg).toBe('CAR created Successfully');
 
 
 });
 
 test('CAR | Get By Aadhar (auth)', async () => {
-
+ // test to get all aadhar authenticated users 
+ // making a post request to login 
   const res = await request(api)
     .post('/public/login')
     .set('Accept', /json/)
@@ -141,14 +172,14 @@ test('CAR | Get By Aadhar (auth)', async () => {
     .expect(200);
 
   expect(res.body.token).toBeTruthy();
-
+  // making a private get  request after login and with the aadhar 
   const res2 = await request(api)
     .get('/private/CAR/getForUser?aadhar=222222222230')
     .set('Accept', /json/)
     .set('Authorization', `Bearer ${res.body.token}`)
     .set('Content-Type', 'application/json')
     .expect(200);
-
+    // expecting the truthy values 
     expect(res2.body).toBeTruthy();
     expect(res2.body.documentModel).toBeTruthy();
     expect(res2.body.gurantorModel).toBeTruthy();
@@ -160,7 +191,7 @@ test('CAR | Get By Aadhar (auth)', async () => {
 });
 
 test('CAR | Get All AadharList (auth)', async () => {
-
+ // making a post request to authenticate
   const res = await request(api)
     .post('/public/login')
     .set('Accept', /json/)
@@ -171,7 +202,7 @@ test('CAR | Get All AadharList (auth)', async () => {
     .expect(200);
 
   expect(res.body.token).toBeTruthy();
-
+  // making pricate get request and Authorizing with bearer token 
   const res2 = await request(api)
     .get('/private/CAR/getAllAadhar')
     .set('Accept', /json/)
@@ -186,7 +217,7 @@ test('CAR | Get All AadharList (auth)', async () => {
 });
 
 test('CAR | Get All PanList (auth)', async () => {
-
+  // making a post request to login 
   const res = await request(api)
     .post('/public/login')
     .set('Accept', /json/)
@@ -195,9 +226,9 @@ test('CAR | Get All PanList (auth)', async () => {
       password: 'Alfanzo@001',
     })
     .expect(200);
-
+  // token verification 
   expect(res.body.token).toBeTruthy();
-
+   // get all cars with pan cards 
   const res2 = await request(api)
     .get('/private/CAR/getAllPan')
     .set('Accept', /json/)
@@ -206,13 +237,14 @@ test('CAR | Get All PanList (auth)', async () => {
     .expect(200);
 
     expect(res2.body).toBeTruthy();
+    // expecting the body to be an array 
     expect(res2.body).toBeInstanceOf(Array)
 
 
 });
 
 test('CAR | Get Firstname with Aadhar (auth)', async () => {
-
+ // post request to login 
   const res = await request(api)
     .post('/public/login')
     .set('Accept', /json/)
@@ -221,9 +253,9 @@ test('CAR | Get Firstname with Aadhar (auth)', async () => {
       password: 'Alfanzo@001',
     })
     .expect(200);
-
+   // token verification 
   expect(res.body.token).toBeTruthy();
-
+    // get all firstnames with the Adhaar while Bearer token Authorizing 
   const res2 = await request(api)
     .get('/private/CAR/getFnameWithAadhar')
     .set('Accept', /json/)
@@ -233,11 +265,18 @@ test('CAR | Get Firstname with Aadhar (auth)', async () => {
 
     expect(res2.body).toBeTruthy();
     expect(res2.body).toBeInstanceOf(Array)
+    // index of 0 in the body has the bearer token 
     expect(res2.body[0]).toBe('aaaaaaaa : 222222222230')
 });
-
+/**
+ * Car comboboc after authentication
+ * @constructor
+ * @param {response} api - Authentication
+ * @param post request for verifying using token- 
+ * And returning the combobox details 
+ */
 test('CAR | Get Combobox data (auth)', async () => {
-
+  // post request to login 
   const res = await request(api)
     .post('/public/login')
     .set('Accept', /json/)
@@ -248,14 +287,14 @@ test('CAR | Get Combobox data (auth)', async () => {
     .expect(200);
 
   expect(res.body.token).toBeTruthy();
-
+   // get request to get the combobox while Authorizing with Bearer Token
   const res2 = await request(api)
     .get('/private/CAR/getComboBoxData')
     .set('Accept', /json/)
     .set('Authorization', `Bearer ${res.body.token}`)
     .set('Content-Type', 'application/json')
     .expect(200);
-
+     // expecting the body of the models to be truthy and Objects.
     expect(res2.body).toBeTruthy();
     expect(res2.body).toBeInstanceOf(Object)
     expect(res2.body.MaritalStatusModel).toBeTruthy();

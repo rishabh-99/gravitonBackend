@@ -1,3 +1,10 @@
+/*
+File DEscription: Creating the pricate Routes to perform API operations with database
+Author: Rishabh Merhotra
+*/
+
+
+// importing the carcontroller to perform sequelize operations 
 const CarController = require("../../api/controllers/CarController");
 
 const privateRoutes = {

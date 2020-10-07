@@ -1,7 +1,15 @@
+/*
+File Description: Tests for the Login  using the models 
+Author: Rishabh Merhotra 
+*/
+
 const {
+  // importing the actions from the setup file
   beforeAction,
   afterAction,
 } = require('../setup/_setup');
+
+// importing the login model from models folder
 const Login = require('../../api/models/Login');
 
 let login;
@@ -15,6 +23,7 @@ afterAll(() => {
 });
 
 beforeEach(async () => {
+  // before each of the test, we create a user using login credentials 
   login = await Login.create({
     "full_name": "Rime",
     "username": "rimet",
@@ -38,11 +47,13 @@ test('Login is created correctly', async () => {
 });
 
 test('Login is updated correctly', async () => {
+  // updating the user with the username
   await login.update({
     username: 'peter@mail.com',
   });
 
   expect(login.username).toBe('peter@mail.com');
+  // cleaning the database before next test 
 
   await login.destroy();
 });
