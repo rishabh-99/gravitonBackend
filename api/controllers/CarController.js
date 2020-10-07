@@ -1,6 +1,7 @@
 /*
 File DEscription: Creating a controller to perform API operations with database
 Author: Rishabh Merhotra
+logs: 07/10/2020 - Added joi validation 
 */
 // Importing all the models from the model folder 
 const Document = require('../models/Document');
@@ -24,12 +25,13 @@ const sequelize = require('../../config/database');
 const Borrower_incredo_details = require('../models/Borrower_incredo_details');
 
 // importing joi Schemas 
-const { documentSchema } = require('../joi_validation/joi_validation_document')
-const { gurantorSchema } = require('../joi_validation/joi_validation_gurantor')
-const {applicantSchema } = require('../joi_validation/joi_validation_applicant')
-const {  accountShcema } = require('../joi_validation/joi_validation_account')
-const {loanSchema  }     = require('../joi_validation/joi_validation_loan')
-const { user_Kyc_Schema} = require('../joi_validation/joi_validation_user_kyc')
+const { documentSchema,
+     gurantorSchema,
+     applicantSchema,
+     accountShcema,
+     loanSchema ,
+     user_Kyc_Schema } = require('../joi_validation/joi_validation_car_controller')
+
 
 
 
@@ -48,7 +50,18 @@ const CarController = () => {
         const { body } = req;   //req.body 
         
         const user_id = req.query.user_id  
-        try {
+
+        const result = Joi.validate(body, documentSchema); 
+        const { value, error } = result; 
+        const valid = error == null; 
+        if (!valid) { 
+          res.status(422).json({ 
+            message: 'Invalid request', 
+            data: body 
+          }) 
+        } else { 
+
+              try {
             
 /**
  * Creating a Document 
@@ -68,18 +81,17 @@ const CarController = () => {
                     'document_id': body.documentModel.document_id,
                     'progress_id': body.documentModel.progress_id
                 }, { transaction: t });
-              const joi_validate_doc = await documentSchema.validateAsync(Document)
-              console.log(joi_validate_doc)  
+            
+              
              // Creating a gurantor with given parameters
 /**
  * Creating a Gurantor 
  * @param {req} body -
  * Gurantor- created using , firstname, lastname, middlename, currentAddress, mobile, relation, 
  * id, related pan and related Adhaar 
- * Gurantor is created.
+ * Gurantor is created.      
  */
-
-
+                   
 
                 const gurantor = await Gurantor.create({
                     'gurantor_firstname': body.gurantorModel.gurantor_firstname,
@@ -93,8 +105,6 @@ const CarController = () => {
                     'gurantor_realtedaadhar': body.gurantorModel.gurantor_realtedaadhar,
 
                 }, { transaction: t });
-                const joi_validate_gurarantor = await gurantorSchema.validateAsync(gurantor)
-                console.log(joi_validate_gurarantor)  
 
             // creating a applicant with given paramaters
 /**
@@ -134,8 +144,7 @@ const CarController = () => {
                     'applicant_pan': body.applicantModel.applicant_pan,
                     'applicant_aadhar': body.applicantModel.applicant_aadhar
                 }, { transaction: t });
-                const joi_validate_applicant = await applicantSchema.validateAsync(applicant)
-                console.log(joi_validate_applicant)  
+
 
                 // Making an account by taking given parameters
 /**
@@ -157,8 +166,7 @@ const CarController = () => {
                     'account_realtedpan': body.accountModel.account_realtedpan,
                     'account_realtedaadhar': body.accountModel.account_realtedaadhar
                 }, { transaction: t });
-                const joi_validate_account = await accountShcema.validateAsync(account)
-              console.log(joi_validate_account)  
+
 
                 // making a seperate array for loan 
                 var loans = []
@@ -185,8 +193,7 @@ const CarController = () => {
                         }, { transaction: t })
                         
                     );
-                    const joi_validate_loan = await loanSchema.validateAsync(Loans)
-                    console.log(joi_validate_loan)  
+
                 } 
                 // Getting the date and month details
                 var today = new Date();
@@ -220,9 +227,7 @@ const CarController = () => {
                     'related_pan': body.documentModel.document_pan,
                     'kyc_date': today
                 }, { transaction: t })
-
-              const joi_validate_user_kyc = await user_Kyc_Schema.validateAsync(log)
-              console.log(joi_validate_user_kyc)  
+  
 
              // returning all the deeclared functions
                 return { document, gurantor, applicant, account, loans };
@@ -428,5 +433,7 @@ const CarController = () => {
         insertBorrowerDetails
     };
     };
+
+}
 // exporting the module 
-module.exports = CarController;
+module.exports = CarController

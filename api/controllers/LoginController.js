@@ -1,6 +1,7 @@
 /*
 File DEscription: Creating a login controller to perform Authentications 
 Author: Rishabh Merhotra
+logs: 07/10/2020 - Added joi validation
 */
 // Importing the models from the model folder 
 const User = require('../models/Login');
@@ -10,7 +11,7 @@ const bcryptService = require('../services/bcrypt.service');
 
 // Importing the joi validation Schema from joi_validation folder
 
-const {loginSchema } = require('../joi_validation/joi_validation_login')
+const {loginSchema } = require('../joi_validation/joi_validation_login_controller')
 // Defining a login controller 
 const LoginController = () => {
 /**
@@ -25,9 +26,18 @@ const LoginController = () => {
   const register = async (req, res) => {
     // registering the user 
     const { body } = req; 
+    const result = Joi.validate(body, loginSchema); 
+    const { value, error } = result; 
+    const valid = error == null; 
+    if (!valid) { 
+      res.status(422).json({ 
+        message: 'Invalid request', 
+        data: body 
+      }) 
+    } else { 
     // req.body 
-    try {
-      // Permissions ko obj me convert krna h
+            try {
+    
 
       // creating a user with parameters given 
       const user = await User.create({
@@ -40,8 +50,7 @@ const LoginController = () => {
         is_active: body.is_active
       });
       // validating using joi Schema 
-      const joi_validating = await loginSchema.validateAsync(user)
-      console.log(joi_validating)
+
       // 200 ok! 
       return res.status(200).json({ msg: 'User created successfully!!' });
     } catch (err) {
@@ -194,5 +203,5 @@ const LoginController = () => {
   };
 };
 // exporting the whole Module
-
-module.exports = LoginController;
+}
+module.exports = LoginController
