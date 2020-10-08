@@ -25,12 +25,7 @@ const sequelize = require('../../config/database');
 const Borrower_incredo_details = require('../models/Borrower_incredo_details');
 
 // importing joi Schemas 
-const { documentSchema,
-     gurantorSchema,
-     applicantSchema,
-     accountShcema,
-     loanSchema ,
-     user_Kyc_Schema } = require('../joi_validation/joi_validation_car_controller')
+const { registerSchema}  = require('../joi_validation/joi_validation_car_controller')
 
 
 
@@ -49,9 +44,9 @@ const CarController = () => {
     const register = async (req, res) => {
         const { body } = req;   //req.body 
         
-        const user_id = req.query.user_id  
+        
 
-        const result = Joi.validate(body, documentSchema); 
+        const result = Joi.validate(body, registerSchema); 
         const { value, error } = result; 
         const valid = error == null; 
         if (!valid) { 
@@ -62,7 +57,7 @@ const CarController = () => {
         } else { 
 
               try {
-            
+                const user_id = req.query.user_id  // user_id.integer()
 /**
  * Creating a Document 
  * @param {req} body - Document is created using, document_pan, document adhaar, document_optional

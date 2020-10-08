@@ -3,7 +3,7 @@ const Joi = require('joi')
 
 /**
  * Represents a joi Schema.
- * @Joi_login_Schema takes , id and name, usernmae, designation
+ * @params , Joi_login_Schema takes , id and name, usernmae, designation
  * user mobile, password, permission and activeness for validation
  */
 
