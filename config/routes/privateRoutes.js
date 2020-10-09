@@ -22,10 +22,16 @@ const privateRoutes = {
   'GET /CAR/getCountOfKyc': 'CarController.getCountOfKyc',
 
   'POST /CAR/create': 'CarController.register',
-  'POST /CAR/insertNewInkredoDetails': 'CarController.insertBorrowerDetails'
+  'POST /CAR/insertNewInkredoDetails': 'CarController.insertBorrowerDetails',
 
   // 'POST /createUserProfile': 'UserProfileController.create',
   // 'GET /userProfiles': 'UserProfileController.getAll'
+
+  
+  // Fi controller Routes 
+
+  'POST /FI/CreateFi': 'fiController.fi_register.'
+
 };
 
 module.exports = privateRoutes;

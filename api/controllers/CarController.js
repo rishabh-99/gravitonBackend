@@ -280,7 +280,7 @@ const CarController = () => {
                     'account_realtedaadhar': aadhar
                 }
             })
-
+            // => req for profile 
             // return {document, gurantor, applicant, account, loans};
             // returns the 200 ok! with json objects
             return res.status(200).json({ documentModel, gurantorModel, applicantModel, accountModel, loanModel });

@@ -13,12 +13,12 @@ const registerSchema  = Joi.object({
          user_id: joi.number().require(),
 
             acccountSchema:{
-                account_bankname : Joi.string().require(),
-                account_ifsc : Joi.string().require().min(2),
-                account_number: Joi.string().require().min(4),
-                account_inhandsalary: Joi.number().require(),
-                account_realtedpan: Joi.string().require(),
-                account_realtedaadhar: Joi.string().require().min(5)
+                account_bankname : Joi.string().required(),
+                account_ifsc : Joi.string().min(2).required(),
+                account_number: Joi.string().min(4).required(),
+                account_inhandsalary: Joi.number().required(),
+                account_realtedpan: Joi.string().required(),
+                account_realtedaadhar: Joi.string().required()
 
             } ,
             
@@ -41,8 +41,8 @@ const registerSchema  = Joi.object({
 
                     Borrower_details_Schema : {
 
-                    borrower_id: Joi.number().require(),
-                    borrower_details:  Joi.string().require(),
+                    borrower_id: Joi.number().required(),
+                    borrower_details:  Joi.string().required(),
                 },
 
 
@@ -56,29 +56,29 @@ const registerSchema  = Joi.object({
 
 
                 applicantSchema: {
-                applicant_firstname: Joi.string().require(),
+                applicant_firstname: Joi.string().required(),
                 applicant_middlename: Joi.string(),
-                applicant_lastname: Joi.string().require(),
-                applicant_acquaintancename:Joi.string().require(),
-                applicant_dob: Joi.date().require(),
-                applicant_state: Joi.string().require(),
+                applicant_lastname: Joi.string().required(),
+                applicant_acquaintancename:Joi.string().required(),
+                applicant_dob: Joi.date().required(),
+                applicant_state: Joi.string().required(),
                 applicant_district: Joi.string().require().min(4),
                 applicant_pincode: Joi.string().require().min(4),
-                applicant_currentaddress: Joi.string().require().min(3),
-                applicant_mobile: Joi.string().require().min(6),
-                applicant_officeno: Joi.string().require().min(6),
-                applicant_desgination: Joi.string().require(),
+                applicant_currentaddress: Joi.string().min(3).required(),
+                applicant_mobile: Joi.string().min(6).required(),
+                applicant_officeno: Joi.string().min(6).required(),
+                applicant_desgination: Joi.string().required(),
                 applicant_education: Joi.string(),
-                applicant_employername: Joi.string().require().min(6),
-                applicant_officeaddress: Joi.string().require().min(6),
+                applicant_employername: Joi.string().min(6).required(),
+                applicant_officeaddress: Joi.string().min(6),
                 applicant_nearestbranch:  Joi.string(),
                 applicant_distance:  Joi.string(),
                 applicant_acquaintanceid: Joi.number(),
                 applicant_maritalstatusid: Joi.number().require(),
                 applicant_casteid: Joi.number(),
                 applicant_categoryid: Joi.number(),
-                applicant_pan:   Joi.string().require().min(3),
-                applicant_aadhar: Joi.string().require().min(3),
+                applicant_pan:   Joi.string().min(3),
+                applicant_aadhar: Joi.string().min(3),
 
             },
 
@@ -90,8 +90,8 @@ const registerSchema  = Joi.object({
 
 
                   categorySchema: {
-                    category_id: Joi.number().require(),
-                    category_name: Joi.string().require(),
+                    category_id: Joi.number().required(),
+                    category_name: Joi.string().required(),
                 },
 
 /**
@@ -102,8 +102,8 @@ const registerSchema  = Joi.object({
 
 
                      casteSchema: {
-                        caste_id: Joi.number().require(),
-                        caste_name: Joi.string().require().min(3),
+                        caste_id: Joi.number().required(),
+                        caste_name: Joi.string().required(),
 
                     } ,
 
@@ -115,8 +115,8 @@ const registerSchema  = Joi.object({
 
                     documenttype_Schema: {
 
-                        documenttype_id: Joi.number().require(),
-                        documenttype_name: Joi.string().require(),
+                        documenttype_id: Joi.number().required(),
+                        documenttype_name: Joi.string().required(),
                     } ,
 /**
  * Represents a joi Schema.
@@ -127,12 +127,12 @@ const registerSchema  = Joi.object({
 
                     documentSchema: {
 
-                        document_pan: Joi.string().require(),
-                        document_aadhar: Joi.string().require(),
+                        document_pan: Joi.string().required(),
+                        document_aadhar: Joi.string().required(),
                         document_optional: Joi.string(),
-                        document_cibil: Joi.number().require(),
+                        document_cibil: Joi.number().required(),
                         document_remark: Joi.string(),
-                        document_id: Joi.number().require(),
+                        document_id: Joi.number().required(),
                         progress_id: Joi.number(),
                         
                     } ,
@@ -145,8 +145,8 @@ const registerSchema  = Joi.object({
 
                      gurantor_type_Schema: {
 
-                        gurantortype_id: Joi.number().require(),
-                        gurantortype_name:  Joi.string().require(),
+                        gurantortype_id: Joi.number().required(),
+                        gurantortype_name:  Joi.string().required(),
                     } ,
 /**
  * Represents a joi Schema.
@@ -156,15 +156,15 @@ const registerSchema  = Joi.object({
 
 
                         gurantorSchema: {
-                        gurantor_firstname: Joi.string().require(),
+                        gurantor_firstname: Joi.string().required(),
                         gurantor_middlename: Joi.string(),
                         gurantor_lastname:  Joi.string(),
-                        gurantor_currentaddress: Joi.string().require(),
-                        gurantor_mobile: Joi.string().require(),
-                        gurantor_relation: Joi.string().require(),
-                        gurantor_realtedpan: Joi.string().require(),
-                        gurantor_realtedaadhar: Joi.string().require(),
-                        gurantortype_id: Joi.number().require(),
+                        gurantor_currentaddress: Joi.string().required(),
+                        gurantor_mobile: Joi.string().required(),
+                        gurantor_relation: Joi.string().required(),
+                        gurantor_realtedpan: Joi.string().required(),
+                        gurantor_realtedaadhar: Joi.string().required(),
+                        gurantortype_id: Joi.number().required(),
 
                     } ,
 
@@ -178,7 +178,7 @@ const registerSchema  = Joi.object({
                         loan_type_schema: {
 
                             loantype_id: Joi.number(),
-                            loantype_name:  Joi.string().require(),
+                            loantype_name:  Joi.string().required(),
                         },
 
 /**
@@ -190,14 +190,14 @@ const registerSchema  = Joi.object({
 
                          loanSchema: {
 
-                            loan_id:  Joi.number().require(),
-                            loan_bankname: Joi.string().require().min(3),
+                            loan_id:  Joi.number().required(),
+                            loan_bankname: Joi.string().required(),
                             loan_amount: Joi.number(),
                             loan_emi:  Joi.number(),
-                            loan_closuredate: Joi.date().require(),
+                            loan_closuredate: Joi.date().required(),
                             loan_type: Joi.number(),
-                            account_realtedpan:  Joi.string().require().min(3),
-                            account_realtedaadhar: Joi.string().require().min(3),
+                            account_realtedpan:  Joi.string().min(3),
+                            account_realtedaadhar: Joi.string().min(3),
 
                         },
 
@@ -209,7 +209,7 @@ const registerSchema  = Joi.object({
 
                          maritalstatusSchema: {
                             maritalstatus_id:  Joi.number(),
-                            maritalstatus_name:  Joi.string().require(),
+                            maritalstatus_name:  Joi.string().required(),
                         },
 
 
@@ -222,7 +222,7 @@ const registerSchema  = Joi.object({
 
                         user_profile_Schema: {
                             user_id:   Joi.number(),
-                            related_aadhar:  Joi.string().require(),
+                            related_aadhar:  Joi.string().required(),
                             related_pan: Joi.string().require(),
 
                         },
@@ -238,8 +238,8 @@ const registerSchema  = Joi.object({
 
                             log_id:Joi.number(),
                             user_id:  Joi.number(),
-                            related_aadhar: Joi.string().require(),
-                            related_pan: Joi.string().require(),
+                            related_aadhar: Joi.string().required(),
+                            related_pan: Joi.string().required(),
                             kyc_date:  Joi.date(),
                         }
 

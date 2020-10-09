@@ -9,13 +9,13 @@ const Joi = require('joi')
 
 
 const loginSchema = Joi.object({
-    user_id: Joi.number().require(),
-    full_name: Joi.string().require(),
-    username: Joi.string().require(),
-    designation: Joi.string().require(),
-    user_mobile:  Joi.string().require(),
-    password: Joi.string().require().min(3),
-    permissions:  Joi.object().require(),
+    user_id: Joi.number().required(),
+    full_name: Joi.string().required(),
+    username: Joi.string().required(),
+    designation: Joi.string().required(),
+    user_mobile:  Joi.string().required(),
+    password: Joi.string().min(3),
+    permissions:  Joi.object().required(),
     is_active: joi.boolean(),
 
 })
