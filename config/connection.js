@@ -1,17 +1,17 @@
 const development = {
-  database: 'demo',
-  username: 'postgres',
-  password: 'postgres',
-  host: 'localhost',
-  dialect: 'postgres',
+  database: 'demo',    // development database
+  username: 'postgres',  // username of the database
+  password: '12345678',   // password of the database
+  host: 'localhost',    // hosting environment 
+  dialect: 'postgres',  // database
 };
 
 const testing = {
-  database: 'testing-2',
-  username: 'postgres',
-  password: 'postgres',
-  host: 'localhost',
-  dialect: 'postgres',
+  database: 'testing 2',  // development database
+  username: 'postgres',  // username of the database
+  password: '12345678',   // password of the database
+  host: 'localhost',     // hosting environment 
+  dialect: 'postgres', // database
 };
 
 const production = {

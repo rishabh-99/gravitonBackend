@@ -1,10 +1,27 @@
+/*
+File Description: Defining the Applicant model and creating the table for same 
+Author: Rishabh Merhotra 
+*/
+
+// importing the sequelize library
 const Sequelize = require('sequelize');
+
+// importing the configurations of the database
 const sequelize = require('../../config/database');
 
 const tableName = 'applicant';
 
+
+//creating the Model 
 const Applicant = sequelize.define('applicant',
 {
+     /* giving the content type : "".
+      setting allowNull to false will add NOT NULL to the column,
+      Auto-increment mamkes the iterations with columns in db
+      primary-key is used to hook to the feild
+       */
+
+
     applicant_firstname: {
       type: Sequelize.STRING,
       allowNull: false
@@ -79,6 +96,7 @@ const Applicant = sequelize.define('applicant',
       type: Sequelize.INTEGER,
       allowNull: false,
       references: {
+        // refering to other models and generating a key 
         model: {
           tableName: 'acquaintance',
         },
@@ -139,5 +157,10 @@ const Applicant = sequelize.define('applicant',
 
 // eslint-disable-next-line
 
+/*
+Removing the attribure from all the fields
+helps to send the reuired field and explicit informaiton
+*/
 Applicant.removeAttribute('id');
+// exporting the whole module 
 module.exports = Applicant;

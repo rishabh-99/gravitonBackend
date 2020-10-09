@@ -1,3 +1,8 @@
+/*
+File Description: Making Routes and mapping with other files to run the API 
+Author: Rishabh Merhotra 
+*/
+
 /**
  * third party libraries
  */
@@ -41,6 +46,7 @@ app.use(helmet({
 // parsing the request bodys
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
 
 app.get('/', (req, res) => {
   res.status(200).send('Successfull')
