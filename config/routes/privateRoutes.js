@@ -23,6 +23,7 @@ const privateRoutes = {
 
   'POST /CAR/create': 'CarController.register',
   'POST /CAR/insertNewInkredoDetails': 'CarController.insertBorrowerDetails',
+  'POST  /CAR/create' : 'CarController.UserProfile',
 
   // 'POST /createUserProfile': 'UserProfileController.create',
   // 'GET /userProfiles': 'UserProfileController.getAll'
@@ -30,7 +31,7 @@ const privateRoutes = {
   
   // Fi controller Routes 
 
-  'POST /FI/CreateFi': 'fiController.fi_register.'
+  'POST /FI/CreateFi': 'fiController.fi_register'
 
 };
 

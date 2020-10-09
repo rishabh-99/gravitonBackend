@@ -10,7 +10,7 @@ const Joi = require('joi')
 
 const registerSchema  = Joi.object({
 
-         user_id: joi.number().require(),
+         user_id: joi.number().required(),
 
             acccountSchema:{
                 account_bankname : Joi.string().required(),
@@ -215,15 +215,36 @@ const registerSchema  = Joi.object({
 
 /**
  * Represents a joi Schema.
- * @params , Joi_user_profile_Schema takes , user_id , related_adhaar, 
+ * @params , Joi_user_profile_Schema takes , user_id , related_adhaar, Details of the user in a Json 
+ * which contains, user_id, name, email , mone_history with Contact and cibil score loan array and 
+ * Kyc logs with Document Array 
  * related_pan for validation
  */
 
 
                         user_profile_Schema: {
                             user_id:   Joi.number(),
-                            related_aadhar:  Joi.string().required(),
-                            related_pan: Joi.string().require(),
+                            details_json: Joi.object ({ 
+                                 user1: { 
+                                     __id: Joi.string(),   // this is one user id 
+                                    general_detail: {
+                                        name: Joi.string(),
+                                        email: Joi.string()
+                                    },
+                                    mone_history: {
+                                        contact: Joi.number(),
+                                        cibil_score: Joi.number()
+                                    },
+                                    loans: Joi.array(),
+                                    kyc: {
+                                        CarJSON: Joi.json()    // inside should be req.body 
+                                    },
+                                    documents: Joi.array()
+                                }
+
+                            }),  
+                            related_aadhar:   Joi.string().regex('d{12}').required(),
+                            related_pan: Joi.alphaNumeric().regex('[A-Z]{5}[0-9]{4}[A-Z]{1}').required()
 
                         },
 /**

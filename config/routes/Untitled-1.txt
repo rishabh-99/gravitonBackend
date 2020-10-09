@@ -1,0 +1,21 @@
+
+
+{
+    "user1": { 
+        "__id": "AAAA",   // this is one user id 
+        "general_detail": {
+            "name": "aa",
+            "email": "aaa"
+        },
+        "mone_history": {
+            "contact": 9899899089,
+            "cibil_score": 700,
+        },
+        "loans": [
+        ],
+        "kyc": {
+            "CarJSON": {}    // inside should be req.body 
+        },
+        "documents": []
+    }
+}

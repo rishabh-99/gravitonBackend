@@ -2,6 +2,7 @@
 File DEscription: Creating a controller to perform API operations with database
 Author: Rishabh Merhotra
 logs: 07/10/2020 - Added joi validation 
+logs: 08/10/2020 - Added User Profile Validation 
 */
 // Importing all the models from the model folder 
 const Document = require('../models/Document');
@@ -25,7 +26,8 @@ const sequelize = require('../../config/database');
 const Borrower_incredo_details = require('../models/Borrower_incredo_details');
 
 // importing joi Schemas 
-const { registerSchema}  = require('../joi_validation/joi_validation_car_controller')
+const { registerSchema}  = require('../joi_validation/joi_validation_car_controller');
+const UserProfile = require('../models/User_profile');
 
 
 
@@ -230,7 +232,7 @@ const CarController = () => {
              // logging the result on the console
 
             console.log({ result })
-            // 200 returns ok! 
+            // 200 returns ok!
             return res.status(200).json({ msg: 'CAR created Successfully' })
         } catch (err) {
             console.log(err);
@@ -238,6 +240,44 @@ const CarController = () => {
             return res.status(500).json({ msg: err });
         }
     };
+             // => req for profile 
+            // Creating a user profile 
+            
+            const user_profile = await UserProfile.create({
+               
+                "user_id": user_id,
+                "details_json": {
+                    "user1": { 
+                        // this is one user id 
+                        "__id": user_id,   
+                        "general_detail": {
+                            "name": body.username, 
+                            "email": body.email, 
+                        }, 
+                        // we recieve details from body
+                        "mone_history": {
+                            "contact": body.contact,
+                            "cibil_score": body.cibil_score,
+                        },
+                        "loans": body.loanModel.loans,
+                         
+                        // Kyc details from req.body
+                        "kyc": {
+                            "CarJSON": body.CarJSON  
+                        },
+                        // document details are entirely recieved from Document model 
+                        "documents": body.documentModel.document,
+                    }
+
+                }
+              
+                
+              
+    
+            })
+       
+            
+            
 /**
  * get request, accepting reqest and response
  * @param {req} body - Accepts he request
@@ -280,10 +320,15 @@ const CarController = () => {
                     'account_realtedaadhar': aadhar
                 }
             })
-            // => req for profile 
+           
+            
+    
+            
+
+
             // return {document, gurantor, applicant, account, loans};
             // returns the 200 ok! with json objects
-            return res.status(200).json({ documentModel, gurantorModel, applicantModel, accountModel, loanModel });
+            return res.status(200).json({ documentModel, gurantorModel, applicantModel, accountModel, loanModel , UserProfileModel });
         } catch (err) {
             console.log(err);
             return res.status(500).json({ msg: err });
