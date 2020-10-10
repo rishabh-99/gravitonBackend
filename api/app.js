@@ -9,7 +9,6 @@ Author: Rishabh Merhotra
 const bodyParser = require('body-parser');
 const express = require('express');
 const helmet = require('helmet');
-const serverless = require('serverless-http');
 const mapRoutes = require('express-routes-mapper');
 const cors = require('cors');
 
