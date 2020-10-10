@@ -11,7 +11,7 @@ const {
   afterAction,
 } = require('../setup/_setup');
 
-const Fi = require('../models/Fi')
+const Fi = require('../../api/models/FI')
 
 //UTF-8 is a variable-width character encoding 
 

@@ -1,6 +1,8 @@
 const bodyParser = require('body-parser');
 const express = require('express');
+
 const mapRoutes = require('express-routes-mapper');
+const MapRoutes = () => mapRoutes;
 
 const config = require('../../config/');
 const database = require('../../config/database');

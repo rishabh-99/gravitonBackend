@@ -126,7 +126,6 @@ test('CAR | Create (auth)', async () => {
         "applicant_categoryid": 2,
         "applicant_pan": "QWETY1234O",
         "applicant_aadhar": "222222222230",
-        "DisplaySearch": "aaaaaaaa   :   222222222227"
       },
       "documentModel": {
         "progress_id": 1,

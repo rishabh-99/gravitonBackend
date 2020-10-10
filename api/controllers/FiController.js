@@ -7,56 +7,54 @@ const Fi = require('../models/Fi');
 
 //importing Joi validation 
 
-const { fiSchema }= require('../joi_validation/joi_validation_fi_controller')
+const { fiSchema } = require('../joi_validation/joi_validation_fi_controller')
 
 
-const fiController = () => {
+const FiController = () => {
 
-                /**
-                 * Regestering an fi 
-                 * @Accepts the request and responses
-                 * @param {req} body - in the form of req.body
-                 * @param fi is created using fi_id, fi_answers, related adhaaar and related pan
-                 * fi- Created
-                 */
+  /**
+   * Regestering an fi 
+   * @Accepts the request and responses
+   * @param {req} body - in the form of req.body
+   * @param fi is created using fi_id, fi_answers, related adhaaar and related pan
+   * fi- Created
+   */
 
-                const fi_register = async (req, res) => {
-                    // registering the fi 
-                    const { body } = req; 
-                    const result = Joi.validate(body, fiSchema); 
-                    const { value, error } = result; 
-                    const valid = error == null; 
-                    if (!valid) { 
-                    res.status(422).json({ 
-                        message: 'Invalid request', 
-                        data: body 
-                    }) 
-                    } else { 
-                    // req.body 
-                            try {
+  const register = async (req, res) => {
+    // registering the fi 
+    const { body } = req;
+    const result = Joi.validate(body, fiSchema);
+    const { value, error } = result;
+    const valid = error == null;
+    if (!valid) {
+      res.status(422).json({
+        message: 'Invalid request',
+        data: body
+      })
+    } else {
+      // req.body 
+      try {
 
-                                const fi = await Fi.create({
-                                    fi_id: body.fi_id,
-                                    fi_answers: body.fi_answers,
-                                    related_aadhar: body.related_aadhar, 
-                                    related_pan: body.related_pan
+        const fi = await Fi.create({
+          fi_id: body.fi_id,
+          fi_answers: body.fi_answers,
+          related_aadhar: body.related_aadhar,
+          related_pan: body.related_pan
 
-                                  });
-                                  
-                            
-                                  // 200 ok! 
-                                  return res.status(200).json({ msg: 'Fi submitted successfully!!' });
-                                } catch (err) {
-                                  console.log(err);
-                                  return res.status(500).json({ msg: 'Internal server error' });
-                                }
-                              };
-
-                              return fi_register
+        });
 
 
+        // 200 ok! 
+        return res.status(200).json({ msg: 'Fi submitted successfully!!' });
+      } catch (err) {
+        console.log(err);
+        return res.status(500).json({ msg: 'Internal server error' });
+      }
+    }
+  };
 
-                            }
-}
+  return {register}
 
-module.exports  = fiController
+};
+
+module.exports = FiController
