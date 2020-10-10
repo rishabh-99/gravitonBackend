@@ -249,231 +249,231 @@ const CarController = () => {
 
             "user_id": self_generated_user_id,
             "details_json": {
-                    "user1": {
-            // this is one user id 
-            "__id": self_generated_user_id,
-            "general_detail": {
-                "name": body.username,
-                "email": body.email,
-            },
-            // we recieve details from body
-            "mone_history": {
-                "contact": body.contact,
-                "cibil_score": body.cibil_score,
-            },
-            "loans": body.loanModel.loans,
+                "user1": {
+                    // this is one user id 
+                    "__id": self_generated_user_id,
+                    "general_detail": {
+                        "name": body.username,
+                        "email": body.email,
+                    },
+                    // we recieve details from body
+                    "mone_history": {
+                        "contact": body.applicantModel.applicant_mobile,
+                        "cibil_score": body.document.document_cibil
+                    },
+                    "loans": [],
 
-            // Kyc details from req.body
-            "kyc": {
-                "CarJSON": body.CarJSON
-            },
-            // document details are entirely recieved from Document model 
-            "documents": body.documentModel.document,
-        }
-
+                    // Kyc details from req.body
+                    "kyc": {
+                        "CarJSON": body
+                    },
+                    // document details are entirely recieved from Document model 
+                    "documents": [],
                 }
 
-
-
-
-})
-
-
-
-/**
- * get request, accepting reqest and response
- * @param {req} body - Accepts he request
- * @param finding - Documentmodel , Gurantor model, applicant model , 
- * account model and loan model who has Adhaar as document
- */
-
-// accepts a request and responds accordingly
-const get = async (req, res) => {
-    // const { body } = req;
-    const aadhar = req.query.aadhar
-    try {
-        // finding all the documents with a paramater Adhaar 
-        const documentModel = await Document.findAll({
-            where: {
-                'document_aadhar': aadhar
             }
-        });
-        // finding all the gurantors with a paramater Adhaar 
-        const gurantorModel = await Gurantor.findAll({
-            where: {
-                'gurantor_realtedaadhar': aadhar
-            }
-        });
-        // finding all the applicants  with a paramater Adhaar 
-        const applicantModel = await Applicant.findAll({
-            where: {
-                'applicant_aadhar': aadhar
-            }
-        });
-        // finding all the accounts with a paramater Adhaar 
-        const accountModel = await Account.findAll({
-            where: {
-                'account_realtedaadhar': aadhar
-            }
-        });
-        // finding all the loans with a paramater Adhaar 
-        const loanModel = await Loan.findAll({
-            where: {
-                'account_realtedaadhar': aadhar
-            }
+
+
+
+
         })
 
 
 
+        /**
+         * get request, accepting reqest and response
+         * @param {req} body - Accepts he request
+         * @param finding - Documentmodel , Gurantor model, applicant model , 
+         * account model and loan model who has Adhaar as document
+         */
+
+        // accepts a request and responds accordingly
+        const get = async (req, res) => {
+            // const { body } = req;
+            const aadhar = req.query.aadhar
+            try {
+                // finding all the documents with a paramater Adhaar 
+                const documentModel = await Document.findAll({
+                    where: {
+                        'document_aadhar': aadhar
+                    }
+                });
+                // finding all the gurantors with a paramater Adhaar 
+                const gurantorModel = await Gurantor.findAll({
+                    where: {
+                        'gurantor_realtedaadhar': aadhar
+                    }
+                });
+                // finding all the applicants  with a paramater Adhaar 
+                const applicantModel = await Applicant.findAll({
+                    where: {
+                        'applicant_aadhar': aadhar
+                    }
+                });
+                // finding all the accounts with a paramater Adhaar 
+                const accountModel = await Account.findAll({
+                    where: {
+                        'account_realtedaadhar': aadhar
+                    }
+                });
+                // finding all the loans with a paramater Adhaar 
+                const loanModel = await Loan.findAll({
+                    where: {
+                        'account_realtedaadhar': aadhar
+                    }
+                })
 
 
 
-        // return {document, gurantor, applicant, account, loans};
-        // returns the 200 ok! with json objects
-        return res.status(200).json({ documentModel, gurantorModel, applicantModel, accountModel, loanModel, UserProfileModel });
-    } catch (err) {
-        console.log(err);
-        return res.status(500).json({ msg: err });
-    }
-};
-// get the Adhaar list upon request and response
-const getAadharList = async (req, res) => {
-    try {
-        // gets all the documents with the Attribute Document-Adhar 
-        const Aadhar = await Document.findAll({
-            attributes: ['document_aadhar']
-        })
-            // returns a promise and we map it to document.document_aadhar
-            .then(document => document.map(document => document.document_aadhar));
-        console.log(Aadhar)
-        // 200 returns a ok! and sends Aadhar object 
-        return res.status(200).send(Aadhar)
-    } catch (err) {
-        return res.status(500).json({ msg: err });
-    }
-};
-// Getting all the pancard lists in the documents 
-const getPanList = async (req, res) => {
-    try {
-        const Pan = await Document.findAll({
-            attributes: ['document_pan'],
 
-        })
-            .then(document => document.map(document => document.document_pan));
-        console.log(typeof (Pan))
-        // returns 200 ok! and pan object 
-        res.status(200).send(Pan)
-    } catch (err) {
-        // catches the error to "internal server error"
-        return res.status(500).json({ msg: err });
-    }
-};
-// Getting the first name of the aadhar 
-//accepts the request and response 
 
-//gets all the applicants with their firstname 
-const getFnameAndAadhar = async (req, res) => {
-    try {
-        const NameWithAadhar = await Applicant.findAll({
-            attributes: ['applicant_aadhar', 'applicant_firstname'],
 
-        })
-            .then(applicant => applicant.map(applicant => `${applicant.applicant_firstname} : ${applicant.applicant_aadhar}`));
-        console.log(NameWithAadhar)
-        res.status(200).send(NameWithAadhar)
-    } catch (err) {
-        return res.status(500).json({ msg: err });
-    }
-};
-// Gets all the detials of their attributes 
-const getComboBoxData = async (req, res) => {
-    try {
-        const MaritalStatusModel = await MaritalStatus.findAll();
-        const AcquaintanceModel = await Acquaintance.findAll();
-        const CasteModel = await Caste.findAll();
-        const CategoryModel = await Category.findAll();
-        const GurantortypeModel = await Gurantortype.findAll();
-        const LoantypeModel = await Loantype.findAll();
-        const DocumenttypeModel = await Documenttype.findAll();
-
-        res.status(200).send({ MaritalStatusModel, AcquaintanceModel, CasteModel, CategoryModel, GurantortypeModel, LoantypeModel, DocumenttypeModel })
-    } catch (err) {
-        return res.status(500).json({ msg: err });
-    }
-};
-
-// Gets the count of the KYC logs.
-
-/**
-* Getting count of Kyc
-* Accepts request and responses
-* @param {req} body - accepts in the form of req.body
-* @Count user_kyc - using user_id and kyc_date
-*/
-const getCountOfKyc = async (req, res) => {
-    try {
-        // Date info 
-        var today = new Date();
-        var dd = today.getDate();
-
-        var mm = today.getMonth() + 1;
-        var yyyy = today.getFullYear();
-        if (dd < 10) {
-            dd = '0' + dd;
-        }
-
-        if (mm < 10) {
-            mm = '0' + mm;
-        }
-
-        // today = dd + '-' + mm + '-' + yyyy;
-        today = yyyy + '-' + mm + '-' + dd;
-        const count = await User_kyc_log.count({
-            // count with the user_id and date
-            where: {
-                'user_id': req.query.user_id,
-                'kyc_date': today
+                // return {document, gurantor, applicant, account, loans};
+                // returns the 200 ok! with json objects
+                return res.status(200).json({ documentModel, gurantorModel, applicantModel, accountModel, loanModel, UserProfileModel });
+            } catch (err) {
+                console.log(err);
+                return res.status(500).json({ msg: err });
             }
-        })
+        };
+        // get the Adhaar list upon request and response
+        const getAadharList = async (req, res) => {
+            try {
+                // gets all the documents with the Attribute Document-Adhar 
+                const Aadhar = await Document.findAll({
+                    attributes: ['document_aadhar']
+                })
+                    // returns a promise and we map it to document.document_aadhar
+                    .then(document => document.map(document => document.document_aadhar));
+                console.log(Aadhar)
+                // 200 returns a ok! and sends Aadhar object 
+                return res.status(200).send(Aadhar)
+            } catch (err) {
+                return res.status(500).json({ msg: err });
+            }
+        };
+        // Getting all the pancard lists in the documents 
+        const getPanList = async (req, res) => {
+            try {
+                const Pan = await Document.findAll({
+                    attributes: ['document_pan'],
 
-        res.status(200).send({ count })
-    } catch (err) {
-        return res.status(500).json({ msg: err });
-    }
-};
-// inserting the borrower details 
-/**
-* Borrower details 
-*Accepts requests and responses
-* @param {req} body - In the form of req.body
-* @param Borrower-details: created using borrower_id and borrower_details
-*/
+                })
+                    .then(document => document.map(document => document.document_pan));
+                console.log(typeof (Pan))
+                // returns 200 ok! and pan object 
+                res.status(200).send(Pan)
+            } catch (err) {
+                // catches the error to "internal server error"
+                return res.status(500).json({ msg: err });
+            }
+        };
+        // Getting the first name of the aadhar 
+        //accepts the request and response 
 
-const insertBorrowerDetails = async (req, res) => {
-    try {
-        // creating a borrower id before insertion 
-        await Borrower_incredo_details.create({
-            'borrower_id': req.body.borrower_id,
-            'borrower_details': req.body.borrower_details
-        })
+        //gets all the applicants with their firstname 
+        const getFnameAndAadhar = async (req, res) => {
+            try {
+                const NameWithAadhar = await Applicant.findAll({
+                    attributes: ['applicant_aadhar', 'applicant_firstname'],
 
-        res.status(200).send({ msg: 'Successfull' })
-    } catch (err) {
-        return res.status(500).json({ msg: err });
-    }
-};
+                })
+                    .then(applicant => applicant.map(applicant => `${applicant.applicant_firstname} : ${applicant.applicant_aadhar}`));
+                console.log(NameWithAadhar)
+                res.status(200).send(NameWithAadhar)
+            } catch (err) {
+                return res.status(500).json({ msg: err });
+            }
+        };
+        // Gets all the detials of their attributes 
+        const getComboBoxData = async (req, res) => {
+            try {
+                const MaritalStatusModel = await MaritalStatus.findAll();
+                const AcquaintanceModel = await Acquaintance.findAll();
+                const CasteModel = await Caste.findAll();
+                const CategoryModel = await Category.findAll();
+                const GurantortypeModel = await Gurantortype.findAll();
+                const LoantypeModel = await Loantype.findAll();
+                const DocumenttypeModel = await Documenttype.findAll();
 
-return {
-    // returning all the functions form the controller
-    register,
-    get,
-    getAadharList,
-    getPanList,
-    getFnameAndAadhar,
-    getComboBoxData,
-    getCountOfKyc,
-    insertBorrowerDetails
-};
+                res.status(200).send({ MaritalStatusModel, AcquaintanceModel, CasteModel, CategoryModel, GurantortypeModel, LoantypeModel, DocumenttypeModel })
+            } catch (err) {
+                return res.status(500).json({ msg: err });
+            }
+        };
+
+        // Gets the count of the KYC logs.
+
+        /**
+        * Getting count of Kyc
+        * Accepts request and responses
+        * @param {req} body - accepts in the form of req.body
+        * @Count user_kyc - using user_id and kyc_date
+        */
+        const getCountOfKyc = async (req, res) => {
+            try {
+                // Date info 
+                var today = new Date();
+                var dd = today.getDate();
+
+                var mm = today.getMonth() + 1;
+                var yyyy = today.getFullYear();
+                if (dd < 10) {
+                    dd = '0' + dd;
+                }
+
+                if (mm < 10) {
+                    mm = '0' + mm;
+                }
+
+                // today = dd + '-' + mm + '-' + yyyy;
+                today = yyyy + '-' + mm + '-' + dd;
+                const count = await User_kyc_log.count({
+                    // count with the user_id and date
+                    where: {
+                        'user_id': req.query.user_id,
+                        'kyc_date': today
+                    }
+                })
+
+                res.status(200).send({ count })
+            } catch (err) {
+                return res.status(500).json({ msg: err });
+            }
+        };
+        // inserting the borrower details 
+        /**
+        * Borrower details 
+        *Accepts requests and responses
+        * @param {req} body - In the form of req.body
+        * @param Borrower-details: created using borrower_id and borrower_details
+        */
+
+        const insertBorrowerDetails = async (req, res) => {
+            try {
+                // creating a borrower id before insertion 
+                await Borrower_incredo_details.create({
+                    'borrower_id': req.body.borrower_id,
+                    'borrower_details': req.body.borrower_details
+                })
+
+                res.status(200).send({ msg: 'Successfull' })
+            } catch (err) {
+                return res.status(500).json({ msg: err });
+            }
+        };
+
+        return {
+            // returning all the functions form the controller
+            register,
+            get,
+            getAadharList,
+            getPanList,
+            getFnameAndAadhar,
+            getComboBoxData,
+            getCountOfKyc,
+            insertBorrowerDetails
+        };
     };
 
 }
