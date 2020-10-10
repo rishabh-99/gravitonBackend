@@ -2,6 +2,7 @@
 File Description: Defining the Marital Status and creating the Schema  table for 
 same with respective fields 
 Author: Rishabh Merhotra 
+Logs: Changed datatypes to Sequelize @ 09/10/2020
 */
 //importing the sequelize package
 const Sequelize = require('sequelize');
@@ -14,20 +15,20 @@ const tableName = 'user_profile';
 const UserProfile = sequelize.define('user_profile',
 {
     user_id: {
-      type: DataTypes.STRING,
+      type: Sequelize.STRING,
       allowNull: false,
       primaryKey: true
     },
     details_json: {
-      type: DataTypes.JSON,
+      type: Sequelize.JSON,
       allowNull: true
     },
     related_aadhar: {
-      type: DataTypes.STRING,
+      type: Sequelize.STRING,
       allowNull: true
     },
     related_pan: {
-      type: DataTypes.STRING,
+      type: Sequelize.STRING,
       allowNull: true
     }
   }  , { tableName, timestamps: false, });

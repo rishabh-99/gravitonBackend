@@ -1,6 +1,9 @@
-// importing joi for validation 
-const Joi = require('joi')
 
+/* File Description: Controlling the Api For all Fi related tasks by registering and Joi Validation included
+Author: Rishabh Mehrothra
+Logs: Addded USer Profile schema for validation 
+*/
+// importing joi for validation
 /**
  * Represents a joi Schema.
  * @params Joi_Account_Schema takes , banknmae, ifsc, number, inhandsalary, relatedpan and adhaar
@@ -10,7 +13,7 @@ const Joi = require('joi')
 
 const registerSchema  = Joi.object({
 
-         user_id: joi.number().required(),
+         user_id: Joi.number().required(),
 
             acccountSchema:{
                 account_bankname : Joi.string().required(),
@@ -62,8 +65,8 @@ const registerSchema  = Joi.object({
                 applicant_acquaintancename:Joi.string().required(),
                 applicant_dob: Joi.date().required(),
                 applicant_state: Joi.string().required(),
-                applicant_district: Joi.string().require().min(4),
-                applicant_pincode: Joi.string().require().min(4),
+                applicant_district: Joi.string().min(4),
+                applicant_pincode: Joi.string().min(4),
                 applicant_currentaddress: Joi.string().min(3).required(),
                 applicant_mobile: Joi.string().min(6).required(),
                 applicant_officeno: Joi.string().min(6).required(),
@@ -74,7 +77,7 @@ const registerSchema  = Joi.object({
                 applicant_nearestbranch:  Joi.string(),
                 applicant_distance:  Joi.string(),
                 applicant_acquaintanceid: Joi.number(),
-                applicant_maritalstatusid: Joi.number().require(),
+                applicant_maritalstatusid: Joi.number().required(),
                 applicant_casteid: Joi.number(),
                 applicant_categoryid: Joi.number(),
                 applicant_pan:   Joi.string().min(3),
@@ -237,14 +240,14 @@ const registerSchema  = Joi.object({
                                     },
                                     loans: Joi.array(),
                                     kyc: {
-                                        CarJSON: Joi.json()    // inside should be req.body 
+                                       // CarJSON: Joi.json()    // inside should be req.body 
                                     },
                                     documents: Joi.array()
                                 }
 
                             }),  
-                            related_aadhar:   Joi.string().regex('d{12}').required(),
-                            related_pan: Joi.alphaNumeric().regex('[A-Z]{5}[0-9]{4}[A-Z]{1}').required()
+                        //    related_aadhar:   Joi.string().regex('d{12}').required(),
+                         //   related_pan: Joi.alphaNumeric().regex('[A-Z]{5}[0-9]{4}[A-Z]{1}').required()
 
                         },
 /**

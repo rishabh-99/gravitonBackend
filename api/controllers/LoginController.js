@@ -8,6 +8,7 @@ const User = require('../models/Login');
 // importing the servcies from the folder 
 const authService = require('../services/auth.service');
 const bcryptService = require('../services/bcrypt.service');
+const Joi = require('joi')
 
 // Importing the joi validation Schema from joi_validation folder
 
@@ -67,7 +68,7 @@ const LoginController = () => {
  * @login require username and password
  */
 
-  const login = async (req, res) => {
+    const login = async (req, res) => {
     const { username, password } = req.body;
   // we find username entered in the database to verify 
     if (username && password) {

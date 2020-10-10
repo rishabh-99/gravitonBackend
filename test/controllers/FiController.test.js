@@ -11,7 +11,7 @@ const {
   afterAction,
 } = require('../setup/_setup');
 
-const Fi = require('../models/Fi')
+const Fi = require('../../api/models/Fi')
 
 //UTF-8 is a variable-width character encoding 
 
@@ -37,7 +37,7 @@ test('Create an Fi', async () => {
   
     // post request with details to register
     const res = await request(api)
-      .post('/private/fi')
+      .post('/private/FI/Create')
       .set('Accept', /json/)
       .send({
         "fi_id": 852852,

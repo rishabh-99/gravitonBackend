@@ -12,7 +12,6 @@
     "create-sqlite-db": "shx touch ./db/database.sqlite",
     "drop-sqlite-db": "shx rm ./db/database.sqlite",
     "lint": "eslint ./api/. ./config/. ./test/.",
-    
     "pretes": "npm run lint",
     "production": "cross-env NODE_ENV=production node ./api/api.js",
     "test": "cross-env NODE_ENV=testing jest --coverage --watchAll",
@@ -37,6 +36,7 @@
     "express": "^4.17.1",
     "express-routes-mapper": "^1.0.2",
     "helmet": "^3.12.0",
+    "joi": "^17.2.1",
     "jose": "^2.0.1",
     "jsonwebtoken": "^8.2.1",
     "pg": "^8.3.3",

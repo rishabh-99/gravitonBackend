@@ -1,3 +1,9 @@
+
+
+/* File Description: Controlling the Api For all Fi related tasks by registering and Joi Validation included
+Author: Rishabh Mehrothra
+*/
+
 const Joi = require('joi')
 
 const fiSchema = Joi.object({

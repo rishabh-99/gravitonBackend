@@ -31,7 +31,7 @@ const privateRoutes = {
   
   // Fi controller Routes 
 
-  'POST /FI/CreateFi': 'fiController.fi_register'
+  'POST /FI/Create': 'FiController.fi_register'
 
 };
 

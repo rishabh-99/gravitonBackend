@@ -10,7 +10,7 @@ const Fi = require('../models/Fi');
 const { fiSchema }= require('../joi_validation/joi_validation_fi_controller')
 
 
-const fiController = () => {
+const FiController = () => {
 
                 /**
                  * Regestering an fi 
@@ -59,4 +59,4 @@ const fiController = () => {
                             }
 }
 
-module.exports  = fiController
+module.exports  = FiController
