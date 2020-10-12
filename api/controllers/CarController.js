@@ -424,6 +424,8 @@ const CarController = () => {
                 'borrower_details': req.body.borrower_details
             })
 
+        
+
             res.status(200).send({ msg: 'Successfull' })
         } catch (err) {
             return res.status(500).json({ msg: err });

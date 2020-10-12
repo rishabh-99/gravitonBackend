@@ -55,8 +55,7 @@ const registerSchema = Joi.object({
         applicant_categoryid: Joi.number(),
         applicant_pan: Joi.string().min(3),
         applicant_aadhar: Joi.string().min(3),
-        DisplaySearch: Joi.string()
-
+        DisplaySearch: Joi.string().required()
     },
 
     /**
@@ -112,7 +111,7 @@ const registerSchema = Joi.object({
             loan_bankname: Joi.string().required(),
             loan_amount: Joi.number(),
             loan_emi: Joi.number(),
-            loan_closuredate: Joi.date().required(),
+            loan_closuredate: Joi.optional(),
             loan_type: Joi.number(),
             account_realtedpan: Joi.string().min(3),
             account_realtedaadhar: Joi.string().min(3),
