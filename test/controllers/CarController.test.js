@@ -93,7 +93,8 @@ test('CAR | Create (auth)', async () => {
     .set('Accept', /json/)
     .set('Authorization', `Bearer ${res.body.token}`)
     .set('Content-Type', 'application/json')
-    .send({
+    .send(
+      {
       "accountModel": {
         "account_bankname": "cdd",
         "account_ifsc": "1111111111k",

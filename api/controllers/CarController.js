@@ -26,7 +26,8 @@ const sequelize = require('../../config/database');
 const Borrower_incredo_details = require('../models/Borrower_incredo_details');
 
 // importing joi Schemas 
-const { registerSchema } = require('../joi_validation/joi_validation_car_controller')
+const { registerSchema } = require('../joi_validation/joi_validation_car_controller');
+const UserProfile = require('../models/User-profile');
 
 
 
@@ -58,15 +59,15 @@ const CarController = () => {
 
             try {
                 const user_id = req.query.user_id  // user_id.integer()
-                /**
-                 * Creating a Document 
-                 * @param {req} body - Document is created using, document_pan, document adhaar, document_optional
-                 * , document_cibil, document_remark, document_id and progress id
-                 * @param document - stored in the document 
-                 */
 
-                // convertion into each objects with given permissions
+
                 const result = await sequelize.transaction(async (t) => {
+                    /**
+                     * Creating a Document 
+                     * @param {req} body - Document is created using, document_pan, document adhaar, document_optional
+                     * , document_cibil, document_remark, document_id and progress id
+                     * @param document - stored in the document 
+                     */
                     const document = await Document.create({
                         'document_pan': body.documentModel.document_pan,
                         'document_aadhar': body.documentModel.document_aadhar,
@@ -86,8 +87,6 @@ const CarController = () => {
                      * id, related pan and related Adhaar 
                      * Gurantor is created.      
                      */
-
-
                     const gurantor = await Gurantor.create({
                         'gurantor_firstname': body.gurantorModel.gurantor_firstname,
                         'gurantor_middlename': body.gurantorModel.gurantor_middlename,
@@ -101,7 +100,6 @@ const CarController = () => {
 
                     }, { transaction: t });
 
-                    // creating a applicant with given paramaters
                     /**
                      * Creating an applicant.
                      * @constructor
@@ -111,9 +109,6 @@ const CarController = () => {
                      * nearest branch. category, distance, marital status, caste id
                      * Applicant created 
                      */
-
-
-
                     const applicant = await Applicant.create({
                         'applicant_firstname': body.applicantModel.applicant_firstname,
                         'applicant_middlename': body.applicantModel.applicant_middlename,
@@ -140,8 +135,6 @@ const CarController = () => {
                         'applicant_aadhar': body.applicantModel.applicant_aadhar
                     }, { transaction: t });
 
-
-                    // Making an account by taking given parameters
                     /**
                      * Account creating.
                      * @constructor 
@@ -150,9 +143,6 @@ const CarController = () => {
                      * related adhaar
                      * Account is created
                      */
-
-
-
                     const account = await Account.create({
                         'account_bankname': body.accountModel.account_bankname,
                         'account_ifsc': body.accountModel.account_ifsc,
@@ -162,8 +152,6 @@ const CarController = () => {
                         'account_realtedaadhar': body.accountModel.account_realtedaadhar
                     }, { transaction: t });
 
-
-                    // making a seperate array for loan 
                     var loans = []
                     for (var i = 0; i < body.loanModel.length; i++) {
                         // pushing all the loan details into a single arary loan[]
@@ -175,8 +163,6 @@ const CarController = () => {
                              * @loan is created with- bankname, amount, emi, closuredate, 
                              * type, related pan and related adhaar 
                              */
-
-
                             await Loan.create({
                                 'loan_bankname': body.loanModel[i].loan_bankname,
                                 'loan_amount': body.loanModel[i].loan_amount,
@@ -211,27 +197,55 @@ const CarController = () => {
 
                     // creating a user_kyc_log with given parameters
                     /**
-      * Making a User_KYC log
-      * @constructor
-      * @param {req} body - accepts req.body
-      * @user_kyc_log using user_id , related adhaar, related pan and kyc_date 
-      */
+                     * Making a User_KYC log
+                     * @constructor
+                     * @param {req} body - accepts req.body
+                     * @user_kyc_log using user_id , related adhaar, related pan and kyc_date 
+                     */
                     const log = await User_kyc_log.create({
                         'user_id': user_id,
                         'related_aadhar': body.documentModel.document_aadhar,
                         'related_pan': body.documentModel.document_pan,
                         'kyc_date': today
                     }, { transaction: t })
+                    const ran = Math.floor(100000 + Math.random() * 900000)
+                    const user_id = parseInt(`100011100${ran}`)
+                    const documentModel = body.documentModel;
+                    const gurantorModel = body.gurantorModel;
+                    const applicantModel = body.applicantModel;
+                    const accountModel = body.accountModel;
+                    const loanModel = body.loanModel;
 
+                    const userProfileModel = await UserProfile.create(
+                        {
+                            'user_id': user_id,
+                            'details_json': {
+                                [user_id]: {
+                                    "__id": user_id,
+                                    "general_detail": {
+                                        "name": applicantModel.applicant_firstname,
+                                        "email": "a@a.com"
+                                    },
+                                    "mone_history": {
+                                        "contact": applicantModel.applicant_mobile,
+                                        "cibil_score": documentModel.document_cibil,
+                                    },
+                                    "loans": [],
+                                    "kyc": {
+                                        "CarJSON": { documentModel, gurantorModel, applicantModel, accountModel, loanModel }
+                                    },
+                                    "documents": []
+                                }
+                            },
+                            'related_aadhar': documentModel.document_aadhar,
+                            'related_pan': documentModel.document_pan
+                        })
 
-                    // returning all the deeclared functions
-                    return { document, gurantor, applicant, account, loans };
+                    return { userProfileModel };
                 });
-                // logging the result on the console
 
-                console.log({ result })
-                // 200 returns ok! 
-                return res.status(200).json({ msg: 'CAR created Successfully' })
+
+                return res.status(200).json(result)
             } catch (err) {
                 console.log(err);
                 // 500 error returns "internal server error"
@@ -417,6 +431,20 @@ const CarController = () => {
         }
     };
 
+
+    const getUserProfileID = async (req, res) => {
+        try {
+            const profileList = await UserProfile.findAll({
+                attributes: ['user_id']
+            })
+            .then(profile => profile.map(profile => profile.user_id));
+
+            res.status(200).send(profileList)
+        } catch (err) {
+            return res.status(500).json({ msg: err });
+        }
+    };
+
     return {
         // returning all the functions form the controller
         register,
@@ -426,7 +454,8 @@ const CarController = () => {
         getFnameAndAadhar,
         getComboBoxData,
         getCountOfKyc,
-        insertBorrowerDetails
+        insertBorrowerDetails,
+        getUserProfileID
     };
 };
 

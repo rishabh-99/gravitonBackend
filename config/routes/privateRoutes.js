@@ -20,6 +20,7 @@ const privateRoutes = {
   'GET /CAR/getFnameWithAadhar': 'CarController.getFnameAndAadhar',
   'GET /CAR/getComboBoxData': 'CarController.getComboBoxData',
   'GET /CAR/getCountOfKyc': 'CarController.getCountOfKyc',
+  'GET /CAR/getProfileIdList': 'CarController.getUserProfileID',
 
   'POST /CAR/create': 'CarController.register',
   'POST /CAR/insertNewInkredoDetails': 'CarController.insertBorrowerDetails',
