@@ -21,6 +21,7 @@ const privateRoutes = {
   'GET /CAR/getComboBoxData': 'CarController.getComboBoxData',
   'GET /CAR/getCountOfKyc': 'CarController.getCountOfKyc',
   'GET /CAR/getProfileIdList': 'CarController.getUserProfileID',
+  'GET /CAR/getProfileForID': 'CarController.getProfileForProfileID',
 
   'POST /CAR/create': 'CarController.register',
   'POST /CAR/insertNewInkredoDetails': 'CarController.insertBorrowerDetails',

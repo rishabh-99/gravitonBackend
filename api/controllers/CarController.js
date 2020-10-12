@@ -445,6 +445,22 @@ const CarController = () => {
         }
     };
 
+    const getProfileForProfileID = async (req, res) => {
+        const user_id = req.query.user_id
+        try {
+            const profile = await UserProfile.findOne({
+                attributes: ['details_json'],
+                where: {
+                    user_id
+                }
+            })
+
+            res.status(200).send(profile.details_json)
+        } catch (err) {
+            return res.status(500).json({ msg: err });
+        }
+    };
+
     return {
         // returning all the functions form the controller
         register,
@@ -455,7 +471,8 @@ const CarController = () => {
         getComboBoxData,
         getCountOfKyc,
         insertBorrowerDetails,
-        getUserProfileID
+        getUserProfileID,
+        getProfileForProfileID
     };
 };
 
