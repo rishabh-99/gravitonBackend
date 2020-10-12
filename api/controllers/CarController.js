@@ -437,7 +437,7 @@ const CarController = () => {
             const profileList = await UserProfile.findAll({
                 attributes: ['user_id']
             })
-            .then(profile => profile.map(profile => profile.user_id));
+                .then(profile => profile.map(profile => profile.user_id));
 
             res.status(200).send(profileList)
         } catch (err) {
@@ -461,6 +461,43 @@ const CarController = () => {
         }
     };
 
+    const insertNewLoan = async (req, res) => {
+        const user_id = req.body.user_id;
+        const loan_type = req.body.loan_type;
+        try {
+            const profile = await UserProfile.findOne({
+                where: {
+                    user_id: user_id
+                }
+            });
+            const generateRandomString = (length = 6) => Math.random().toString(20).substr(2, length)
+            const newLoanId = generateRandomString()
+            profile.details_json[user_id].loans = [...profile.details_json[user_id].loans,
+            {
+
+                "__loan_id": newLoanId,
+                "loan_type": loan_type,
+                "stages": {
+                    "kyc_approval": {
+                        "status": false,
+                    },
+                    "current_stage": "kyc_approval"
+                },
+                "assigned_to": {},
+                "fi_data": {},
+                "emi_schedule": {}
+
+            }]
+
+            await UserProfile.update({
+                'details_json': profile.details_json
+            }, { where: { 'user_id': user_id } })
+            res.status(200).json({ msg: 'Operation Successfull' })
+        } catch (err) {
+            return res.status(500).json({ msg: err });
+        }
+    };
+
     return {
         // returning all the functions form the controller
         register,
@@ -472,7 +509,8 @@ const CarController = () => {
         getCountOfKyc,
         insertBorrowerDetails,
         getUserProfileID,
-        getProfileForProfileID
+        getProfileForProfileID,
+        insertNewLoan
     };
 };
 
