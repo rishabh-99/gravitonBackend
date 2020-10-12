@@ -1,8 +1,8 @@
 const development = {
-  database: 'demo',    // development database
+  database: 'rishabh_aws',    // development database
   username: 'postgres',  // username of the database
   password: 'postgres',   // password of the database
-  host: 'localhost',    // hosting environment 
+  host: 'mydb.ctmbums33jwn.ap-south-1.rds.amazonaws.com',    // hosting environment 
   dialect: 'postgres',  // database
 };
 
