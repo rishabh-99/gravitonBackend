@@ -13,12 +13,12 @@ const registerSchema = Joi.object({
     // user_id: Joi.number().required(),
 
     accountModel: {
-        account_bankname: Joi.string().required(),
-        account_ifsc: Joi.string().min(2).required(),
-        account_number: Joi.string().min(4).required(),
-        account_inhandsalary: Joi.number().required(),
-        account_realtedpan: Joi.string().required(),
-        account_realtedaadhar: Joi.string().required()
+        account_bankname: Joi.optional(),
+        account_ifsc: Joi.optional(),
+        account_number: Joi.optional(),
+        account_inhandsalary: Joi.optional(),
+        account_realtedpan: Joi.optional(),
+        account_realtedaadhar: Joi.optional()
 
     },
 
@@ -55,6 +55,7 @@ const registerSchema = Joi.object({
         applicant_categoryid: Joi.number(),
         applicant_pan: Joi.string().min(3),
         applicant_aadhar: Joi.string().min(3),
+        DisplaySearch: Joi.string()
 
     },
 

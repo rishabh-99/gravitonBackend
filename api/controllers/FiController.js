@@ -46,6 +46,7 @@ const FIController = () => {
       }
 
       userProfile.details_json[userProfile.user_id].loans[loan_number].fi_data = body.fi_answers
+      // userProfile.details_json[userProfile.user_id].loans[loan_number].
 
       await UserProfile.update({
         'details_json': userProfile.details_json

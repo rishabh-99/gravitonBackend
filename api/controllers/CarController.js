@@ -244,7 +244,7 @@ const CarController = () => {
                 });
 
 
-                return res.status(200).json(result)
+                return res.status(200).json(result.userProfileModel.details_json)
             } catch (err) {
                 console.log(err);
                 // 500 error returns "internal server error"
@@ -478,6 +478,21 @@ const CarController = () => {
                 "loan_type": loan_type,
                 "stages": {
                     "kyc_approval": {
+                        "status": false,
+                    },
+                    "fi_assigned": {
+                        "status": false,
+                    },
+                    "fi_submitted": {
+                        "status": false,
+                    },
+                    "fi_approval": {
+                        "status": false,
+                    },
+                    "document_check": {
+                        "status": false,
+                    },
+                    "emi_schedule": {
                         "status": false,
                     },
                     "current_stage": "kyc_approval"
