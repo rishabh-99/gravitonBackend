@@ -36,8 +36,16 @@ const FIController = () => {
           'related_pan': body.related_pan
         }
       })
+      let loan_number = 0;
+      let counter = 0;
+      for(loan of userProfile.details_json[userProfile.user_id].loans) {
+        if(loan.__loan_id == body.__loan_id) {
+          loan_number = counter
+        }
+        counter++;
+      }
 
-      userProfile.details_json[userProfile.user_id].loans[body.loan_number - 1].fi_data = body.fi_answers
+      userProfile.details_json[userProfile.user_id].loans[loan_number].fi_data = body.fi_answers
 
       await UserProfile.update({
         'details_json': userProfile.details_json
