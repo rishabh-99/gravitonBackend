@@ -203,7 +203,7 @@ const CarController = () => {
                      * @user_kyc_log using user_id , related adhaar, related pan and kyc_date 
                      */
                     const log = await User_kyc_log.create({
-                        'user_id': user_id,
+                        'user_id': req.query.user_id,
                         'related_aadhar': body.documentModel.document_aadhar,
                         'related_pan': body.documentModel.document_pan,
                         'kyc_date': today
