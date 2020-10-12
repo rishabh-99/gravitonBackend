@@ -26,38 +26,29 @@ const LoginController = () => {
   const register = async (req, res) => {
     // registering the user 
     const { body } = req;
-    const result = await loginSchema.validate(body);
-    const { value, error } = result;
-    const valid = error == null;
-    if (!valid) {
-      res.status(422).json({
-        msg: error,
-        data: body
-      })
-    } else {
-      // req.body 
-      try {
+    // req.body 
+    try {
 
 
-        // creating a user with parameters given 
-        const user = await User.create({
-          full_name: body.full_name,
-          username: body.username,
-          designation: body.designation,
-          user_mobile: body.user_mobile,
-          password: body.password,
-          permissions: JSON.parse(body.permissions),
-          is_active: body.is_active
-        });
-        // validating using joi Schema 
+      // creating a user with parameters given 
+      const user = await User.create({
+        full_name: body.full_name,
+        username: body.username,
+        designation: body.designation,
+        user_mobile: body.user_mobile,
+        password: body.password,
+        permissions: JSON.parse(body.permissions),
+        is_active: body.is_active
+      });
+      // validating using joi Schema 
 
-        // 200 ok! 
-        return res.status(200).json({ msg: 'User created successfully!!' });
-      } catch (err) {
-        console.log(err);
-        return res.status(500).json({ msg: 'Internal server error' });
-      }
+      // 200 ok! 
+      return res.status(200).json({ msg: 'User created successfully!!' });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({ msg: 'Internal server error' });
     }
+
   };
 
   // login function accepts both the request and responses 
@@ -202,6 +193,6 @@ const LoginController = () => {
     disableUser
   };
 };
-  // exporting the whole Module
+// exporting the whole Module
 
 module.exports = LoginController

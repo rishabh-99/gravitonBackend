@@ -9,7 +9,7 @@ const CarController = require("../../api/controllers/CarController");
 
 const privateRoutes = {
   // Login Controller Routes
-  'GET /logins': 'LoginController.getAll',
+  'GET /User/logins': 'LoginController.getAll',
   
   'POST /User/disableUser': 'LoginController.disableUser',
 
