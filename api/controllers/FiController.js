@@ -42,7 +42,7 @@ const FIController = () => {
       await UserProfile.update({
         'details_json': userProfile.details_json
       }, { where: { 'user_id': userProfile.user_id } })
-      return res.status(200).json(userProfile)
+      return res.status(200).json(msg: 'Operation Successful')
     } catch (err) {
       console.log(err);
       // 500 error returns "internal server error"
