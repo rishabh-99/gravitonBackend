@@ -224,7 +224,6 @@ const CarController = () => {
                                     "__id": user_id,
                                     "general_detail": {
                                         "name": applicantModel.applicant_firstname,
-                                        "email": "a@a.com"
                                     },
                                     "mone_history": {
                                         "contact": applicantModel.applicant_mobile,
