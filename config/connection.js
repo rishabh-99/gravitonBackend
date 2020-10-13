@@ -9,7 +9,7 @@ const development = {
 const testing = {
   database: 'testing-2',  // development database
   username: 'postgres',  // username of the database
-  password: 'postgres',   // password of the database
+  password: '12345678',   // password of the database
   host: 'localhost',     // hosting environment 
   dialect: 'postgres', // database
 };

@@ -61,7 +61,7 @@ test('Login | create', async () => {
     // .expect(200);
   console.log(res.body)
   expect(res.body.msg).toBe('User created successfully!!');
-
+  
   const login = await Login.findOne({
     // finding the user with given username 
     where: {
@@ -71,6 +71,10 @@ test('Login | create', async () => {
   expect(login.full_name).toBe('Rime');
   // cleaning the database before next test 
   await login.destroy();
+
+
+
+  
 });
 
 test('Login | login', async () => {
@@ -193,3 +197,132 @@ test('Login | DisableUser (auth)', async () => {
   // cleaning the database before next test 
   await login.destroy();
 });
+
+
+test('Login | create | with invalid request ', async () => {
+
+  /**
+ * Creating a login user
+ * @constructor
+ * @param {response} = req.api 
+ * @param Login created using - full_name, username, password , designation, user_mobile 
+ * and permissions
+ * Created the login user
+ */
+
+  // post request with details to register
+  const res = await request(api)
+    .post('/public/register')
+    .set('Accept', /json/)
+    .send({
+      "full_name": "Rime",
+      "username": "rimet",
+      "designation": "Boss",
+      "user_mobile": 8299213792,
+      "password": "Alfanzdo@001",
+      "password2": "Alfanzo@001",
+      "permissions": "{\"Admin\": true, \"Employee\": false}",
+      "is_active": true
+    })
+    // 200 to be ok! 
+  expect(500)
+  console.log(res.body)
+  //expect(res.body.msg).toBe('User created successfully!!');
+  
+  const login = await Login.findOne({
+    // finding the user with given username 
+    where: {
+      username: 'rimet',
+    }
+  })
+  expect(login.full_name).toBe('Rime');
+  
+  // cleaning the database before next test 
+  await login.destroy();
+});
+
+test('Login | create | with incorrect passwords', async () => {
+
+  /**
+ * Creating a login user
+ * @constructor
+ * @param {response} = req.api 
+ * @param Login created using - full_name, username, password , designation, user_mobile 
+ * and permissions
+ * Created the login user
+ */
+
+  // post request with details to register
+  const res = await request(api)
+    .post('/public/register')
+    .set('Accept', /json/)
+    .send({
+      "full_name": "Rime",
+      "username": "rimet",
+      "designation": "Boss",
+      "user_mobile": "8299213792",
+      "password": "Alfanzdlo@001",
+      "password2": "Alfanzo@001",
+      "permissions": "{\"Admin\": true, \"Employee\": false}",
+      "is_active": true
+    })
+    // 200 to be ok! 
+  expect(401)
+  console.log(res.body)
+  //expect(res.body.msg).toBe('User created successfully!!');
+  
+  const login = await Login.findOne({
+    // finding the user with given username 
+    where: {
+      username: 'rimet',
+    }
+  })
+  expect(login.full_name).toBe('Rime');
+  
+  // cleaning the database before next test 
+  await login.destroy();
+});
+test('Login | create | with 201 (added) ', async () => {
+
+  /**
+ * Creating a login user
+ * @constructor
+ * @param {response} = req.api 
+ * @param Login created using - full_name, username, password , designation, user_mobile 
+ * and permissions
+ * Created the login user
+ */
+
+  // post request with details to register
+  const res = await request(api)
+    .post('/public/register')
+    .set('Accept', /json/)
+    .send({
+      "full_name": "Rime",
+      "username": "rimet",
+      "designation": "Boss",
+      "user_mobile": "8299213792",
+      "password": "Alfanzdlo@001",
+      "password2": "Alfanzo@001",
+      "permissions": "{\"Admin\": true, \"Employee\": false}",
+      "is_active": true
+    })
+    // 200 to be ok! 
+  expect(201)
+  console.log(res.body)
+  //expect(res.body.msg).toBe('User created successfully!!');
+  
+  const login = await Login.findOne({
+    // finding the user with given username 
+    where: {
+      username: 'rimet',
+    }
+  })
+  expect(login.full_name).toBe('Rime');
+  
+  // cleaning the database before next test 
+  await login.destroy();
+});
+
+
+
