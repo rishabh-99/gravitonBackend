@@ -118,6 +118,26 @@
                       "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/my-express-application-dev*:*:*"
                     }
                   ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:PutObject"
+                  ],
+                  "Resource": {
+                    "Fn::Join": [
+                      "",
+                      [
+                        {
+                          "Fn::GetAtt": [
+                            "S3Bucket",
+                            "Arn"
+                          ]
+                        },
+                        "/*"
+                      ]
+                    ]
+                  }
                 }
               ]
             }
@@ -146,7 +166,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/my-express-application/dev/1602314092179-2020-10-10T07:14:52.179Z/my-express-application.zip"
+          "S3Key": "serverless/my-express-application/dev/1602569946784-2020-10-13T06:19:06.784Z/my-express-application.zip"
         },
         "FunctionName": "my-express-application-dev-app",
         "Handler": "./api/api.handler",
@@ -161,7 +181,10 @@
         "Timeout": 6,
         "Environment": {
           "Variables": {
-            "NODE_ENV": "development"
+            "NODE_ENV": "development",
+            "S3_BUCKET": {
+              "Ref": "S3Bucket"
+            }
           }
         }
       },
@@ -169,14 +192,14 @@
         "AppLogGroup"
       ]
     },
-    "AppLambdaVersionTE10rqBbSVjzYwrCnTbhp4q2hzfpvtSsYewiBwX5s": {
+    "AppLambdaVersionSMRzqKqoNamXuBZONad6GTsD1l8mGJA0fEtjehajSDQ": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "AppLambdaFunction"
         },
-        "CodeSha256": "tv3Wr0mmWRirKGJQ7GLh67twI3b7n6g20gfWFXlHNd8="
+        "CodeSha256": "AgHlK3KFblqeAQnM31gKmvua+AGReNqjfjuY0hO7e/M="
       }
     },
     "ApiGatewayRestApi": {
@@ -295,7 +318,7 @@
         "MethodResponses": []
       }
     },
-    "ApiGatewayDeployment1602314074428": {
+    "ApiGatewayDeployment1602569929371": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
@@ -344,6 +367,61 @@
           ]
         }
       }
+    },
+    "S3Bucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "CorsConfiguration": {
+          "CorsRules": [
+            {
+              "AllowedHeaders": [
+                "*"
+              ],
+              "AllowedMethods": [
+                "GET",
+                "POST",
+                "PUT"
+              ],
+              "AllowedOrigins": [
+                "*"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "S3BucketPolicy": {
+      "Type": "AWS::S3::BucketPolicy",
+      "Properties": {
+        "Bucket": {
+          "Ref": "S3Bucket"
+        },
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "s3:GetObject"
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    {
+                      "Fn::GetAtt": [
+                        "S3Bucket",
+                        "Arn"
+                      ]
+                    },
+                    "/*"
+                  ]
+                ]
+              },
+              "Principal": "*"
+            }
+          ]
+        }
+      }
     }
   },
   "Outputs": {
@@ -355,7 +433,7 @@
     "AppLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "AppLambdaVersionTE10rqBbSVjzYwrCnTbhp4q2hzfpvtSsYewiBwX5s"
+        "Ref": "AppLambdaVersionSMRzqKqoNamXuBZONad6GTsD1l8mGJA0fEtjehajSDQ"
       }
     },
     "ServiceEndpoint": {

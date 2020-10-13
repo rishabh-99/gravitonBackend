@@ -7,12 +7,41 @@ provider:
   region: ap-south-1
   environment:
     NODE_ENV: development
+    S3_BUCKET: { Ref: S3Bucket }
+  iamRoleStatements: # Signed URL will have same permissions as the IAM Role
+    - Effect: Allow
+      Action:
+        - s3:PutObject
+      Resource: { Fn::Join: ["", [{ Fn::GetAtt: [S3Bucket, Arn] }, "/*"]] } # arn:aws:s3:::bucketName/*
 
 functions:
   app:
     handler: ./api/api.handler
     events:
       - http: ANY /
-      - http: 'ANY {proxy+}'
+      - http: "ANY {proxy+}"
+resources:
+  Resources:
+    S3Bucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        CorsConfiguration:
+          CorsRules:
+            - AllowedHeaders: ["*"]
+              AllowedMethods: [POST, PUT]
+              AllowedOrigins: ["*"]
+    S3BucketPolicy: # Allow uploaded files to be public and downloadable
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket: { Ref: S3Bucket }
+        PolicyDocument:
+          Statement:
+            - Action:
+                - "s3:GetObject"
+              Effect: "Allow"
+              Resource: {
+                  Fn::Join: ["", [{ Fn::GetAtt: [S3Bucket, Arn] }, "/*"]],
+                } # arn:aws:s3:::bucketName/*
+              Principal: "*"
 plugins:
   - serverless-offline

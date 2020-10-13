@@ -22,6 +22,9 @@ const privateRoutes = {
   'GET /CAR/getCountOfKyc': 'CarController.getCountOfKyc',
   'GET /CAR/getProfileIdList': 'CarController.getUserProfileID',
   'GET /CAR/getProfileForID': 'CarController.getProfileForProfileID',
+  'GET /CAR/getPreSignedUrl': 'CarController.getPreSignedUrl',
+  'GET /CAR/approveKYC': 'CarController.approveKYC',
+  'GET /CAR/getAgentNameForKYC': 'CarController.getAgentNameForKYC',
 
   'POST /CAR/create': 'CarController.register',
   'POST /CAR/insertNewInkredoDetails': 'CarController.insertBorrowerDetails',

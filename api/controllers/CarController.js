@@ -17,7 +17,8 @@ const Gurantortype = require('../models/Gurantortype');
 const Documenttype = require('../models/Documenttype');
 const Loantype = require('../models/Loantype');
 const User_kyc_log = require('../models/User_kyc_log');
-
+const AWS = require('aws-sdk');
+const s3 = new AWS.S3();
 
 
 // importing the database confifurations from the datavbase folder 
@@ -28,6 +29,7 @@ const Borrower_incredo_details = require('../models/Borrower_incredo_details');
 // importing joi Schemas 
 const { registerSchema } = require('../joi_validation/joi_validation_car_controller');
 const UserProfile = require('../models/User-profile');
+const Login = require('../models/Login');
 
 
 
@@ -317,7 +319,7 @@ const CarController = () => {
                 .then(document => document.map(document => document.document_pan));
             console.log(typeof (Pan))
             // returns 200 ok! and pan object 
-            res.status(200).send(Pan)
+            return res.status(200).send(Pan)
         } catch (err) {
             // catches the error to "internal server error"
             return res.status(500).json({ msg: err });
@@ -335,7 +337,7 @@ const CarController = () => {
             })
                 .then(applicant => applicant.map(applicant => `${applicant.applicant_firstname} : ${applicant.applicant_aadhar}`));
             console.log(NameWithAadhar)
-            res.status(200).send(NameWithAadhar)
+            return res.status(200).send(NameWithAadhar)
         } catch (err) {
             return res.status(500).json({ msg: err });
         }
@@ -351,7 +353,7 @@ const CarController = () => {
             const LoantypeModel = await Loantype.findAll();
             const DocumenttypeModel = await Documenttype.findAll();
 
-            res.status(200).send({ MaritalStatusModel, AcquaintanceModel, CasteModel, CategoryModel, GurantortypeModel, LoantypeModel, DocumenttypeModel })
+            return res.status(200).send({ MaritalStatusModel, AcquaintanceModel, CasteModel, CategoryModel, GurantortypeModel, LoantypeModel, DocumenttypeModel })
         } catch (err) {
             return res.status(500).json({ msg: err });
         }
@@ -391,7 +393,7 @@ const CarController = () => {
                 }
             })
 
-            res.status(200).send({ count })
+            return res.status(200).send({ count })
         } catch (err) {
             return res.status(500).json({ msg: err });
         }
@@ -414,7 +416,7 @@ const CarController = () => {
 
 
 
-            res.status(200).send({ msg: 'Successfull' })
+            return res.status(200).send({ msg: 'Successfull' })
         } catch (err) {
             return res.status(500).json({ msg: err });
         }
@@ -428,7 +430,7 @@ const CarController = () => {
             })
                 .then(profile => profile.map(profile => profile.user_id));
 
-            res.status(200).send(profileList)
+            return res.status(200).send(profileList)
         } catch (err) {
             return res.status(500).json({ msg: err });
         }
@@ -444,7 +446,7 @@ const CarController = () => {
                 }
             })
 
-            res.status(200).send(profile.details_json)
+            return res.status(200).send(profile.details_json)
         } catch (err) {
             return res.status(500).json({ msg: err });
         }
@@ -496,7 +498,77 @@ const CarController = () => {
             await UserProfile.update({
                 'details_json': profile.details_json
             }, { where: { 'user_id': user_id } })
-            res.status(200).json({ msg: 'Operation Successfull' })
+            return res.status(200).json({ msg: 'Operation Successfull' })
+        } catch (err) {
+            return res.status(500).json({ msg: err });
+        }
+    };
+
+    const getPreSignedUrl = async (req, res) => {
+        try {
+            // console.log(JSON.parse(process.env.S3_BUCKET))
+            const preSignedUrl = await s3.getSignedUrlPromise('putObject', {
+                Bucket: 'my-express-application-dev-s3bucket-18eh6dlfu6qih',
+                Key: req.query.filename, // File name could come from queryParameters
+            });
+
+            // const storageUrl = `https://my-express-application-dev-s3bucket-18eh6dlfu6qih.s3.ap-south-1.amazonaws.com/${req.query.filename}`
+            return res.status(200).json(preSignedUrl)
+        } catch (err) {
+            return res.status(500).json({ msg: err });
+        }
+    };
+
+    const approveKYC = async (req, res) => {
+        const user_id = req.query.user_id;
+        const __loan_id = req.query.__loan_id;
+
+        try {
+            let profile = await UserProfile.findOne({
+                where: {
+                    user_id: user_id
+                }
+            })
+            let counter = 0;
+            let loanNumber = 0;
+            for (let loan of profile.details_json[user_id].loans) {
+                if (loan.__loan_id == __loan_id) {
+                    loanNumber = counter;
+                }
+                counter++;
+            }
+
+            profile.details_json[user_id].loans[loanNumber].stages.kyc_approval.status = true;
+            profile.details_json[user_id].loans[loanNumber].stages.kyc_approval.time_stamp = new Date();
+
+            await UserProfile.update({
+                'details_json': profile.details_json
+            }, { where: { 'user_id': user_id } })
+
+
+            return res.status(200).json({ msg: 'Operation Successful' })
+        } catch (err) {
+            return res.status(500).json({ msg: err });
+        }
+    };
+
+    const getAgentNameForKYC = async (req, res) => {
+        const related_aadhar = req.query.related_aadhar
+        try {
+            const log = await User_kyc_log.findOne({
+                where: {
+                    'related_aadhar': related_aadhar
+                },
+                attributes: ['user_id']
+            });
+
+            const name = await Login.findOne({
+                where:{
+                    user_id: log.user_id
+                },
+                attributes: ['full_name']
+            })
+            return res.status(200).json(name.full_name);
         } catch (err) {
             return res.status(500).json({ msg: err });
         }
@@ -514,7 +586,10 @@ const CarController = () => {
         insertBorrowerDetails,
         getUserProfileID,
         getProfileForProfileID,
-        insertNewLoan
+        insertNewLoan,
+        getPreSignedUrl,
+        approveKYC,
+        getAgentNameForKYC
     };
 };
 
