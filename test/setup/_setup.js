@@ -12,6 +12,7 @@ const Account = require('../../api/models/Account');
 const Applicant = require('../../api/models/Applicant');
 const Gurantor = require('../../api/models/Gurantor');
 const Document = require('../../api/models/Document');
+const User_kyc_log = require('../../api/models/User_kyc_log');
 
 const beforeAction = async () => {
   const testapp = express();
@@ -39,9 +40,13 @@ const beforeAction = async () => {
   await Gurantor.destroy({
     where: {},
   });
+  await User_kyc_log.destroy({
+    where: {},
+  })
   await Document.destroy({
     where: {},
   })
+ 
   // await database.drop({force: true});
   await database.sync().then(() => console.log('Connection to the database has been established successfully'));
 

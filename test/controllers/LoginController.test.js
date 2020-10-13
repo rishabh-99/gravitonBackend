@@ -139,7 +139,7 @@ test('Login | get all (auth)', async () => {
 
   // verifying using the Bearer token 
   const res2 = await request(api)
-    .get('/private/logins')
+    .get('/private/User/logins')
     .set('Accept', /json/)
     .set('Authorization', `Bearer ${res.body.token}`)
     .set('Content-Type', 'application/json')
