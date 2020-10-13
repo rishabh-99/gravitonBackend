@@ -1,3 +1,12 @@
+/*
+File Description: Configuring the database
+Author: Rishabh Merhotra 
+logs: Change of username and password with respect to the writer's local environment
+on  13/10/2020
+*/
+
+
+
 const development = {
   database: 'rishabh_aws',    // development database
   username: 'postgres',  // username of the database
