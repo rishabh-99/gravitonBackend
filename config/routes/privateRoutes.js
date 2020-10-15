@@ -36,7 +36,9 @@ const privateRoutes = {
   
   // Fi controller Routes 
 
-  'POST /FI/insertNewFIData': 'FiController.register'
+  'POST /FI/insertNewFIData': 'FiController.register',
+  'GET /FI/getComboBoxData': 'FiController.getComboBoxData',
+
 
 };
 
