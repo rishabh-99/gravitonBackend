@@ -305,7 +305,116 @@ test('CAR | Get Combobox data (auth)', async () => {
     expect(res2.body.LoantypeModel).toBeTruthy();
     expect(res2.body.DocumenttypeModel).toBeTruthy();
     // expect(res2.body[0]).toBe('aaaaaaaa : 222222222230')
-});
+});   
+
+
+// test with invalid inputs
 
 
 
+test('CAR | Create (auth) | with invalid input', async () => {
+  /**
+   * creating a car authenticaion test 
+   * @constructor- After Authenticatoin
+   * @param {respones} api to request 
+   * @param {token}- token verification for authencticatoin 
+   */
+  
+      // post request to login and authenticate
+    const res = await request(api)
+      .post('/public/login')
+      .set('Accept', /json/)
+      .send({
+        username: 'rimet',
+        password: 'Alfanzo@001',
+      })
+      // 200 for ok! 
+      .expect(200);
+       // tobeTruthy returns only if true.
+       // here verifying the token to be true 
+    expect(res.body.token).toBeTruthy();
+  
+    const res2 = await request(api)
+    /**
+   * Creating a car after getting documents 
+   * @constructor
+   * @param {response} api - 
+   * @param private post request with all document details into the database 
+   * and car gets created 
+   */
+    // making a private post request using Bearer Tokens and Authorizing later 
+      .post('/private/CAR/create')
+      .set('Accept', /json/)
+      .set('Authorization', `Bearer ${res.body.token}`)
+      .set('Content-Type', 'application/json')
+      .send(
+        {
+        "accountModel": {
+          "account_bankname": "cdd",
+          "account_ifsc": "1111111111k",
+          "account_number": "111111111111",
+          "account_inhandsalary": "1111111111",  // int to string 
+          "account_realtedpan": "QWETY1234O",
+          "account_realtedaadhar": "222222222230"
+        },
+        "applicantModel": {
+          "applicant_firstname": "aaaaaaaa",
+          "applicant_middlename": "",
+          "applicant_lastname": "aaaaaaaaaa",
+          "applicant_acquaintancename": "aaaaaaaaaaaa",
+          "applicant_dob": "2020-10-07",
+          "applicant_state": "Assam",
+          "applicant_district": "Dhubri",
+          "applicant_pincode": "111111",
+          "applicant_currentaddress": "aaaaaaaaaaaaaa",
+          "applicant_mobile": "1111111111",
+          "applicant_officeno": "1111111111",
+          "applicant_desgination": "aaaaaaaaaaaa",
+          "applicant_education": "Postgraduate ",
+          "applicant_employername": "aaaaaaaaaa",
+          "applicant_officeaddress": "aaaaaaaaaaaaaaaaa",
+          "applicant_nearestbranch": "Jaipur Office ",
+          "applicant_distance": 1110,
+          "applicant_acquaintanceid": 1,
+          "applicant_maritalstatusid": 2,
+          "applicant_casteid": 3,
+          "applicant_categoryid": 2,
+          "applicant_pan": "QWETY1234O",
+          "applicant_aadhar": "222222222230",
+        },
+        "documentModel": {
+          "progress_id": 1,
+          "document_id": 7,
+          "document_remark": null,
+          "document_cibil": 0,
+          "document_optional": null,
+          "document_aadhar": "222222222230",
+          "document_pan": "QWETY1234O"
+        },
+        "gurantorModel": {
+          "gurantor_firstname": "aaaaaaaaaaaa",
+          "gurantor_middlename": "",
+          "gurantor_lastname": "aaaaaaaaaaa",
+          "gurantor_currentaddress": "aaaaaaaaaaaaaaaaaaaa",
+          "gurantor_mobile": "1111111111",
+          "gurantor_relation": "sffdfd",
+          "gurantor_realtedpan": "QWETY1234O",
+          "gurantor_realtedaadhar": "222222222230",
+          "gurantortype_id": 1
+        },
+        "loanModel": []
+      })
+
+      
+      .expect(500);
+    //expect(res2.body).toBe("invalid input")  
+      // we expect the msg to be Truthy 
+    expect(res2.body).toBeTruthy();
+    // expecting it to be successfull 
+    expect(res2.body).toBeInstanceOf(Object)
+  
+  
+  });
+
+
+ 

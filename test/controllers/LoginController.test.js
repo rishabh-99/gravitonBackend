@@ -72,9 +72,6 @@ test('Login | create', async () => {
   // cleaning the database before next test 
   await login.destroy();
 
-
-
-  
 });
 
 test('Login | login', async () => {
@@ -282,6 +279,8 @@ test('Login | create | with incorrect passwords', async () => {
   // cleaning the database before next test 
   await login.destroy();
 });
+
+
 test('Login | create | with 201 (added) ', async () => {
 
   /**
@@ -302,12 +301,12 @@ test('Login | create | with 201 (added) ', async () => {
       "username": "rimet",
       "designation": "Boss",
       "user_mobile": "8299213792",
-      "password": "Alfanzdlo@001",
+      "password": "Alfanzo@001",
       "password2": "Alfanzo@001",
       "permissions": "{\"Admin\": true, \"Employee\": false}",
       "is_active": true
     })
-    // 200 to be ok! 
+    // 
   expect(201)
   console.log(res.body)
   //expect(res.body.msg).toBe('User created successfully!!');
@@ -326,3 +325,131 @@ test('Login | create | with 201 (added) ', async () => {
 
 
 
+// Token invalid 
+
+
+test('Login | get all (auth) | with wrong token', async () => {
+  // post request the login credentials 
+  const login = await Login.create({
+    "full_name": "Rime",
+    "username": "rimet",
+    "designation": "Boss",
+    "user_mobile": "8299213792",
+    "password": "Alfanzo@001",
+    "password2": "Alfanzo@001",
+    "permissions": "{\"Admin\": true, \"Employee\": false}",
+    "is_active": true
+  });
+
+  const res = await request(api)
+  // post request the detials to login 
+    .post('/public/login')
+    .set('Accept', /json/)
+    .send({
+      username: 'rimet',
+      password: 'Alfanzo@001',
+    })
+    .expect(200);
+
+  expect(res.body.token).toBeTruthy();
+
+  // verifying using the Bearer token 
+  const res2 = await request(api)
+    .get('/private/User/logins')
+    .set('Accept', /json/)                
+    .set('Authorization', 'heman')  // giving random token to verify
+    .set('Content-Type', 'application/json')
+    .expect(401);
+    expect(res2.body.msg).toBeTruthy();
+    
+  // expecting the user to be truthy 
+  // expect(res2.body.users).toBeTruthy();
+  // expect(res2.body.users.length).toBeGreaterThanOrEqual(1);
+  // cleaning the database before next test 
+  await login.destroy();
+});
+
+// login login test 
+
+test('Login | login | incorrect username or password ', async () => {
+
+  // post request tp create a login of a user 
+  const login = await Login.create({
+    "full_name": "Rime",
+    "username": "rimet",
+    "designation": "Boss",
+    "user_mobile": "8299213792",
+    "password": "Alfanzo@001",
+    "password2": "Alfanzo@001",
+    "permissions": "{\"Admin\": true, \"Employee\": false}",
+    "is_active": true
+  });
+
+  const res = await request(api)
+  /**
+ * Login of the user .
+ * @constructor
+ * @param {req} api - login the user 
+ * @param Login using the following details - Username and password
+ * After veriying with token the login is done
+ */
+
+    .post('/public/login')
+    // post request using the login details 
+    .set('Accept', /json/)
+    .send({
+      "username": "rimet",
+      "password": "Alfanzor@001"
+    })
+   
+  expect(res.body.msg).toBeTruthy()
+
+  // expect(login).toBeTruthy();
+  // cleaning the database before next test 
+  await login.destroy();
+});
+
+
+
+test('Login | DisableUser (auth) | Authorization fail ', async () => {
+  // post request with the login credentials 
+  const login = await Login.create({
+    "full_name": "Rime",
+    "username": "rimet",
+    "designation": "Boss",
+    "user_mobile": "8299213792",
+    "password": "Alfanzo@001",
+    "password2": "Alfanzo@001",
+    "permissions": "{\"Admin\": true, \"Employee\": false}",
+    "is_active": true
+  });
+
+  const res = await request(api)
+  /**
+ * Disabling a user
+ * Accepts the responses and requests from the api
+ * @param Login with the usename and password and verification starts
+ * @param login_id is used and the user gets disabled 
+ */
+  /// logging in using username and password 
+    .post('/public/login')
+    .set('Accept', /json/)
+    .send({
+      username: 'rimet',
+      password: 'Alfanzo@001',
+    })
+    .expect(200);
+  // verifying using token 
+  expect(res.body.token).toBeTruthy();
+  //using the login, disable a user with their id.
+  const res2 = await request(api)
+    .post(`/private/User/disableUser?user_id=${login.user_id}&username=rimet&password=Alfanzo@001`)
+    .set('Accept', /json/)
+    .set('Authorization', "hh")
+    .set('Content-Type', 'application/json')
+    .expect(401);
+
+  expect(res2.body).toBeTruthy();
+  // cleaning the database before next test 
+  await login.destroy();
+});
