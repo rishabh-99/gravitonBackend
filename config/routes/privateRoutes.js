@@ -22,7 +22,7 @@ const privateRoutes = {
   'GET /CAR/getCountOfKyc': 'CarController.getCountOfKyc',
   'GET /CAR/getProfileIdList': 'CarController.getUserProfileID',
   'GET /CAR/getProfileForID': 'CarController.getProfileForProfileID',
-  'GET /CAR/getPreSignedUrl': 'CarController.getPreSignedUrl',
+  'GET /Inkredo/getPreSignedUrl': 'CarController.getPreSignedUrl',
   'GET /CAR/approveKYC': 'CarController.approveKYC',
   'GET /CAR/getAgentNameForKYC': 'CarController.getAgentNameForKYC',
 
@@ -38,7 +38,7 @@ const privateRoutes = {
 
   'POST /FI/insertNewFIData': 'FiController.register',
   'GET /FI/getComboBoxData': 'FiController.getComboBoxData',
-
+  'GET /FI/getPreSignedUrl': 'FiController.getPreSignedUrl',
 
 };
 

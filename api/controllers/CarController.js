@@ -509,7 +509,7 @@ const CarController = () => {
             // console.log(JSON.parse(process.env.S3_BUCKET))
             const preSignedUrl = await s3.getSignedUrlPromise('putObject', {
                 Bucket: 'my-express-application-dev-s3bucket-18eh6dlfu6qih',
-                Key: req.query.filename, // File name could come from queryParameters
+                Key: `Inkredo/${req.query.loan_type}/${req.query.profile_id}/${req.query.__loan_id}/${req.query.filename}`, // File name could come from queryParameters
             });
 
             // const storageUrl = `https://my-express-application-dev-s3bucket-18eh6dlfu6qih.s3.ap-south-1.amazonaws.com/${req.query.filename}`
