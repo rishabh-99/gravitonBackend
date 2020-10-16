@@ -458,7 +458,7 @@ const CarController = () => {
         try {
             const profile = await UserProfile.findOne({
                 where: {
-                    user_id: user_id
+                    user_id: user_id 
                 }
             });
             const generateRandomString = (length = 6) => Math.random().toString(20).substr(2, length)
