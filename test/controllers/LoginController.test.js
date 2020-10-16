@@ -453,3 +453,87 @@ test('Login | DisableUser (auth) | Authorization fail ', async () => {
   // cleaning the database before next test 
   await login.destroy();
 });
+
+test('Login | get all (auth) | With incorrect username and password', async () => {
+  // post request the login credentials 
+  const login = await Login.create({
+    "full_name": "Rime",
+    "username": "rimet",
+    "designation": "Boss",
+    "user_mobile": "8299213792",
+    "password": "Alfanzo@001",
+    "password2": "Alfanzo@001",
+    "permissions": "{\"Admin\": true, \"Employee\": false}",
+    "is_active": true
+  });
+
+  const res = await request(api)
+  // post request the detials to login 
+    .post('/public/login')
+    .set('Accept', /json/)
+    .send({
+      username: 'rimet8',
+      password: 'Alfanzo@0018',
+    })
+    .expect(401);
+    expect(res.body.msg).toBeTruthy()
+
+  expect(res.body.token).toBeTruthy();
+
+  // verifying using the Bearer token 
+  const res2 = await request(api)
+    .get('/private/User/logins')
+    .set('Accept', /json/)                
+    .set('Authorization', `Bearer ${res.body.token}` )  
+    .set('Content-Type', 'application/json')
+  // .expect(401);
+    expect(res2.body.msg).toBeTruthy();
+    
+  // expecting the user to be truthy 
+  // expect(res2.body.users).toBeTruthy();
+  // expect(res2.body.users.length).toBeGreaterThanOrEqual(1);
+  // cleaning the database before next test 
+  await login.destroy();
+});
+
+test('Login | get all (auth) | With Inactive', async () => {
+  // post request the login credentials 
+  const login = await Login.create({
+    "full_name": "Rime",
+    "username": "rimet",
+    "designation": "Boss",
+    "user_mobile": "8299213792",
+    "password": "Alfanzo@001",
+    "password2": "Alfanzo@001",
+    "permissions": "{\"Admin\": true, \"Employee\": false}",
+    "is_active": false
+  });
+
+
+  const res = await request(api)
+  // post request the detials to login 
+    .post('/public/login')
+    .set('Accept', /json/)
+    .send({
+      username: 'rimet',
+      password: 'Alfanzo@001',
+    })
+    .expect(401);
+    expect(res.body.error).toBeInstancOf(Error)
+
+  expect(res.body.token).toBeTruthy();
+
+  // verifying using the Bearer token 
+  const res2 = await request(api)
+    .get('/private/User/logins')
+    .set('Accept', /json/)                
+    .set('Authorization', `Bearer ${res.body.token}` )  
+    .set('Content-Type', 'application/json')
+    expect(res2.body.msg).toBeTruthy();
+    
+  // expecting the user to be truthy 
+  // expect(res2.body.users).toBeTruthy();
+  // expect(res2.body.users.length).toBeGreaterThanOrEqual(1);
+  // cleaning the database before next test 
+  await login.destroy();
+});
