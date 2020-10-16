@@ -38,7 +38,7 @@ const FIController = () => {
     try {
       const { body } = req;
       await FI.create({
-        'fi_answers': body.fi_answers,
+        'fi_answers': JSON.parse(body.fi_answers),
         'related_aadhar': body.related_aadhar,
         'related_pan': body.related_pan
       });
