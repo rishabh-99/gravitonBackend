@@ -461,8 +461,15 @@ const CarController = () => {
                     user_id: user_id 
                 }
             });
-            const generateRandomString = (length = 6) => Math.random().toString(20).substr(2, length)
-            const newLoanId = generateRandomString()
+            function getRandomString(length) {
+                var randomChars = 'abcdefghijklmnopqrstuvwxyz';
+                var result = '';
+                for ( var i = 0; i < length; i++ ) {
+                    result += randomChars.charAt(Math.floor(Math.random() * randomChars.length));
+                }
+                return result;
+            }
+            const newLoanId = getRandomString(6)
             profile.details_json[user_id].loans = [...profile.details_json[user_id].loans,
             {
 
