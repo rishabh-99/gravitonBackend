@@ -11,7 +11,9 @@ const bcryptService = require('../services/bcrypt.service');
 
 // Importing the joi validation Schema from joi_validation folder
 
-const { loginSchema } = require('../joi_validation/joi_validation_login_controller')
+const { loginSchema } = require('../joi_validation/joi_validation_login_controller');
+const User_kyc_log = require('../models/User_kyc_log');
+const sequelize = require('../../config/database');
 // Defining a login controller 
 const LoginController = () => {
   /**
@@ -127,13 +129,26 @@ const LoginController = () => {
 
     try {
       // gets all the users who are active
-      const users = await User.findAll({
-        where: {
-          is_active: true
-        }
-      });
+      var today = new Date();
+      var dd = today.getDate();
 
-      return res.status(200).json({ users });
+      var mm = today.getMonth() + 1;
+      var yyyy = today.getFullYear();
+      if (dd < 10) {
+        dd = '0' + dd;
+      }
+
+      if (mm < 10) {
+        mm = '0' + mm;
+      }
+
+      // today = dd + '-' + mm + '-' + yyyy;
+      today = yyyy + '-' + mm + '-' + dd;
+      const users = await sequelize.query(`SELECT login.user_id, full_name, username, designation, user_mobile, permissions, is_active, count(user_kyc_log.user_id)
+      FROM (public.login
+      join public.user_kyc_log on login.user_id = user_kyc_log.user_id) where kyc_date = '${today}' group by (login.user_id) ;`)
+
+      return res.status(200).json({ users: users[0] });
     } catch (err) {
       console.log(err);
       return res.status(500).json({ msg: 'Internal server error' });
