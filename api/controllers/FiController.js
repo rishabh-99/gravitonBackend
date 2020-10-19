@@ -4,7 +4,7 @@ Author: Rishabh Merhotra
 logs: 07/10/2020 - Added joi validation 
 */
 // Importing all the models from the model folder 
-const FI = require('../models/FI');
+const FI = require('../models/Fi');
 
 
 
@@ -70,7 +70,7 @@ const FIController = () => {
       // 500 error returns "internal server error"
       return res.status(500).json({ msg: err });
     }
-  }
+  };
 
   const getComboBoxData = async (req, res) => {
     try {
@@ -96,27 +96,66 @@ const FIController = () => {
       // 500 error returns "internal server error"
       return res.status(500).json({ msg: err });
     }
-  }
+  };
 
   const getPreSignedUrl = async (req, res) => {
     try {
-        // console.log(JSON.parse(process.env.S3_BUCKET))
-        const preSignedUrl = await s3.getSignedUrl('putObject', {
-            Bucket: 'my-express-application-dev-s3bucket-18eh6dlfu6qih',
-            Key: `FI/${req.query.loan_type}/${req.query.profile_id}/${req.query.__loan_id}/${req.query.filename}`, // File name could come from queryParameters
-        });
+      // console.log(JSON.parse(process.env.S3_BUCKET))
+      const preSignedUrl = await s3.getSignedUrl('putObject', {
+        Bucket: 'my-express-application-dev-s3bucket-18eh6dlfu6qih',
+        Key: `FI/${req.query.loan_type}/${req.query.profile_id}/${req.query.__loan_id}/${req.query.filename}`, // File name could come from queryParameters
+      });
 
-        return res.status(200).json(preSignedUrl)
+      return res.status(200).json(preSignedUrl)
     } catch (err) {
-        return res.status(500).json({ msg: err });
+      return res.status(500).json({ msg: err });
     }
-};
+  };
+
+  const assignTo = async (req, res) => {
+    const user_id = req.body.user_id;
+    const __loan_id = req.body.__loan_id;
+    const name = req.body.name;
+    const agent_id = req.body.agent_id;
+
+    try {
+      const profile = await UserProfile.findOne({
+        where: {
+          user_id: user_id
+        }
+      });
+
+      let counter = 0;
+      let loanNumber = 0;
+      for (let loan of profile.details_json[user_id].loans) {
+        if (loan.__loan_id == __loan_id) {
+          loanNumber = counter;
+        }
+        counter++;
+      }
+
+      profile.details_json[user_id].loans[loanNumber].stages.fi_assigned.status = true;
+      profile.details_json[user_id].loans[loanNumber].stages.fi_assigned.time_stamp = new Date();
+      profile.details_json[user_id].loans[loanNumber].assigned_to.name = name;
+      profile.details_json[user_id].loans[loanNumber].assigned_to.id = agent_id;
+
+      await UserProfile.update({
+        'details_json': profile.details_json
+      }, { where: { 'user_id': user_id } })
+
+
+      return res.status(200).json({msg: 'Operation Successful'});
+    } catch (err) {
+      return res.status(500).json({ msg: err });
+    }
+  };
 
   return {
     // returning all the functions form the controller
     register,
     getComboBoxData,
-    getPreSignedUrl
+    getPreSignedUrl,
+    assignTo
   };
 };
 

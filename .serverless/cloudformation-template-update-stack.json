@@ -166,7 +166,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/my-express-application/dev/1602569946784-2020-10-13T06:19:06.784Z/my-express-application.zip"
+          "S3Key": "serverless/my-express-application/dev/1602934250054-2020-10-17T11:30:50.054Z/my-express-application.zip"
         },
         "FunctionName": "my-express-application-dev-app",
         "Handler": "./api/api.handler",
@@ -192,14 +192,14 @@
         "AppLogGroup"
       ]
     },
-    "AppLambdaVersionSMRzqKqoNamXuBZONad6GTsD1l8mGJA0fEtjehajSDQ": {
+    "AppLambdaVersiona7XpYfM3IkTRNytWR7PtT6Cop5OX8icUDNp2W0pQa4": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "AppLambdaFunction"
         },
-        "CodeSha256": "AgHlK3KFblqeAQnM31gKmvua+AGReNqjfjuY0hO7e/M="
+        "CodeSha256": "s7osYvO1e2qKWLWOoGlrtr4Z6SBj9RRTfrIl7QoNgVg="
       }
     },
     "ApiGatewayRestApi": {
@@ -318,7 +318,7 @@
         "MethodResponses": []
       }
     },
-    "ApiGatewayDeployment1602569929371": {
+    "ApiGatewayDeployment1602934234567": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
@@ -378,7 +378,6 @@
                 "*"
               ],
               "AllowedMethods": [
-                "GET",
                 "POST",
                 "PUT"
               ],
@@ -433,7 +432,7 @@
     "AppLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "AppLambdaVersionSMRzqKqoNamXuBZONad6GTsD1l8mGJA0fEtjehajSDQ"
+        "Ref": "AppLambdaVersiona7XpYfM3IkTRNytWR7PtT6Cop5OX8icUDNp2W0pQa4"
       }
     },
     "ServiceEndpoint": {
