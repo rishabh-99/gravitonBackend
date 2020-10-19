@@ -25,6 +25,7 @@ const Sourcetype = require('../models/Sourcetype');
 
 
 const AWS = require('aws-sdk');
+const Borrowerappearance = require('../models/Borrowerappearance');
 const s3 = new AWS.S3();
 
 
@@ -85,9 +86,10 @@ const FIController = () => {
       const PhysicalconditionModel = await Physicalcondition.findAll();
       const RidequalityModel = await Ridequality.findAll();
       const SourcetypeModel = await Sourcetype.findAll();
+      const BorrowerappearanceModel = await Borrowerappearance.findAll()
 
       return res.status(200).json({
-        AddressproofModel, FinancetypeModel, HomeaccessibilityModel, HouseconditionModel,
+        AddressproofModel, BorrowerappearanceModel, FinancetypeModel, HomeaccessibilityModel, HouseconditionModel,
         LocalitytypeModel, NocModel, OfficeaccesibilityModel, OfficeconditionModel, PhysicalconditionModel,
         RidequalityModel, SourcetypeModel
       })
