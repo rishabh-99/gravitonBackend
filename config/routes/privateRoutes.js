@@ -42,6 +42,7 @@ const privateRoutes = {
 
   'GET /FI/getComboBoxData': 'FiController.getComboBoxData',
   'GET /FI/getPreSignedUrl': 'FiController.getPreSignedUrl',
+  'GET /FI/getAllPendingList': 'FiController.getAllPendingList',
 
 };
 

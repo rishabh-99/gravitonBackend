@@ -26,6 +26,13 @@ const Sourcetype = require('../models/Sourcetype');
 
 const AWS = require('aws-sdk');
 const Borrowerappearance = require('../models/Borrowerappearance');
+const KycApprovalPending = require('../models/Kyc_approval_pending');
+const FiAssignedPending = require('../models/Fi_assigned_pending');
+const FiSubmittedPending = require('../models/Fi_submitted_pending');
+const FiApprovalPending = require('../models/Fi_approval_pending');
+const DocumentCheckUploadPending = require('../models/Document_check_upload_pending');
+const EmiSchedulePending = require('../models/Emi_schedule_pending');
+const DocumentCheckApprovePending = require('../models/Document_check_approve_pending');
 const s3 = new AWS.S3();
 
 
@@ -146,7 +153,29 @@ const FIController = () => {
       }, { where: { 'user_id': user_id } })
 
 
-      return res.status(200).json({msg: 'Operation Successful'});
+      return res.status(200).json({ msg: 'Operation Successful' });
+    } catch (err) {
+      return res.status(500).json({ msg: err });
+    }
+  };
+
+
+  const getAllPendingList = async (req, res) => {
+    try {
+
+      const KycApprovalPendingModel = await KycApprovalPending.findAll();
+      const FiAssignedPendingModel = await FiAssignedPending.findAll();
+      const FiSubmittedPendingModel = await FiSubmittedPending.findAll();
+      const FiApprovalPendingModel = await FiApprovalPending.findAll();
+      const DocumentCheckUploadPendingModel = await DocumentCheckUploadPending.findAll();
+      const DocumentCheckApprovePendingModel = await DocumentCheckApprovePending.findAll();
+      const EmiSchedulePendingModel = await EmiSchedulePending.findAll();
+
+      return res.status(200).json({
+        KycApprovalPendingModel, FiAssignedPendingModel, FiSubmittedPendingModel,
+        FiApprovalPendingModel, DocumentCheckUploadPendingModel, DocumentCheckApprovePendingModel, 
+        EmiSchedulePendingModel
+      });
     } catch (err) {
       return res.status(500).json({ msg: err });
     }
@@ -157,7 +186,8 @@ const FIController = () => {
     register,
     getComboBoxData,
     getPreSignedUrl,
-    assignTo
+    assignTo,
+    getAllPendingList
   };
 };
 
