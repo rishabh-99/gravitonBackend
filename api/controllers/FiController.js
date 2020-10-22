@@ -223,6 +223,38 @@ const FIController = () => {
     }
   };
 
+  const getFiSubmittedPendingForUser = async (req, res) => {
+      const user_id = req.query.user_id
+    try {
+      const FiSubmittedPendingModel = await FiSubmittedPending.findAll({
+        where: {
+          user_id
+        },
+        attributes : ['profile_id', 'loan_id']
+      })
+
+      return res.status(200).json(FiSubmittedPendingModel)
+    } catch (err) {
+      return res.status(500).json({ msg: err });
+    }
+  };
+
+  const getDocumentCheckUploadPendingForUser = async (req, res) => {
+    const user_id = req.query.user_id
+  try {
+    const DocumentCheckUploadPendingModel = await DocumentCheckUploadPending.findAll({
+      where: {
+        user_id
+      },
+      attributes : ['profile_id', 'loan_id']
+    })
+
+    return res.status(200).json(DocumentCheckUploadPendingModel)
+  } catch (err) {
+    return res.status(500).json({ msg: err });
+  }
+};
+
   return {
     // returning all the functions form the controller
     register,
@@ -232,7 +264,9 @@ const FIController = () => {
     getAllPendingList,
     getPreSignedUrlForRetrieval,
     getPreSignedUrlDocument,
-    getPreSignedUrlForRetrievalDocument
+    getPreSignedUrlForRetrievalDocument,
+    getFiSubmittedPendingForUser,
+    getDocumentCheckUploadPendingForUser
   };
 };
 
