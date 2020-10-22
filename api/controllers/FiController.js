@@ -195,6 +195,34 @@ const FIController = () => {
     }
   };
 
+  const getPreSignedUrlDocument = async (req, res) => {
+    try {
+      // console.log(JSON.parse(process.env.S3_BUCKET))
+      const preSignedUrl = await s3.getSignedUrl('putObject', {
+        Bucket: 'my-express-application-dev-s3bucket-18eh6dlfu6qih',
+        Key: `Document/${req.query.profile_id}/${req.query.filename}`, // File name could come from queryParameters
+      });
+
+      return res.status(200).json(preSignedUrl)
+    } catch (err) {
+      return res.status(500).json({ msg: err });
+    }
+  };
+
+  const getPreSignedUrlForRetrievalDocument = async (req, res) => {
+    try {
+      // console.log(JSON.parse(process.env.S3_BUCKET))
+      const preSignedUrl = await s3.getSignedUrl('getObject', {
+        Bucket: 'my-express-application-dev-s3bucket-18eh6dlfu6qih',
+        Key: `Document/${req.query.profile_id}/${req.query.filename}`, // File name could come from queryParameters
+      });
+
+      return res.status(200).json(preSignedUrl)
+    } catch (err) {
+      return res.status(500).json({ msg: err });
+    }
+  };
+
   return {
     // returning all the functions form the controller
     register,
@@ -202,7 +230,9 @@ const FIController = () => {
     getPreSignedUrl,
     assignTo,
     getAllPendingList,
-    getPreSignedUrlForRetrieval
+    getPreSignedUrlForRetrieval,
+    getPreSignedUrlDocument,
+    getPreSignedUrlForRetrievalDocument
   };
 };
 
