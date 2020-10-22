@@ -121,6 +121,20 @@ const FIController = () => {
     }
   };
 
+  const getPreSignedUrlForRetrieval = async (req, res) => {
+    try {
+      // console.log(JSON.parse(process.env.S3_BUCKET))
+      const preSignedUrl = await s3.getSignedUrl('getObject', {
+        Bucket: 'my-express-application-dev-s3bucket-18eh6dlfu6qih',
+        Key: `FI/${req.query.loan_type}/${req.query.profile_id}/${req.query.__loan_id}/${req.query.filename}`, // File name could come from queryParameters
+      });
+
+      return res.status(200).json(preSignedUrl)
+    } catch (err) {
+      return res.status(500).json({ msg: err });
+    }
+  };
+
   const assignTo = async (req, res) => {
     const user_id = req.body.user_id;
     const __loan_id = req.body.__loan_id;
@@ -187,7 +201,8 @@ const FIController = () => {
     getComboBoxData,
     getPreSignedUrl,
     assignTo,
-    getAllPendingList
+    getAllPendingList,
+    getPreSignedUrlForRetrieval
   };
 };
 
