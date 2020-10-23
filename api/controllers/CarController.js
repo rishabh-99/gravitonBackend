@@ -30,6 +30,8 @@ const Borrower_incredo_details = require('../models/Borrower_incredo_details');
 const { registerSchema } = require('../joi_validation/joi_validation_car_controller');
 const UserProfile = require('../models/User-profile');
 const Login = require('../models/Login');
+const KycApprovalPending = require('../models/Kyc_approval_pending');
+const FiAssignedPending = require('../models/Fi_assigned_pending');
 
 
 
@@ -488,7 +490,10 @@ const CarController = () => {
                     "fi_approval": {
                         "status": false,
                     },
-                    "document_check": {
+                    "document_check_upload": {
+                        "status": false,
+                    },
+                    "document_check_approve": {
                         "status": false,
                     },
                     "emi_schedule": {
@@ -504,7 +509,12 @@ const CarController = () => {
 
             await UserProfile.update({
                 'details_json': profile.details_json
-            }, { where: { 'user_id': user_id } })
+            }, { where: { 'user_id': user_id } });
+
+            await KycApprovalPending.create({
+                'profile_id': user_id,
+                'loan_id': newLoanId,
+            })
             return res.status(200).json({ msg: 'Operation Successfull' })
         } catch (err) {
             return res.status(500).json({ msg: err });
@@ -529,6 +539,7 @@ const CarController = () => {
     const approveKYC = async (req, res) => {
         const user_id = req.query.user_id;
         const __loan_id = req.query.__loan_id;
+        const approve_status = req.query.approve_status;
 
         try {
             let profile = await UserProfile.findOne({
@@ -546,11 +557,19 @@ const CarController = () => {
             }
 
             profile.details_json[user_id].loans[loanNumber].stages.kyc_approval.status = true;
+            profile.details_json[user_id].loans[loanNumber].stages.kyc_approval.approve_status = approve_status;
             profile.details_json[user_id].loans[loanNumber].stages.kyc_approval.time_stamp = new Date();
 
             await UserProfile.update({
                 'details_json': profile.details_json
             }, { where: { 'user_id': user_id } })
+
+            if(approve_status === 'true') {
+                await FiAssignedPending.create({
+                    'profile_id': user_id,
+                    'loan_id': __loan_id
+                })
+            }
 
 
             return res.status(200).json({ msg: 'Operation Successful' })
