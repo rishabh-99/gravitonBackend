@@ -199,13 +199,28 @@ const LoginController = () => {
     }
   };
 
+  const getAccessKeys = async (req, res) => {
+    try {
+
+      const access_id = '5f67a59fdf25606eb13ade1e';
+      const access_key = '005c81366d1bd668580392f299b676f0d2cc69b2b53e107f841be2fbcc1a4893'
+
+      return res.status(200).json({ access_id, access_key });
+    } catch (err) {
+
+      res.status(500).json({ msg: err })
+    }
+  };
+
+
   // returns all the functions from login Controller
   return {
     register,
     login,
     validate,
     getAll,
-    disableUser
+    disableUser,
+    getAccessKeys
   };
 };
 // exporting the whole Module

@@ -42,8 +42,7 @@ const CarController = () => {
 
     /**
      * Registerring a user 
-     * @accepts a  request to give out a response .
-     * @param {body} user_id - taking user_id from querry request 
+     * @param {query} user_id - taking user_id from query request 
      */
 
     // defining a function inside a controller 
@@ -230,7 +229,7 @@ const CarController = () => {
                         },
                         'related_aadhar': documentModel.document_aadhar,
                         'related_pan': documentModel.document_pan
-                    })
+                    }, { transaction: t })
 
                 return { userProfileModel };
             });
