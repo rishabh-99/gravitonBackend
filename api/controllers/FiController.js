@@ -119,6 +119,7 @@ const FIController = () => {
       const preSignedUrl = await s3.getSignedUrl('putObject', {
         Bucket: 'my-express-application-dev-s3bucket-18eh6dlfu6qih',
         Key: `FI/${req.query.loan_type}/${req.query.profile_id}/${req.query.__loan_id}/${req.query.filename}`, // File name could come from queryParameters
+        Metadata:{}
       });
 
       return res.status(200).json(preSignedUrl)
