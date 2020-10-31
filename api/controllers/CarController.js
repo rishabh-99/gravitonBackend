@@ -540,6 +540,7 @@ const CarController = () => {
         const user_id = req.query.user_id;
         const __loan_id = req.query.__loan_id;
         const approve_status = req.query.approve_status;
+        const remark = req.query.remark;
 
         try {
             let profile = await UserProfile.findOne({
@@ -559,6 +560,7 @@ const CarController = () => {
             profile.details_json[user_id].loans[loanNumber].stages.kyc_approval.status = true;
             profile.details_json[user_id].loans[loanNumber].stages.kyc_approval.approve_status = approve_status;
             profile.details_json[user_id].loans[loanNumber].stages.kyc_approval.time_stamp = new Date();
+            profile.details_json[user_id].loans[loanNumber].stages.kyc_approval.remark = remark;
 
             await UserProfile.update({
                 'details_json': profile.details_json
