@@ -556,10 +556,10 @@ const CarController = () => {
                 }
                 counter++;
             }
-
+            const date = new Date();
             profile.details_json[user_id].loans[loanNumber].stages.kyc_approval.status = true;
             profile.details_json[user_id].loans[loanNumber].stages.kyc_approval.approve_status = approve_status;
-            profile.details_json[user_id].loans[loanNumber].stages.kyc_approval.time_stamp = new Date();
+            profile.details_json[user_id].loans[loanNumber].stages.kyc_approval.time_stamp = date.toLocaleString();
             profile.details_json[user_id].loans[loanNumber].stages.kyc_approval.remark = remark;
 
             await UserProfile.update({
