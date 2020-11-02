@@ -24,6 +24,7 @@ const privateRoutes = {
   'GET /CAR/getProfileIdList': 'CarController.getUserProfileID',
   'GET /CAR/getProfileForID': 'CarController.getProfileForProfileID',
   'GET /Inkredo/getPreSignedUrl': 'CarController.getPreSignedUrl',
+  'GET /Inkredo/getPreSignedUrlForRetrieval': 'CarController.getPreSignedUrlForRetrieval',
   'GET /CAR/approveKYC': 'CarController.approveKYC',
   'GET /CAR/getAgentNameForKYC': 'CarController.getAgentNameForKYC',
 

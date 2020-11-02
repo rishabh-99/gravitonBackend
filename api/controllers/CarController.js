@@ -536,6 +536,21 @@ const CarController = () => {
         }
     };
 
+    const getPreSignedUrlForRetrieval = async (req, res) => {
+        try {
+            // console.log(JSON.parse(process.env.S3_BUCKET))
+            const preSignedUrl = await s3.getSignedUrlPromise('getObject', {
+                Bucket: 'my-express-application-dev-s3bucket-18eh6dlfu6qih',
+                Key: `Inkredo/${req.query.loan_type}/${req.query.profile_id}/${req.query.__loan_id}/${req.query.filename}`, // File name could come from queryParameters
+            });
+
+            // const storageUrl = `https://my-express-application-dev-s3bucket-18eh6dlfu6qih.s3.ap-south-1.amazonaws.com/${req.query.filename}`
+            return res.status(200).json(preSignedUrl)
+        } catch (err) {
+            return res.status(500).json({ msg: err });
+        }
+    };
+
     const approveKYC = async (req, res) => {
         const user_id = req.query.user_id;
         const __loan_id = req.query.__loan_id;
@@ -616,6 +631,7 @@ const CarController = () => {
         getProfileForProfileID,
         insertNewLoan,
         getPreSignedUrl,
+        getPreSignedUrlForRetrieval,
         approveKYC,
         getAgentNameForKYC
     };
