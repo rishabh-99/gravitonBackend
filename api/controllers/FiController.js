@@ -64,10 +64,10 @@ const FIController = () => {
         }
         counter++;
       }
-
+      const date = new Date();
       userProfile.details_json[userProfile.user_id].loans[loan_number].fi_data = body.fi_answers
       userProfile.details_json[userProfile.user_id].loans[loan_number].stages.fi_submitted.status = true;
-      userProfile.details_json[userProfile.user_id].loans[loan_number].stages.fi_submitted.time_stamp = new Date();
+      userProfile.details_json[userProfile.user_id].loans[loan_number].stages.fi_submitted.time_stamp = date.toLocaleString();
 
       await UserProfile.update({
         'details_json': userProfile.details_json
@@ -163,9 +163,9 @@ const FIController = () => {
         }
         counter++;
       }
-
+      const date = new Date()
       profile.details_json[user_id].loans[loanNumber].stages.fi_assigned.status = true;
-      profile.details_json[user_id].loans[loanNumber].stages.fi_assigned.time_stamp = new Date();
+      profile.details_json[user_id].loans[loanNumber].stages.fi_assigned.time_stamp = date.toLocaleString();
       profile.details_json[user_id].loans[loanNumber].assigned_to.name = name;
       profile.details_json[user_id].loans[loanNumber].assigned_to.id = agent_id;
 
