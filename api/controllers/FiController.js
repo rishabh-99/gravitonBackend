@@ -392,11 +392,14 @@ const FIController = () => {
 
   const getEMISchedule = async (req, res) => {
     const emi_schedule_profile_id = req.query.emi_schedule_profile_id;
+    const emi_schedule_loan_id = req.query.emi_schedule_loan_id;
+
     try {
       const schedule = await EmiSchedule.findOne({
         attributes:['emi_schedule_json_object'],
         where:{
-          emi_schedule_profile_id
+          emi_schedule_profile_id,
+          emi_schedule_loan_id
         }
       });
 
