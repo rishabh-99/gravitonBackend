@@ -52,7 +52,10 @@ const privateRoutes = {
 
   'GET /Document/getPreSignedUrl': 'FiController.getPreSignedUrlDocument',
   'GET /Document/getPreSignedUrlForRetrieval': 'FiController.getPreSignedUrlForRetrievalDocument',
+  'GET /Document/getEMISchedule': 'FiController.getEMISchedule',
+
   'POST /Document/createDocumentApprovePending': 'FiController.createDocumentApprovePending',
+  'POST /Document/createEMISchedule': 'FiController.createEMISchedule',
 
 
 };
