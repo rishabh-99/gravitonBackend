@@ -341,7 +341,7 @@ const FIController = () => {
 
     const remark = req.query.remark;
 
-    const emi_schedule_json_object = req.body.emi_schedule_json_object;
+    const emi_schedule_json_object = req.body;
     console.log({
       emi_schedule_profile_id, emi_schedule_loan_id, emi_schedule_loan_amount,
       emi_schedule_interest_rate, emi_schedule_loan_tenure, emi_schedule_start_date,
@@ -406,7 +406,7 @@ const FIController = () => {
       
      
 
-      return res.status(200).send(schedule)
+      return res.status(200).send(schedule.emi_schedule_json_object)
     
 
     } catch (err) {
