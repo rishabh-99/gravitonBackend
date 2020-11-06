@@ -253,12 +253,10 @@ const FIController = () => {
   const getDocumentCheckUploadPendingForUser = async (req, res) => {
     const user_id = req.query.user_id
     try {
-      const DocumentCheckUploadPendingModel = await DocumentCheckUploadPending.findAll({
-        where: {
-          user_id
-        },
-        attributes: ['profile_id', 'loan_id']
-      })
+      const result = await sequelize.query(`SELECT fsp.profile_id, fsp.loan_id, applicant_firstname
+      FROM public.document_check_upload_pending as fsp, (select user_id, applicant_firstname from user_profile, applicant where related_aadhar = applicant_aadhar) as d where d.user_id = fsp.profile_id and fsp.user_id = ${user_id};`)
+
+      const DocumentCheckUploadPendingModel = result[0]
 
       return res.status(200).json(DocumentCheckUploadPendingModel)
     } catch (err) {
