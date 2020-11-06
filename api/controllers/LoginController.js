@@ -146,7 +146,7 @@ const LoginController = () => {
       today = yyyy + '-' + mm + '-' + dd;
       const users = await sequelize.query(`SELECT login.user_id, full_name, username, designation, user_mobile, permissions, is_active, count(u.user_id)
       FROM (public.login
-      left join (select * from user_kyc_log where kyc_date = '${today}') as u on login.user_id = u.user_id) group by (login.user_id) ;`)
+      left join (select * from user_kyc_log where kyc_date = '${today}') as u on login.user_id = u.user_id) where login.is_active = true  group by (login.user_id) ;`)
 
       return res.status(200).json({ users: users[0] });
     } catch (err) {
