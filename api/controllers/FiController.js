@@ -240,13 +240,10 @@ const FIController = () => {
   const getFiSubmittedPendingForUser = async (req, res) => {
     const user_id = req.query.user_id
     try {
-      const FiSubmittedPendingModel = await FiSubmittedPending.findAll({
-        where: {
-          user_id
-        },
-        attributes: ['profile_id', 'loan_id']
-      })
+      const result = await sequelize.query(`SELECT fsp.profile_id, fsp.loan_id, applicant_firstname
+      FROM public.fi_submitted_pending as fsp, (select user_id, applicant_firstname from user_profile, applicant where related_aadhar = applicant_aadhar) as d where d.user_id = fsp.profile_id and fsp.user_id = ${user_id};`)
 
+      const FiSubmittedPendingModel = result[0]
       return res.status(200).json(FiSubmittedPendingModel)
     } catch (err) {
       return res.status(500).json({ msg: err });
@@ -414,7 +411,8 @@ const FIController = () => {
       return res.status(500).json({ msg: err });
     }
   };  
-  
+
+
 
   return {
     // returning all the functions form the controller

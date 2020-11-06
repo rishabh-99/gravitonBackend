@@ -498,7 +498,7 @@ const CarController = () => {
                     "emi_schedule": {
                         "status": false,
                     },
-                    "current_stage": "kyc_approval"
+                    "current_stage": "new"
                 },
                 "assigned_to": {},
                 "fi_data": {},
