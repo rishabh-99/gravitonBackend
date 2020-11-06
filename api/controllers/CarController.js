@@ -576,6 +576,7 @@ const CarController = () => {
             profile.details_json[user_id].loans[loanNumber].stages.kyc_approval.approve_status = approve_status;
             profile.details_json[user_id].loans[loanNumber].stages.kyc_approval.time_stamp = date.toLocaleString();
             profile.details_json[user_id].loans[loanNumber].stages.kyc_approval.remark = remark;
+            profile.details_json[user_id].loans[loanNumber].stages.current_stage = 'kyc_approval';
 
             await UserProfile.update({
                 'details_json': profile.details_json
@@ -585,6 +586,12 @@ const CarController = () => {
                 await FiAssignedPending.create({
                     'profile_id': user_id,
                     'loan_id': __loan_id
+                })
+
+                await KycApprovalPending.destroy({
+                    where:{
+                        'profile_id': user_id
+                    }
                 })
             }
 

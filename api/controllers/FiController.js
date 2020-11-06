@@ -69,6 +69,7 @@ const FIController = () => {
       userProfile.details_json[userProfile.user_id].loans[loan_number].fi_data = body.fi_answers
       userProfile.details_json[userProfile.user_id].loans[loan_number].stages.fi_submitted.status = true;
       userProfile.details_json[userProfile.user_id].loans[loan_number].stages.fi_submitted.time_stamp = date.toLocaleString();
+      userProfile.details_json[userProfile.user_id].loans[loan_number].stages.current_stage = 'fi_submitted';
 
       await UserProfile.update({
         'details_json': userProfile.details_json
@@ -78,6 +79,12 @@ const FIController = () => {
         'profile_id': userProfile.user_id,
         'loan_id': req.body.__loan_id,
         'user_id': userProfile.details_json[userProfile.user_id].loans[loan_number].assigned_to.id
+      })
+
+      await FiSubmittedPending.destroy({
+        where: {
+          'profile_id': userProfile.user_id
+        }
       })
       return res.status(200).json({ msg: 'Operation Successful' })
     } catch (err) {
@@ -120,7 +127,7 @@ const FIController = () => {
       const preSignedUrl = await s3.getSignedUrl('putObject', {
         Bucket: 'my-express-application-dev-s3bucket-18eh6dlfu6qih',
         Key: `FI/${req.query.loan_type}/${req.query.profile_id}/${req.query.__loan_id}/${req.query.filename}`, // File name could come from queryParameters
-        Metadata:{}
+        Metadata: {}
       });
 
       return res.status(200).json(preSignedUrl)
@@ -167,6 +174,7 @@ const FIController = () => {
       const date = new Date()
       profile.details_json[user_id].loans[loanNumber].stages.fi_assigned.status = true;
       profile.details_json[user_id].loans[loanNumber].stages.fi_assigned.time_stamp = date.toLocaleString();
+      profile.details_json[user_id].loans[loanNumber].stages.current_stage = 'fi_assigned';
       profile.details_json[user_id].loans[loanNumber].assigned_to.name = name;
       profile.details_json[user_id].loans[loanNumber].assigned_to.id = agent_id;
 
@@ -178,6 +186,12 @@ const FIController = () => {
         'profile_id': user_id,
         'loan_id': __loan_id,
         'user_id': agent_id
+      })
+
+      await FiAssignedPending.destroy({
+        where: {
+          'profile_id': user_id
+        }
       })
 
       return res.status(200).json({ msg: 'Operation Successful' });
@@ -214,7 +228,7 @@ const FIController = () => {
       const preSignedUrl = await s3.getSignedUrl('putObject', {
         Bucket: 'my-express-application-dev-s3bucket-18eh6dlfu6qih',
         Key: `Document/${req.query.profile_id}/${req.query.filename}`, // File name could come from queryParameters
-        Metadata:{}
+        Metadata: {}
       });
 
       return res.status(200).json(preSignedUrl)
@@ -289,6 +303,7 @@ const FIController = () => {
       profile.details_json[user_id].loans[loanNumber].stages.fi_approval.approve_status = approve_status;
       profile.details_json[user_id].loans[loanNumber].stages.fi_approval.time_stamp = date.toLocaleString();
       profile.details_json[user_id].loans[loanNumber].stages.fi_approval.remark = remark;
+      profile.details_json[user_id].loans[loanNumber].stages.current_stage = 'fi_approval';
 
       await UserProfile.update({
         'details_json': profile.details_json
@@ -299,6 +314,12 @@ const FIController = () => {
           'profile_id': user_id,
           'loan_id': __loan_id,
           'user_id': profile.details_json[user_id].loans[loanNumber].assigned_to.id
+        })
+
+        await FiApprovalPending.destroy({
+          where: {
+            'profile_id': user_id,
+          }
         })
       }
 
@@ -316,9 +337,15 @@ const FIController = () => {
 
     try {
       await DocumentCheckApprovePending.create({
-        profile_id,user_id, loan_id
+        profile_id, user_id, loan_id
       })
-      return res.status(200).json({msg: 'Operation Successful'})
+
+      await DocumentCheckUploadPending.destroy({
+        where:{
+          profile_id
+        }
+      })
+      return res.status(200).json({ msg: 'Operation Successful' })
     } catch (err) {
       return res.status(500).json({ msg: err });
     }
@@ -350,7 +377,7 @@ const FIController = () => {
         emi_schedule_json_object
       });
 
-      
+
       let profile = await UserProfile.findOne({
         where: {
           user_id: emi_schedule_profile_id
@@ -371,13 +398,20 @@ const FIController = () => {
       profile.details_json[user_id].loans[loanNumber].stages.emi_schedule.time_stamp = date.toLocaleString();
       profile.details_json[user_id].loans[loanNumber].stages.emi_schedule.remark = remark;
       profile.details_json[user_id].loans[loanNumber].stages.current_stage = 'emi_schedule';
+      profile.details_json[user_id].loans[loanNumber].emi_schedule = emi_schedule_json_object;
 
       await UserProfile.update({
         'details_json': profile.details_json
       }, { where: { 'user_id': emi_schedule_profile_id } })
 
+      await EmiSchedulePending.destroy({
+        where: {
+          'profile_id': emi_schedule_profile_id
+        }
+      })
+
       return res.status(200).json({ msg: 'Operation Successful' })
-    
+
 
     } catch (err) {
       console.log(err)
@@ -391,24 +425,24 @@ const FIController = () => {
 
     try {
       const schedule = await EmiSchedule.findOne({
-        attributes:['emi_schedule_json_object'],
-        where:{
+        attributes: ['emi_schedule_json_object'],
+        where: {
           emi_schedule_profile_id,
           emi_schedule_loan_id
         }
       });
 
-      
-     
+
+
 
       return res.status(200).send(schedule.emi_schedule_json_object)
-    
+
 
     } catch (err) {
       console.log(err)
       return res.status(500).json({ msg: err });
     }
-  };  
+  };
 
 
 
