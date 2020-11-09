@@ -459,13 +459,13 @@ const CarController = () => {
         try {
             const profile = await UserProfile.findOne({
                 where: {
-                    user_id: user_id 
+                    user_id: user_id
                 }
             });
             function getRandomString(length) {
                 var randomChars = 'abcdefghijklmnopqrstuvwxyz';
                 var result = '';
-                for ( var i = 0; i < length; i++ ) {
+                for (var i = 0; i < length; i++) {
                     result += randomChars.charAt(Math.floor(Math.random() * randomChars.length));
                 }
                 return result;
@@ -526,7 +526,7 @@ const CarController = () => {
             const preSignedUrl = await s3.getSignedUrlPromise('putObject', {
                 Bucket: 'my-express-application-dev-s3bucket-18eh6dlfu6qih',
                 Key: `Inkredo/${req.query.loan_type}/${req.query.profile_id}/${req.query.__loan_id}/${req.query.filename}`, // File name could come from queryParameters
-                Metadata:{}
+                Metadata: {}
             });
 
             // const storageUrl = `https://my-express-application-dev-s3bucket-18eh6dlfu6qih.s3.ap-south-1.amazonaws.com/${req.query.filename}`
@@ -582,14 +582,14 @@ const CarController = () => {
                 'details_json': profile.details_json
             }, { where: { 'user_id': user_id } })
 
-            if(approve_status === 'true') {
+            if (approve_status === 'true') {
                 await FiAssignedPending.create({
                     'profile_id': user_id,
                     'loan_id': __loan_id
                 })
 
                 await KycApprovalPending.destroy({
-                    where:{
+                    where: {
                         'profile_id': user_id
                     }
                 })
@@ -613,12 +613,45 @@ const CarController = () => {
             });
 
             const name = await Login.findOne({
-                where:{
+                where: {
                     user_id: log.user_id
                 },
                 attributes: ['full_name']
             })
             return res.status(200).json(name.full_name);
+        } catch (err) {
+            return res.status(500).json({ msg: err });
+        }
+    };
+
+    const terminateLoan = async (req, res) => {
+        const profile_id = req.query.profile_id;
+        const loan_id = req.query.loan_id;
+
+        try {
+            let profile = await UserProfile.findOne({
+                where: {
+                    user_id: profile_id
+                }
+            });
+
+            let counter = 0;
+            let loanNumber = 0;
+            for (let loan of profile.details_json[profile_id].loans) {
+                if (loan.__loan_id == loan_id) {
+                    loanNumber = counter;
+                }
+                counter++;
+            }
+
+            profile.details_json[profile_id].loans[loanNumber].stages.current_stage = 'Terminated';
+
+            await UserProfile.update({
+                'details_json': profile.details_json
+              }, { where: { 'user_id': profile_id } })
+      
+
+            return res.status(200).send('Operation successfull!');
         } catch (err) {
             return res.status(500).json({ msg: err });
         }
@@ -640,7 +673,8 @@ const CarController = () => {
         getPreSignedUrl,
         getPreSignedUrlForRetrieval,
         approveKYC,
-        getAgentNameForKYC
+        getAgentNameForKYC,
+        terminateLoan
     };
 };
 
