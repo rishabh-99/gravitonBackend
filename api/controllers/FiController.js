@@ -341,7 +341,7 @@ const FIController = () => {
       })
 
       await DocumentCheckUploadPending.destroy({
-        where:{
+        where: {
           profile_id
         }
       })
@@ -444,6 +444,92 @@ const FIController = () => {
     }
   };
 
+  const approveDocument = async (req, res) => {
+    const profile_id = req.query.profile_id;
+    const loan_id = req.query.loan_id;
+    const user_id = req.query.user_id;
+    const remark = req.query.remark;
+    const status = req.query.status;
+
+    try {
+      await DocumentCheckApprovePending.destroy({
+        where: {
+          profile_id, loan_id
+        }
+      });
+      if (status === 'true') {
+        let profile = await UserProfile.findOne({
+          where: {
+            user_id: profile_id
+          }
+        });
+
+        let counter = 0;
+        let loanNumber = 0;
+        for (let loan of profile.details_json[profile_id].loans) {
+          if (loan.__loan_id == loan_id) {
+            loanNumber = counter;
+          }
+          counter++;
+        }
+
+        const date = new Date();
+        profile.details_json[profile_id].loans[loanNumber].stages.document_check_approve.status = true;
+        profile.details_json[profile_id].loans[loanNumber].stages.document_check_approve.time_stamp = date.toLocaleString();
+        profile.details_json[profile_id].loans[loanNumber].stages.document_check_approve.remark = remark;
+        profile.details_json[profile_id].loans[loanNumber].stages.current_stage = 'document_check_approve';
+
+        await UserProfile.update({
+          'details_json': profile.details_json
+        }, { where: { 'user_id': profile_id } })
+
+
+        await EmiSchedulePending.create({
+          profile_id, loan_id
+        })
+      }
+      else if (status === 'false') {
+        let profile = await UserProfile.findOne({
+          where: {
+            user_id: profile_id
+          }
+        });
+
+        let counter = 0;
+        let loanNumber = 0;
+        for (let loan of profile.details_json[profile_id].loans) {
+          if (loan.__loan_id == loan_id) {
+            loanNumber = counter;
+          }
+          counter++;
+        }
+
+        const date = new Date();
+        profile.details_json[profile_id].loans[loanNumber].stages.document_check_approve.status = false;
+        profile.details_json[profile_id].loans[loanNumber].stages.document_check_approve.time_stamp = date.toLocaleString();
+        profile.details_json[profile_id].loans[loanNumber].stages.document_check_approve.remark = remark;
+        profile.details_json[profile_id].loans[loanNumber].stages.current_stage = 'document_check_approve';
+
+        await UserProfile.update({
+          'details_json': profile.details_json
+        }, { where: { 'user_id': profile_id } })
+
+        await DocumentCheckUploadPending.create({
+          profile_id, loan_id, user_id
+        })
+      } else {
+        return res.status(400).send('Incorrect status')
+      }
+
+      return res.status(200).send('Operation Successfull')
+
+
+    } catch (err) {
+      console.log(err)
+      return res.status(500).json({ msg: err });
+    }
+  };
+
 
 
   return {
@@ -461,7 +547,8 @@ const FIController = () => {
     approveFI,
     createDocumentApprovePending,
     createEMISchedule,
-    getEMISchedule
+    getEMISchedule,
+    approveDocument
   };
 };
 

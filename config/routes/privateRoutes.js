@@ -56,6 +56,8 @@ const privateRoutes = {
 
   'POST /Document/createDocumentApprovePending': 'FiController.createDocumentApprovePending',
   'POST /Document/createEMISchedule': 'FiController.createEMISchedule',
+  'POST /Document/approveDocument': 'FiController.approveDocument',
+
 
 
 };
