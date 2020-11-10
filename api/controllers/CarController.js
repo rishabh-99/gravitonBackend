@@ -657,6 +657,42 @@ const CarController = () => {
         }
     };
 
+    const resubmitKYC = async (req, res) => {
+        const profile_id = req.query.profile_id;
+        const loan_id = req.query.loan_id;
+        const remark = req.query.remark;
+
+        try {
+            let profile = await UserProfile.findOne({
+              where: {
+                user_id: profile_id
+              }
+            });
+    
+            let counter = 0;
+            let loanNumber = 0;
+            for (let loan of profile.details_json[profile_id].loans) {
+              if (loan.__loan_id == loan_id) {
+                loanNumber = counter;
+              }
+              counter++;
+            }
+    
+            const date = new Date();
+            profile.details_json[profile_id].loans[loanNumber].stages.kyc_approval.status = false;
+            profile.details_json[profile_id].loans[loanNumber].stages.kyc_approval.time_stamp = date.toLocaleString();
+            profile.details_json[profile_id].loans[loanNumber].stages.kyc_approval.remark = remark;
+            profile.details_json[profile_id].loans[loanNumber].stages.current_stage = 'kyc_approval';
+    
+            await UserProfile.update({
+              'details_json': profile.details_json
+            }, { where: { 'user_id': profile_id } })
+    
+          } catch (err) {
+            return res.status(500).json({ msg: err });
+        }
+    };
+
     return {
         // returning all the functions form the controller
         register,
@@ -674,7 +710,8 @@ const CarController = () => {
         getPreSignedUrlForRetrieval,
         approveKYC,
         getAgentNameForKYC,
-        terminateLoan
+        terminateLoan,
+        resubmitKYC
     };
 };
 

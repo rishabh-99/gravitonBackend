@@ -514,9 +514,6 @@ const FIController = () => {
           'details_json': profile.details_json
         }, { where: { 'user_id': profile_id } })
 
-        await DocumentCheckUploadPending.create({
-          profile_id, loan_id, user_id
-        })
       } else {
         return res.status(400).send('Incorrect status')
       }
@@ -529,6 +526,48 @@ const FIController = () => {
       return res.status(500).json({ msg: err });
     }
   };
+
+  const resubmitDocument = async (req, res) => {
+    const profile_id = req.query.profile_id;
+    const loan_id = req.query.loan_id;
+    const user_id = req.query.user_id;
+    const remark = req.query.remark;
+
+    try {
+      let profile = await UserProfile.findOne({
+        where: {
+          user_id: profile_id
+        }
+      });
+
+      let counter = 0;
+      let loanNumber = 0;
+      for (let loan of profile.details_json[profile_id].loans) {
+        if (loan.__loan_id == loan_id) {
+          loanNumber = counter;
+        }
+        counter++;
+      }
+
+      const date = new Date();
+      profile.details_json[profile_id].loans[loanNumber].stages.document_check_approve.status = false;
+      profile.details_json[profile_id].loans[loanNumber].stages.document_check_approve.time_stamp = date.toLocaleString();
+      profile.details_json[profile_id].loans[loanNumber].stages.document_check_approve.remark = remark;
+      profile.details_json[profile_id].loans[loanNumber].stages.current_stage = 'document_check_approve';
+
+      await UserProfile.update({
+        'details_json': profile.details_json
+      }, { where: { 'user_id': profile_id } })
+
+      await DocumentCheckUploadPending.create({
+        profile_id, loan_id, user_id
+      })
+    } catch (err) {
+      console.log(err)
+      return res.status(500).json({ msg: err });
+    }
+  };
+  
 
 
 
@@ -548,7 +587,8 @@ const FIController = () => {
     createDocumentApprovePending,
     createEMISchedule,
     getEMISchedule,
-    approveDocument
+    approveDocument,
+    resubmitDocument
   };
 };
 
