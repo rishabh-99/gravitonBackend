@@ -606,8 +606,6 @@ const FIController = () => {
         }
       });
 
-     
-
       let counter = 0;
       let loanNumber = 0;
       for (let loan of profile.details_json[profile_id].loans) {
@@ -621,7 +619,7 @@ const FIController = () => {
       profile.details_json[profile_id].loans[loanNumber].stages.fi_submitted.status = false;
       profile.details_json[profile_id].loans[loanNumber].stages.fi_submitted.time_stamp = date.toLocaleString();
       profile.details_json[profile_id].loans[loanNumber].stages.fi_submitted.remark = remark;
-      profile.details_json[profile_id].loans[loanNumber].stages.current_stage = 'fi_submitted';
+      profile.details_json[profile_id].loans[loanNumber].stages.current_stage = 'fi_assigned';
 
       
       await UserProfile.update({
