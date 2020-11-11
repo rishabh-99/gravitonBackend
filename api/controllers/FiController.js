@@ -334,7 +334,7 @@ const FIController = () => {
     const user_id = req.query.user_id;
     const loan_id = req.query.loan_id;
     const profile_id = req.query.profile_id;
-    const documentJSON = req.body.documentJSON;
+    const documentJSON = req.body;
     try {
 
       
