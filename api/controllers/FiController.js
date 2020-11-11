@@ -331,7 +331,7 @@ const FIController = () => {
   };
 
   const createDocumentApprovePending = async (req, res) => {
-    const user_id = req.query.user_id;
+    const user_id = parseInt(req.query.user_id);
     const loan_id = req.query.loan_id;
     const profile_id = req.query.profile_id;
     const documentJSON = req.body;
