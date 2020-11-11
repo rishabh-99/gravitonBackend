@@ -352,8 +352,11 @@ const FIController = () => {
         }
         counter++;
       }
-
+      const date = new Date();
       profile.details_json[profile_id].loans[loanNumber].documentJSON = documentJSON;
+      profile.details_json[profile_id].loans[loanNumber].stages.document_check_upload.status = true;
+      profile.details_json[profile_id].loans[loanNumber].stages.document_check_upload.time_stamp = date.toLocaleString();
+      profile.details_json[user_id].loans[loanNumber].stages.current_stage = 'document_check_upload';
 
       await UserProfile.update({
         'details_json': profile.details_json
