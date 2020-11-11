@@ -6,6 +6,8 @@ Author: Rishabh Merhotra
 // importing the 3rd party libraries
 const jwt = require('jsonwebtoken');
 const CryptoJS = require("crypto-js");
+const Login = require('../models/Login');
+const bcryptService = require('./bcrypt.service');
 
 // ensuring the environment we are wokring on 
 const jwtSecret = process.env.NODE_ENV === 'production' ? process.env.JWT_SECRET : '78uighjfyuyu97puoiohgf879';
@@ -23,12 +25,12 @@ const authService = () => {
       iv: iv,
       mode: CryptoJS.mode.CBC,
       padding: CryptoJS.pad.Pkcs7
-    /*
-     Encrypting the payloads , utf8 with Stringified Payloads and key..
-     Size given to be 128/8. 
-      cryptojs for AES encryption
-      padding means number of distinct practices 
-    */
+      /*
+       Encrypting the payloads , utf8 with Stringified Payloads and key..
+       Size given to be 128/8. 
+        cryptojs for AES encryption
+        padding means number of distinct practices 
+      */
 
     }).toString();
     return jwt.sign({ encryptedPayload: encryptedPayload }, jwtSecret, {
@@ -46,7 +48,36 @@ const authService = () => {
       padding: CryptoJS.pad.Pkcs7
     }).toString(CryptoJS.enc.Utf8);
     return jwt.verify(token, jwtSecret, {}, cb)
-  };   
+  };
+
+  const verifyUser = async (token,encPassword) => {
+    const dec = JSON.parse(CryptoJS.AES.decrypt(jwt.decode(token).encryptedPayload, key, {
+      keySize: 128 / 8,
+      iv: iv,
+      mode: CryptoJS.mode.CBC,
+      padding: CryptoJS.pad.Pkcs7
+    }).toString(CryptoJS.enc.Utf8))
+
+    console.log(dec)
+
+    const user = await Login.findOne({
+      where: {
+        user_id: dec.user_id,
+        is_active: true
+      },
+    });
+    if(!user) {
+      return false;
+    }
+    const password = CryptoJS.AES.decrypt(encPassword, key, {
+      keySize: 128 / 8,
+      iv: iv,
+      mode: CryptoJS.mode.CBC,
+      padding: CryptoJS.pad.Pkcs7
+    }).toString(CryptoJS.enc.Utf8);
+    const res = bcryptService().comparePassword(password, user.password)
+    return res;
+  };
 
   // it returns the jwt verification 
 
@@ -54,6 +85,7 @@ const authService = () => {
     // returning the issue and verify functions
     issue,
     verify,
+    verifyUser
   };
 };
 

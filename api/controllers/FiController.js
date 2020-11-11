@@ -334,130 +334,10 @@ const FIController = () => {
     const user_id = req.query.user_id;
     const loan_id = req.query.loan_id;
     const profile_id = req.query.profile_id;
-
+    const documentJSON = req.body.documentJSON;
     try {
-      await DocumentCheckApprovePending.create({
-        profile_id, user_id, loan_id
-      })
 
-      await DocumentCheckUploadPending.destroy({
-        where: {
-          profile_id
-        }
-      })
-      return res.status(200).json({ msg: 'Operation Successful' })
-    } catch (err) {
-      return res.status(500).json({ msg: err });
-    }
-  };
-
-  const createEMISchedule = async (req, res) => {
-    const emi_schedule_profile_id = req.query.emi_schedule_profile_id;
-    const emi_schedule_loan_id = req.query.emi_schedule_loan_id;
-    const emi_schedule_loan_amount = parseInt(req.query.emi_schedule_loan_amount);
-    const emi_schedule_interest_rate = parseInt(req.query.emi_schedule_interest_rate);
-    const emi_schedule_loan_tenure = parseInt(req.query.emi_schedule_loan_tenure);
-    const emi_schedule_start_date = req.query.emi_schedule_start_date;
-
-    const user_id = emi_schedule_profile_id;
-
-    const remark = req.query.remark;
-
-    const emi_schedule_json_object = req.body;
-    console.log({
-      emi_schedule_profile_id, emi_schedule_loan_id, emi_schedule_loan_amount,
-      emi_schedule_interest_rate, emi_schedule_loan_tenure, emi_schedule_start_date,
-      emi_schedule_json_object
-    });
-
-    try {
-      await EmiSchedule.create({
-        emi_schedule_profile_id, emi_schedule_loan_id, emi_schedule_loan_amount,
-        emi_schedule_interest_rate, emi_schedule_loan_tenure, emi_schedule_start_date,
-        emi_schedule_json_object
-      });
-
-
-      let profile = await UserProfile.findOne({
-        where: {
-          user_id: emi_schedule_profile_id
-        }
-      })
-
-      console.log(profile)
-      let counter = 0;
-      let loanNumber = 0;
-      for (let loan of profile.details_json[user_id].loans) {
-        if (loan.__loan_id == emi_schedule_loan_id) {
-          loanNumber = counter;
-        }
-        counter++;
-      }
-      const date = new Date();
-      profile.details_json[user_id].loans[loanNumber].stages.emi_schedule.status = true;
-      profile.details_json[user_id].loans[loanNumber].stages.emi_schedule.time_stamp = date.toLocaleString();
-      profile.details_json[user_id].loans[loanNumber].stages.emi_schedule.remark = remark;
-      profile.details_json[user_id].loans[loanNumber].stages.current_stage = 'emi_schedule';
-      profile.details_json[user_id].loans[loanNumber].emi_schedule = emi_schedule_json_object;
-
-      await UserProfile.update({
-        'details_json': profile.details_json
-      }, { where: { 'user_id': emi_schedule_profile_id } })
-
-      await EmiSchedulePending.destroy({
-        where: {
-          'profile_id': emi_schedule_profile_id
-        }
-      })
-
-      return res.status(200).json({ msg: 'Operation Successful' })
-
-
-    } catch (err) {
-      console.log(err)
-      return res.status(500).json({ msg: err });
-    }
-  };
-
-  const getEMISchedule = async (req, res) => {
-    const emi_schedule_profile_id = req.query.emi_schedule_profile_id;
-    const emi_schedule_loan_id = req.query.emi_schedule_loan_id;
-
-    try {
-      const schedule = await EmiSchedule.findOne({
-        attributes: ['emi_schedule_json_object'],
-        where: {
-          emi_schedule_profile_id,
-          emi_schedule_loan_id
-        }
-      });
-
-
-
-
-      return res.status(200).send(schedule.emi_schedule_json_object)
-
-
-    } catch (err) {
-      console.log(err)
-      return res.status(500).json({ msg: err });
-    }
-  };
-
-  const approveDocument = async (req, res) => {
-    const profile_id = req.query.profile_id;
-    const loan_id = req.query.loan_id;
-    const user_id = req.query.user_id;
-    const remark = req.query.remark;
-    const status = req.query.status;
-
-    try {
-      await DocumentCheckApprovePending.destroy({
-        where: {
-          profile_id, loan_id
-        }
-      });
-      if (status === 'true') {
+      
         let profile = await UserProfile.findOne({
           where: {
             user_id: profile_id
@@ -473,22 +353,203 @@ const FIController = () => {
           counter++;
         }
 
+        profile.details_json[profile_id].loans[loanNumber].documentJSON = documentJSON;
+
+
+        await DocumentCheckApprovePending.create({
+          profile_id, user_id, loan_id
+        })
+
+        await DocumentCheckUploadPending.destroy({
+          where: {
+            profile_id
+          }
+        })
+        return res.status(200).json({ msg: 'Operation Successful' })
+      } catch (err) {
+        return res.status(500).json({ msg: err });
+      }
+    };
+
+    const createEMISchedule = async (req, res) => {
+      const emi_schedule_profile_id = req.query.emi_schedule_profile_id;
+      const emi_schedule_loan_id = req.query.emi_schedule_loan_id;
+      const emi_schedule_loan_amount = parseInt(req.query.emi_schedule_loan_amount);
+      const emi_schedule_interest_rate = parseInt(req.query.emi_schedule_interest_rate);
+      const emi_schedule_loan_tenure = parseInt(req.query.emi_schedule_loan_tenure);
+      const emi_schedule_start_date = req.query.emi_schedule_start_date;
+
+      const user_id = emi_schedule_profile_id;
+
+      const remark = req.query.remark;
+
+      const emi_schedule_json_object = req.body;
+
+
+      try {
+        await EmiSchedule.create({
+          emi_schedule_profile_id, emi_schedule_loan_id, emi_schedule_loan_amount,
+          emi_schedule_interest_rate, emi_schedule_loan_tenure, emi_schedule_start_date,
+          emi_schedule_json_object
+        });
+
+
+        let profile = await UserProfile.findOne({
+          where: {
+            user_id: emi_schedule_profile_id
+          }
+        })
+
+        console.log(profile)
+        let counter = 0;
+        let loanNumber = 0;
+        for (let loan of profile.details_json[user_id].loans) {
+          if (loan.__loan_id == emi_schedule_loan_id) {
+            loanNumber = counter;
+          }
+          counter++;
+        }
         const date = new Date();
-        profile.details_json[profile_id].loans[loanNumber].stages.document_check_approve.status = true;
-        profile.details_json[profile_id].loans[loanNumber].stages.document_check_approve.time_stamp = date.toLocaleString();
-        profile.details_json[profile_id].loans[loanNumber].stages.document_check_approve.remark = remark;
-        profile.details_json[profile_id].loans[loanNumber].stages.current_stage = 'document_check_approve';
+        profile.details_json[user_id].loans[loanNumber].stages.emi_schedule.status = true;
+        profile.details_json[user_id].loans[loanNumber].stages.emi_schedule.time_stamp = date.toLocaleString();
+        profile.details_json[user_id].loans[loanNumber].stages.emi_schedule.remark = remark;
+        profile.details_json[user_id].loans[loanNumber].stages.current_stage = 'emi_schedule';
+        profile.details_json[user_id].loans[loanNumber].emi_schedule = emi_schedule_json_object;
 
         await UserProfile.update({
           'details_json': profile.details_json
-        }, { where: { 'user_id': profile_id } })
+        }, { where: { 'user_id': emi_schedule_profile_id } })
 
-
-        await EmiSchedulePending.create({
-          profile_id, loan_id
+        await EmiSchedulePending.destroy({
+          where: {
+            'profile_id': emi_schedule_profile_id
+          }
         })
+
+        return res.status(200).json({ msg: 'Operation Successful' })
+
+
+      } catch (err) {
+        console.log(err)
+        return res.status(500).json({ msg: err });
       }
-      else if (status === 'false') {
+    };
+
+    const getEMISchedule = async (req, res) => {
+      const emi_schedule_profile_id = req.query.emi_schedule_profile_id;
+      const emi_schedule_loan_id = req.query.emi_schedule_loan_id;
+
+      try {
+        const schedule = await EmiSchedule.findOne({
+          attributes: ['emi_schedule_json_object'],
+          where: {
+            emi_schedule_profile_id,
+            emi_schedule_loan_id
+          }
+        });
+
+
+
+
+        return res.status(200).send(schedule.emi_schedule_json_object)
+
+
+      } catch (err) {
+        console.log(err)
+        return res.status(500).json({ msg: err });
+      }
+    };
+
+    const approveDocument = async (req, res) => {
+      const profile_id = req.query.profile_id;
+      const loan_id = req.query.loan_id;
+      const user_id = req.query.user_id;
+      const remark = req.query.remark;
+      const status = req.query.status;
+
+      try {
+        await DocumentCheckApprovePending.destroy({
+          where: {
+            profile_id, loan_id
+          }
+        });
+        if (status === 'true') {
+          let profile = await UserProfile.findOne({
+            where: {
+              user_id: profile_id
+            }
+          });
+
+          let counter = 0;
+          let loanNumber = 0;
+          for (let loan of profile.details_json[profile_id].loans) {
+            if (loan.__loan_id == loan_id) {
+              loanNumber = counter;
+            }
+            counter++;
+          }
+
+          const date = new Date();
+          profile.details_json[profile_id].loans[loanNumber].stages.document_check_approve.status = true;
+          profile.details_json[profile_id].loans[loanNumber].stages.document_check_approve.time_stamp = date.toLocaleString();
+          profile.details_json[profile_id].loans[loanNumber].stages.document_check_approve.remark = remark;
+          profile.details_json[profile_id].loans[loanNumber].stages.current_stage = 'document_check_approve';
+
+          await UserProfile.update({
+            'details_json': profile.details_json
+          }, { where: { 'user_id': profile_id } })
+
+
+          await EmiSchedulePending.create({
+            profile_id, loan_id
+          })
+        }
+        else if (status === 'false') {
+          let profile = await UserProfile.findOne({
+            where: {
+              user_id: profile_id
+            }
+          });
+
+          let counter = 0;
+          let loanNumber = 0;
+          for (let loan of profile.details_json[profile_id].loans) {
+            if (loan.__loan_id == loan_id) {
+              loanNumber = counter;
+            }
+            counter++;
+          }
+
+          const date = new Date();
+          profile.details_json[profile_id].loans[loanNumber].stages.document_check_approve.status = false;
+          profile.details_json[profile_id].loans[loanNumber].stages.document_check_approve.time_stamp = date.toLocaleString();
+          profile.details_json[profile_id].loans[loanNumber].stages.document_check_approve.remark = remark;
+          profile.details_json[profile_id].loans[loanNumber].stages.current_stage = 'document_check_approve';
+
+          await UserProfile.update({
+            'details_json': profile.details_json
+          }, { where: { 'user_id': profile_id } })
+
+        } else {
+          return res.status(400).send('Incorrect status')
+        }
+
+        return res.status(200).send('Operation Successfull')
+
+
+      } catch (err) {
+        console.log(err)
+        return res.status(500).json({ msg: err });
+      }
+    };
+
+    const resubmitDocument = async (req, res) => {
+      const profile_id = req.query.profile_id;
+      const loan_id = req.query.loan_id;
+      const user_id = req.query.user_id;
+      const remark = req.query.remark;
+
+      try {
         let profile = await UserProfile.findOne({
           where: {
             user_id: profile_id
@@ -514,83 +575,86 @@ const FIController = () => {
           'details_json': profile.details_json
         }, { where: { 'user_id': profile_id } })
 
-      } else {
-        return res.status(400).send('Incorrect status')
+        await DocumentCheckUploadPending.create({
+          profile_id, loan_id, user_id
+        })
+      } catch (err) {
+        console.log(err)
+        return res.status(500).json({ msg: err });
       }
+    };
 
-      return res.status(200).send('Operation Successfull')
+    const resubmitFI = async (req, res) => {
+      const profile_id = req.query.profile_id;
+      const loan_id = req.query.loan_id;
+      const remark = req.query.remark;
+      const user_id = req.query.user_id;
 
+      try {
+        let profile = await UserProfile.findOne({
+          where: {
+            user_id: profile_id
+          }
+        });
 
-    } catch (err) {
-      console.log(err)
-      return res.status(500).json({ msg: err });
-    }
-  };
-
-  const resubmitDocument = async (req, res) => {
-    const profile_id = req.query.profile_id;
-    const loan_id = req.query.loan_id;
-    const user_id = req.query.user_id;
-    const remark = req.query.remark;
-
-    try {
-      let profile = await UserProfile.findOne({
-        where: {
-          user_id: profile_id
+        let counter = 0;
+        let loanNumber = 0;
+        for (let loan of profile.details_json[profile_id].loans) {
+          if (loan.__loan_id == loan_id) {
+            loanNumber = counter;
+          }
+          counter++;
         }
-      });
 
-      let counter = 0;
-      let loanNumber = 0;
-      for (let loan of profile.details_json[profile_id].loans) {
-        if (loan.__loan_id == loan_id) {
-          loanNumber = counter;
-        }
-        counter++;
+        const date = new Date();
+        profile.details_json[profile_id].loans[loanNumber].stages.fi_submitted.status = false;
+        profile.details_json[profile_id].loans[loanNumber].stages.fi_submitted.time_stamp = date.toLocaleString();
+        profile.details_json[profile_id].loans[loanNumber].stages.fi_submitted.remark = remark;
+        profile.details_json[profile_id].loans[loanNumber].stages.current_stage = 'fi_submitted';
+
+        await UserProfile.update({
+          'details_json': profile.details_json
+        }, { where: { 'user_id': profile_id } })
+
+        await FiApprovalPending.destroy({
+          where: {
+            profile, loan_id
+          }
+        })
+
+        await FiSubmittedPending.create({
+          profile_id, loan_id, user_id
+        })
+
+      } catch (err) {
+        return res.status(500).json({ msg: err });
       }
+    };
 
-      const date = new Date();
-      profile.details_json[profile_id].loans[loanNumber].stages.document_check_approve.status = false;
-      profile.details_json[profile_id].loans[loanNumber].stages.document_check_approve.time_stamp = date.toLocaleString();
-      profile.details_json[profile_id].loans[loanNumber].stages.document_check_approve.remark = remark;
-      profile.details_json[profile_id].loans[loanNumber].stages.current_stage = 'document_check_approve';
 
-      await UserProfile.update({
-        'details_json': profile.details_json
-      }, { where: { 'user_id': profile_id } })
 
-      await DocumentCheckUploadPending.create({
-        profile_id, loan_id, user_id
-      })
-    } catch (err) {
-      console.log(err)
-      return res.status(500).json({ msg: err });
-    }
+
+    return {
+      // returning all the functions form the controller
+      register,
+      getComboBoxData,
+      getPreSignedUrl,
+      assignTo,
+      getAllPendingList,
+      getPreSignedUrlForRetrieval,
+      getPreSignedUrlDocument,
+      getPreSignedUrlForRetrievalDocument,
+      getFiSubmittedPendingForUser,
+      getDocumentCheckUploadPendingForUser,
+      approveFI,
+      createDocumentApprovePending,
+      createEMISchedule,
+      getEMISchedule,
+      approveDocument,
+      resubmitDocument,
+      resubmitFI
+    };
   };
-  
-
-
-
-  return {
-    // returning all the functions form the controller
-    register,
-    getComboBoxData,
-    getPreSignedUrl,
-    assignTo,
-    getAllPendingList,
-    getPreSignedUrlForRetrieval,
-    getPreSignedUrlDocument,
-    getPreSignedUrlForRetrievalDocument,
-    getFiSubmittedPendingForUser,
-    getDocumentCheckUploadPendingForUser,
-    approveFI,
-    createDocumentApprovePending,
-    createEMISchedule,
-    getEMISchedule,
-    approveDocument,
-    resubmitDocument
-  };
-};
 
 
 
@@ -598,5 +662,5 @@ const FIController = () => {
 
 
 
-// exporting the module 
-module.exports = FIController
+  // exporting the module 
+  module.exports = FIController

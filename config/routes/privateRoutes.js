@@ -28,7 +28,6 @@ const privateRoutes = {
   'GET /CAR/approveKYC': 'CarController.approveKYC',
   'GET /CAR/getAgentNameForKYC': 'CarController.getAgentNameForKYC',
   'GET /CAR/terminateLoan': 'CarController.terminateLoan',
-  'GET /CAR/resubmitKYC': 'CarController.resubmitKYC',
 
   'POST /CAR/create': 'CarController.register',
   'POST /CAR/insertNewInkredoDetails': 'CarController.insertBorrowerDetails',
@@ -51,6 +50,7 @@ const privateRoutes = {
   'GET /FI/getFiSubmittedPendingForUser': 'FiController.getFiSubmittedPendingForUser',
   'GET /FI/getDocumentCheckUploadPendingForUser': 'FiController.getDocumentCheckUploadPendingForUser',
   'GET /FI/approveFI': 'FiController.approveFI',
+  'GET /FI/resubmitFI': 'FiController.resubmitFI',
 
   'GET /Document/getPreSignedUrl': 'FiController.getPreSignedUrlDocument',
   'GET /Document/getPreSignedUrlForRetrieval': 'FiController.getPreSignedUrlForRetrievalDocument',

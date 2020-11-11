@@ -32,6 +32,7 @@ const UserProfile = require('../models/User-profile');
 const Login = require('../models/Login');
 const KycApprovalPending = require('../models/Kyc_approval_pending');
 const FiAssignedPending = require('../models/Fi_assigned_pending');
+const authService = require('../services/auth.service');
 
 
 
@@ -627,6 +628,67 @@ const CarController = () => {
     const terminateLoan = async (req, res) => {
         const profile_id = req.query.profile_id;
         const loan_id = req.query.loan_id;
+        const remark = req.query.remark;
+        const password = req.query.password;
+
+        try {
+            let tokenToVerify;
+            // accepts  the header format 
+            if (req.header('Authorization')) {
+                const parts = req.header('Authorization').split(' ');
+                // splitting to parts 
+
+                if (parts.length === 2) {
+                    const scheme = parts[0];
+                    const credentials = parts[1];
+                    // bearer holds the token 
+                    if (/^Bearer$/.test(scheme)) {
+                        tokenToVerify = credentials;
+                    }
+                }
+            }
+            console.log({ tokenToVerify })
+            const verified = await authService().verifyUser(tokenToVerify, password);
+
+            if (verified) {
+
+                let profile = await UserProfile.findOne({
+                    where: {
+                        user_id: profile_id
+                    }
+                });
+
+                let counter = 0;
+                let loanNumber = 0;
+                for (let loan of profile.details_json[profile_id].loans) {
+                    if (loan.__loan_id == loan_id) {
+                        loanNumber = counter;
+                    }
+                    counter++;
+                }
+
+                profile.details_json[profile_id].loans[loanNumber].stages.current_stage = 'Terminated';
+                profile.details_json[profile_id].loans[loanNumber].loanStatus = { status: 'Terminated', remark };
+
+                await UserProfile.update({
+                    'details_json': profile.details_json
+                }, { where: { 'user_id': profile_id } })
+
+
+                return res.status(200).send('Operation successfull!');
+
+            } else {
+                return res.status(400).json({ msg: 'Incorrect Password' })
+            }
+        } catch (err) {
+            return res.status(500).json({ msg: err });
+        }
+    };
+
+    const resubmitKYC = async (req, res) => {
+        const profile_id = req.query.profile_id;
+        const loan_id = req.query.loan_id;
+        const remark = req.query.remark;
 
         try {
             let profile = await UserProfile.findOne({
@@ -644,51 +706,17 @@ const CarController = () => {
                 counter++;
             }
 
-            profile.details_json[profile_id].loans[loanNumber].stages.current_stage = 'Terminated';
-
-            await UserProfile.update({
-                'details_json': profile.details_json
-              }, { where: { 'user_id': profile_id } })
-      
-
-            return res.status(200).send('Operation successfull!');
-        } catch (err) {
-            return res.status(500).json({ msg: err });
-        }
-    };
-
-    const resubmitKYC = async (req, res) => {
-        const profile_id = req.query.profile_id;
-        const loan_id = req.query.loan_id;
-        const remark = req.query.remark;
-
-        try {
-            let profile = await UserProfile.findOne({
-              where: {
-                user_id: profile_id
-              }
-            });
-    
-            let counter = 0;
-            let loanNumber = 0;
-            for (let loan of profile.details_json[profile_id].loans) {
-              if (loan.__loan_id == loan_id) {
-                loanNumber = counter;
-              }
-              counter++;
-            }
-    
             const date = new Date();
             profile.details_json[profile_id].loans[loanNumber].stages.kyc_approval.status = false;
             profile.details_json[profile_id].loans[loanNumber].stages.kyc_approval.time_stamp = date.toLocaleString();
             profile.details_json[profile_id].loans[loanNumber].stages.kyc_approval.remark = remark;
             profile.details_json[profile_id].loans[loanNumber].stages.current_stage = 'kyc_approval';
-    
+
             await UserProfile.update({
-              'details_json': profile.details_json
+                'details_json': profile.details_json
             }, { where: { 'user_id': profile_id } })
-    
-          } catch (err) {
+
+        } catch (err) {
             return res.status(500).json({ msg: err });
         }
     };
