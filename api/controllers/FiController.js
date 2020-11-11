@@ -576,7 +576,7 @@ const FIController = () => {
       profile.details_json[profile_id].loans[loanNumber].stages.document_check_approve.status = false;
       profile.details_json[profile_id].loans[loanNumber].stages.document_check_approve.time_stamp = date.toLocaleString();
       profile.details_json[profile_id].loans[loanNumber].stages.document_check_approve.remark = remark;
-      profile.details_json[profile_id].loans[loanNumber].stages.current_stage = 'document_check_approve';
+      profile.details_json[profile_id].loans[loanNumber].stages.current_stage = 'fi_approval';
 
       await UserProfile.update({
         'details_json': profile.details_json
