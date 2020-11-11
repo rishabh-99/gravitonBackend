@@ -362,7 +362,7 @@ const FIController = () => {
 
         await DocumentCheckUploadPending.destroy({
           where: {
-            profile_id, loan_id
+            profile_id, loan_id, user_id
           }
         })
         return res.status(200).json({ msg: 'Operation Successful' })
