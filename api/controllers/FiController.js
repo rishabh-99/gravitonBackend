@@ -585,6 +585,8 @@ const FIController = () => {
       await DocumentCheckUploadPending.create({
         profile_id, loan_id, user_id
       })
+
+      return res.status(200).json({msg: 'Operation Successfull'})
     } catch (err) {
       console.log(err)
       return res.status(500).json({ msg: err });
