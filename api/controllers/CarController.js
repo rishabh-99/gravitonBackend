@@ -256,39 +256,42 @@ const CarController = () => {
         const aadhar = req.query.aadhar
         try {
             // finding all the documents with a paramater Adhaar 
+            const result = await sequelize.transaction(async (t) => {
+
             const documentModel = await Document.findAll({
                 where: {
                     'document_aadhar': aadhar
                 }
-            });
+            }, { transaction: t });
             // finding all the gurantors with a paramater Adhaar 
             const gurantorModel = await Gurantor.findAll({
                 where: {
                     'gurantor_realtedaadhar': aadhar
                 }
-            });
+            }, { transaction: t });
             // finding all the applicants  with a paramater Adhaar 
             const applicantModel = await Applicant.findAll({
                 where: {
                     'applicant_aadhar': aadhar
                 }
-            });
+            }, { transaction: t });
             // finding all the accounts with a paramater Adhaar 
             const accountModel = await Account.findAll({
                 where: {
                     'account_realtedaadhar': aadhar
                 }
-            });
+            }, { transaction: t });
             // finding all the loans with a paramater Adhaar 
             const loanModel = await Loan.findAll({
                 where: {
                     'account_realtedaadhar': aadhar
                 }
-            })
+            }, { transaction: t })
             // => req for profile 
             // return {document, gurantor, applicant, account, loans};
             // returns the 200 ok! with json objects
             return res.status(200).json({ documentModel, gurantorModel, applicantModel, accountModel, loanModel });
+        });
         } catch (err) {
             console.log(err);
             return res.status(500).json({ msg: err });
@@ -297,15 +300,17 @@ const CarController = () => {
     // get the Adhaar list upon request and response
     const getAadharList = async (req, res) => {
         try {
+            const result = await sequelize.transaction(async (t) => {
             // gets all the documents with the Attribute Document-Adhar 
             const Aadhar = await Document.findAll({
                 attributes: ['document_aadhar']
-            })
+            }, { transaction : t})
                 // returns a promise and we map it to document.document_aadhar
                 .then(document => document.map(document => document.document_aadhar));
             console.log(Aadhar)
             // 200 returns a ok! and sends Aadhar object 
             return res.status(200).send(Aadhar)
+        })
         } catch (err) {
             return res.status(500).json({ msg: err });
         }
@@ -313,14 +318,17 @@ const CarController = () => {
     // Getting all the pancard lists in the documents 
     const getPanList = async (req, res) => {
         try {
+            const result = await sequelize.transaction(async (t) => {
+
             const Pan = await Document.findAll({
                 attributes: ['document_pan'],
 
-            })
+            }, { transaction : t})
                 .then(document => document.map(document => document.document_pan));
             console.log(typeof (Pan))
             // returns 200 ok! and pan object 
             return res.status(200).send(Pan)
+        })
         } catch (err) {
             // catches the error to "internal server error"
             return res.status(500).json({ msg: err });
@@ -332,13 +340,16 @@ const CarController = () => {
     //gets all the applicants with their firstname 
     const getFnameAndAadhar = async (req, res) => {
         try {
+            const result = await sequelize.transaction(async (t) => {
+
             const NameWithAadhar = await Applicant.findAll({
                 attributes: ['applicant_aadhar', 'applicant_firstname'],
 
-            })
+            }, { transaction : t})
                 .then(applicant => applicant.map(applicant => `${applicant.applicant_firstname} : ${applicant.applicant_aadhar}`));
             console.log(NameWithAadhar)
             return res.status(200).send(NameWithAadhar)
+        })
         } catch (err) {
             return res.status(500).json({ msg: err });
         }
@@ -346,15 +357,17 @@ const CarController = () => {
     // Gets all the detials of their attributes 
     const getComboBoxData = async (req, res) => {
         try {
-            const MaritalStatusModel = await MaritalStatus.findAll();
-            const AcquaintanceModel = await Acquaintance.findAll();
-            const CasteModel = await Caste.findAll();
-            const CategoryModel = await Category.findAll();
-            const GurantortypeModel = await Gurantortype.findAll();
-            const LoantypeModel = await Loantype.findAll();
-            const DocumenttypeModel = await Documenttype.findAll();
+        const result = await sequelize.transaction(async (t) => {
+            const MaritalStatusModel = await MaritalStatus.findAll({},{transaction : t});
+            const AcquaintanceModel = await Acquaintance.findAll({}, {transaction : t});
+            const CasteModel = await Caste.findAll({},{transaction : t});
+            const CategoryModel = await Category.findAll({}, { transaction : t});
+            const GurantortypeModel = await Gurantortype.findAll({},{transaction : t});
+            const LoantypeModel = await Loantype.findAll({}, {transaction: t});
+            const DocumenttypeModel = await Documenttype.findAll({}, {transaction : t});
 
             return res.status(200).send({ MaritalStatusModel, AcquaintanceModel, CasteModel, CategoryModel, GurantortypeModel, LoantypeModel, DocumenttypeModel })
+        })
         } catch (err) {
             return res.status(500).json({ msg: err });
         }
@@ -370,6 +383,8 @@ const CarController = () => {
  */
     const getCountOfKyc = async (req, res) => {
         try {
+
+        const result = await sequelize.transaction(async (t) => {  
             // Date info 
             var today = new Date();
             var dd = today.getDate();
@@ -392,9 +407,10 @@ const CarController = () => {
                     'user_id': req.query.user_id,
                     'kyc_date': today
                 }
-            })
+            },{transaction :t})
 
             return res.status(200).send({ count })
+        })
         } catch (err) {
             return res.status(500).json({ msg: err });
         }
@@ -409,15 +425,18 @@ const CarController = () => {
 
     const insertBorrowerDetails = async (req, res) => {
         try {
+
+        const result = await sequelize.transaction(async (t) => { 
             // creating a borrower id before insertion 
             await Borrower_incredo_details.create({
                 'borrower_id': req.body.borrower_id,
                 'borrower_details': req.body.borrower_details
-            })
+            }, {transaction : t})
 
 
 
             return res.status(200).send({ msg: 'Successfull' })
+        })
         } catch (err) {
             return res.status(500).json({ msg: err });
         }
@@ -426,12 +445,15 @@ const CarController = () => {
 
     const getUserProfileID = async (req, res) => {
         try {
+
+         const result = await sequelize.transaction(async (t) => {    
             const profileList = await UserProfile.findAll({
                 attributes: ['user_id']
-            })
+            }, { transaction : t})
                 .then(profile => profile.map(profile => profile.user_id));
 
             return res.status(200).send(profileList)
+        })
         } catch (err) {
             return res.status(500).json({ msg: err });
         }
@@ -440,14 +462,17 @@ const CarController = () => {
     const getProfileForProfileID = async (req, res) => {
         const user_id = req.query.user_id
         try {
+         const result = await sequelize.transaction(async (t) => {
+
             const profile = await UserProfile.findOne({
                 attributes: ['details_json'],
                 where: {
                     user_id
                 }
-            })
+            }, {transaction : t })
 
             return res.status(200).send(profile.details_json)
+        })
         } catch (err) {
             return res.status(500).json({ msg: err });
         }
@@ -457,11 +482,14 @@ const CarController = () => {
         const user_id = req.body.user_id;
         const loan_type = req.body.loan_type;
         try {
+            const result = await sequelize.transaction(async (t) => {
+
             const profile = await UserProfile.findOne({
                 where: {
                     user_id: user_id
                 }
-            });
+            }, { transaction: t});
+        
             function getRandomString(length) {
                 var randomChars = 'abcdefghijklmnopqrstuvwxyz';
                 var result = '';
@@ -508,12 +536,13 @@ const CarController = () => {
 
             await UserProfile.update({
                 'details_json': profile.details_json
-            }, { where: { 'user_id': user_id } });
+            }, { where: { 'user_id': user_id } }, { transaction: t});
 
             await KycApprovalPending.create({
                 'profile_id': user_id,
                 'loan_id': newLoanId,
-            })
+            }, {transaction : t})
+        });
             return res.status(200).json({ msg: 'Operation Successfull' })
         } catch (err) {
             return res.status(500).json({ msg: err });
@@ -558,11 +587,13 @@ const CarController = () => {
         const remark = req.query.remark;
 
         try {
+        const result = await sequelize.transaction(async (t) => {
+
             let profile = await UserProfile.findOne({
                 where: {
                     user_id: user_id
                 }
-            })
+            }, { transaction : t})
             let counter = 0;
             let loanNumber = 0;
             for (let loan of profile.details_json[user_id].loans) {
@@ -580,23 +611,24 @@ const CarController = () => {
 
             await UserProfile.update({
                 'details_json': profile.details_json
-            }, { where: { 'user_id': user_id } })
+            }, { where: { 'user_id': user_id } }, { transaction : t})
 
             if (approve_status === 'true') {
                 await FiAssignedPending.create({
                     'profile_id': user_id,
                     'loan_id': __loan_id
-                })
+                }, { transaction : t})
 
                 await KycApprovalPending.destroy({
                     where: {
                         'profile_id': user_id
                     }
-                })
+                }, { transaction : t})
             }
 
 
             return res.status(200).json({ msg: 'Operation Successful' })
+        })
         } catch (err) {
             return res.status(500).json({ msg: err });
         }
@@ -605,20 +637,23 @@ const CarController = () => {
     const getAgentNameForKYC = async (req, res) => {
         const related_aadhar = req.query.related_aadhar
         try {
+        const result = await sequelize.transaction(async (t) => {
+
             const log = await User_kyc_log.findOne({
                 where: {
                     'related_aadhar': related_aadhar
                 },
                 attributes: ['user_id']
-            });
+            },{ transaction : t});
 
             const name = await Login.findOne({
                 where: {
                     user_id: log.user_id
                 },
                 attributes: ['full_name']
-            })
+            },{ transaction : t})
             return res.status(200).json(name.full_name);
+        })
         } catch (err) {
             return res.status(500).json({ msg: err });
         }
@@ -629,11 +664,14 @@ const CarController = () => {
         const loan_id = req.query.loan_id;
 
         try {
+
+        const result = await sequelize.transaction(async (t) => {     
+
             let profile = await UserProfile.findOne({
                 where: {
                     user_id: profile_id
                 }
-            });
+            }, { transaction : t});
 
             let counter = 0;
             let loanNumber = 0;
@@ -648,10 +686,11 @@ const CarController = () => {
 
             await UserProfile.update({
                 'details_json': profile.details_json
-              }, { where: { 'user_id': profile_id } })
+              }, { where: { 'user_id': profile_id } }, { transaction : t})
       
 
             return res.status(200).send('Operation successfull!');
+        })
         } catch (err) {
             return res.status(500).json({ msg: err });
         }

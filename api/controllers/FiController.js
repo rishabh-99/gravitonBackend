@@ -46,17 +46,19 @@ const FIController = () => {
 
     try {
       const { body } = req;
+      const result = await sequelize.transaction(async (t) => {
+      
       await FI.create({
         'fi_answers': JSON.parse(body.fi_answers),
         'related_aadhar': body.related_aadhar,
         'related_pan': body.related_pan
-      });
+      }, { transaction : t});
 
       const userProfile = await UserProfile.findOne({
         where: {
           'related_pan': body.related_pan
         }
-      })
+      }, { transaction : t})
       let loan_number = 0;
       let counter = 0;
       for (loan of userProfile.details_json[userProfile.user_id].loans) {
@@ -73,20 +75,21 @@ const FIController = () => {
 
       await UserProfile.update({
         'details_json': userProfile.details_json
-      }, { where: { 'user_id': userProfile.user_id } })
+      }, { where: { 'user_id': userProfile.user_id } }, { transaction : t })
 
       await FiApprovalPending.create({
         'profile_id': userProfile.user_id,
         'loan_id': req.body.__loan_id,
         'user_id': userProfile.details_json[userProfile.user_id].loans[loan_number].assigned_to.id
-      })
+      }, { transaction : t})
 
       await FiSubmittedPending.destroy({
         where: {
           'profile_id': userProfile.user_id
         }
-      })
+      }, { transaction : t})
       return res.status(200).json({ msg: 'Operation Successful' })
+    })
     } catch (err) {
       console.log(err);
       // 500 error returns "internal server error"
@@ -96,24 +99,26 @@ const FIController = () => {
 
   const getComboBoxData = async (req, res) => {
     try {
-      const AddressproofModel = await Addressproof.findAll();
-      const FinancetypeModel = await Financetype.findAll();
-      const HomeaccessibilityModel = await Homeaccesibility.findAll();
-      const HouseconditionModel = await Housecondition.findAll();
-      const LocalitytypeModel = await Localitytype.findAll();
-      const NocModel = await Noc.findAll();
-      const OfficeaccesibilityModel = await Officeaccesibility.findAll();
-      const OfficeconditionModel = await Officecondition.findAll();
-      const PhysicalconditionModel = await Physicalcondition.findAll();
-      const RidequalityModel = await Ridequality.findAll();
-      const SourcetypeModel = await Sourcetype.findAll();
-      const BorrowerappearanceModel = await Borrowerappearance.findAll()
+    const result = await sequelize.transaction(async (t) => {
+      const AddressproofModel = await Addressproof.findAll({}, { transaction : t});
+      const FinancetypeModel = await Financetype.findAll({}, { transaction : t});
+      const HomeaccessibilityModel = await Homeaccesibility.findAll({}, { transaction : t});
+      const HouseconditionModel = await Housecondition.findAll({}, { transaction : t});
+      const LocalitytypeModel = await Localitytype.findAll({}, { transaction : t});
+      const NocModel = await Noc.findAll({}, { transaction : t});
+      const OfficeaccesibilityModel = await Officeaccesibility.findAll({}, { transaction : t});
+      const OfficeconditionModel = await Officecondition.findAll({}, { transaction : t});
+      const PhysicalconditionModel = await Physicalcondition.findAll({}, { transaction : t});
+      const RidequalityModel = await Ridequality.findAll({}, { transaction : t});
+      const SourcetypeModel = await Sourcetype.findAll({}, { transaction : t});
+      const BorrowerappearanceModel = await Borrowerappearance.findAll({}, { transaction : t})
 
       return res.status(200).json({
         AddressproofModel, BorrowerappearanceModel, FinancetypeModel, HomeaccessibilityModel, HouseconditionModel,
         LocalitytypeModel, NocModel, OfficeaccesibilityModel, OfficeconditionModel, PhysicalconditionModel,
         RidequalityModel, SourcetypeModel
       })
+    })
 
     } catch (err) {
       // 500 error returns "internal server error"
@@ -151,17 +156,21 @@ const FIController = () => {
   };
 
   const assignTo = async (req, res) => {
+    
+    
     const user_id = req.body.user_id;
     const __loan_id = req.body.__loan_id;
     const name = req.body.name;
     const agent_id = req.body.agent_id;
 
     try {
+     const result = await sequelize.transaction(async (t) => {
+
       const profile = await UserProfile.findOne({
         where: {
           user_id: user_id
         }
-      });
+      }, { transaction : t});
 
       let counter = 0;
       let loanNumber = 0;
@@ -180,21 +189,22 @@ const FIController = () => {
 
       await UserProfile.update({
         'details_json': profile.details_json
-      }, { where: { 'user_id': user_id } })
+      }, { where: { 'user_id': user_id } }, { transaction : t})
 
       await FiSubmittedPending.create({
         'profile_id': user_id,
         'loan_id': __loan_id,
         'user_id': agent_id
-      })
+      }, { transaction : t})
 
       await FiAssignedPending.destroy({
         where: {
           'profile_id': user_id
         }
-      })
+      }, { transaction : t})
 
       return res.status(200).json({ msg: 'Operation Successful' });
+    })
     } catch (err) {
       return res.status(500).json({ msg: err });
     }
@@ -203,20 +213,22 @@ const FIController = () => {
 
   const getAllPendingList = async (req, res) => {
     try {
+    const result = await sequelize.transaction(async (t) => {
 
-      const KycApprovalPendingModel = await KycApprovalPending.findAll();
-      const FiAssignedPendingModel = await FiAssignedPending.findAll();
-      const FiSubmittedPendingModel = await FiSubmittedPending.findAll();
-      const FiApprovalPendingModel = await FiApprovalPending.findAll();
-      const DocumentCheckUploadPendingModel = await DocumentCheckUploadPending.findAll();
-      const DocumentCheckApprovePendingModel = await DocumentCheckApprovePending.findAll();
-      const EmiSchedulePendingModel = await EmiSchedulePending.findAll();
+      const KycApprovalPendingModel = await KycApprovalPending.findAll({}, { transaction : t});
+      const FiAssignedPendingModel = await FiAssignedPending.findAll({}, { transaction : t});
+      const FiSubmittedPendingModel = await FiSubmittedPending.findAll({}, { transaction : t});
+      const FiApprovalPendingModel = await FiApprovalPending.findAll({}, { transaction : t});
+      const DocumentCheckUploadPendingModel = await DocumentCheckUploadPending.findAll({}, { transaction : t});
+      const DocumentCheckApprovePendingModel = await DocumentCheckApprovePending.findAll({}, { transaction : t});
+      const EmiSchedulePendingModel = await EmiSchedulePending.findAll({}, { transaction : t});
 
       return res.status(200).json({
         KycApprovalPendingModel, FiAssignedPendingModel, FiSubmittedPendingModel,
         FiApprovalPendingModel, DocumentCheckUploadPendingModel, DocumentCheckApprovePendingModel,
         EmiSchedulePendingModel
       });
+    })
     } catch (err) {
       return res.status(500).json({ msg: err });
     }
@@ -254,6 +266,7 @@ const FIController = () => {
   const getFiSubmittedPendingForUser = async (req, res) => {
     const user_id = req.query.user_id
     try {
+      
       const result = await sequelize.query(`SELECT fsp.profile_id, fsp.loan_id, applicant_firstname
       FROM public.fi_submitted_pending as fsp, (select user_id, applicant_firstname from user_profile, applicant where related_aadhar = applicant_aadhar) as d where d.user_id = fsp.profile_id and fsp.user_id = ${user_id};`)
 
@@ -285,11 +298,13 @@ const FIController = () => {
     const remark = req.query.remark;
 
     try {
+      const result = await sequelize.transaction(async (t) => {
+
       let profile = await UserProfile.findOne({
         where: {
           user_id: user_id
         }
-      })
+      }, { transaction : t})
       let counter = 0;
       let loanNumber = 0;
       for (let loan of profile.details_json[user_id].loans) {
@@ -307,24 +322,25 @@ const FIController = () => {
 
       await UserProfile.update({
         'details_json': profile.details_json
-      }, { where: { 'user_id': user_id } })
+      }, { where: { 'user_id': user_id } }, { transaction : t})
 
       if (approve_status === 'true') {
         await DocumentCheckUploadPending.create({
           'profile_id': user_id,
           'loan_id': __loan_id,
           'user_id': profile.details_json[user_id].loans[loanNumber].assigned_to.id
-        })
+        }, { transaction : t})
 
         await FiApprovalPending.destroy({
           where: {
             'profile_id': user_id,
           }
-        })
+        }, { transaction : t})
       }
 
 
       return res.status(200).json({ msg: 'Operation Successful' })
+    })
     } catch (err) {
       return res.status(500).json({ msg: err });
     }
@@ -336,16 +352,19 @@ const FIController = () => {
     const profile_id = req.query.profile_id;
 
     try {
+      const result = await sequelize.transaction(async (t) => {
+
       await DocumentCheckApprovePending.create({
         profile_id, user_id, loan_id
-      })
+      }, { transaction : t})
 
       await DocumentCheckUploadPending.destroy({
         where: {
           profile_id
         }
-      })
+      }, { transaction : t})
       return res.status(200).json({ msg: 'Operation Successful' })
+    })
     } catch (err) {
       return res.status(500).json({ msg: err });
     }
@@ -371,18 +390,20 @@ const FIController = () => {
     });
 
     try {
+      const result = await sequelize.transaction(async (t) => {
+
       await EmiSchedule.create({
         emi_schedule_profile_id, emi_schedule_loan_id, emi_schedule_loan_amount,
         emi_schedule_interest_rate, emi_schedule_loan_tenure, emi_schedule_start_date,
         emi_schedule_json_object
-      });
+      }, { transaction : t});
 
 
       let profile = await UserProfile.findOne({
         where: {
           user_id: emi_schedule_profile_id
         }
-      })
+      }, { transaction : t})
 
       console.log(profile)
       let counter = 0;
@@ -402,15 +423,16 @@ const FIController = () => {
 
       await UserProfile.update({
         'details_json': profile.details_json
-      }, { where: { 'user_id': emi_schedule_profile_id } })
+      }, { where: { 'user_id': emi_schedule_profile_id } }, { transaction : t})
 
       await EmiSchedulePending.destroy({
         where: {
           'profile_id': emi_schedule_profile_id
         }
-      })
+      }, { transaction : t})
 
       return res.status(200).json({ msg: 'Operation Successful' })
+    })
 
 
     } catch (err) {
@@ -424,18 +446,21 @@ const FIController = () => {
     const emi_schedule_loan_id = req.query.emi_schedule_loan_id;
 
     try {
+      const result = await sequelize.transaction(async (t) => {
+
       const schedule = await EmiSchedule.findOne({
         attributes: ['emi_schedule_json_object'],
         where: {
           emi_schedule_profile_id,
           emi_schedule_loan_id
         }
-      });
+      }, { transaction : t});
 
 
 
 
       return res.status(200).send(schedule.emi_schedule_json_object)
+    })
 
 
     } catch (err) {
@@ -452,17 +477,19 @@ const FIController = () => {
     const status = req.query.status;
 
     try {
+      const result = await sequelize.transaction(async (t) => {
+
       await DocumentCheckApprovePending.destroy({
         where: {
           profile_id, loan_id
         }
-      });
+      }, { transaction : t});
       if (status === 'true') {
         let profile = await UserProfile.findOne({
           where: {
             user_id: profile_id
           }
-        });
+        }, { transaction : t});
 
         let counter = 0;
         let loanNumber = 0;
@@ -481,19 +508,19 @@ const FIController = () => {
 
         await UserProfile.update({
           'details_json': profile.details_json
-        }, { where: { 'user_id': profile_id } })
+        }, { where: { 'user_id': profile_id } }, { transaction : t})
 
 
         await EmiSchedulePending.create({
           profile_id, loan_id
-        })
+        }, { transaction : t})
       }
       else if (status === 'false') {
         let profile = await UserProfile.findOne({
           where: {
             user_id: profile_id
           }
-        });
+        }, { transaction : t});
 
         let counter = 0;
         let loanNumber = 0;
@@ -512,16 +539,17 @@ const FIController = () => {
 
         await UserProfile.update({
           'details_json': profile.details_json
-        }, { where: { 'user_id': profile_id } })
+        }, { where: { 'user_id': profile_id } }, { transaction : t})
 
         await DocumentCheckUploadPending.create({
           profile_id, loan_id, user_id
-        })
+        }, { transaction : t})
       } else {
         return res.status(400).send('Incorrect status')
       }
 
       return res.status(200).send('Operation Successfull')
+    })
 
 
     } catch (err) {

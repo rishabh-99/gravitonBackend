@@ -30,6 +30,7 @@ const LoginController = () => {
     const { body } = req;
     // req.body 
     try {
+      const result = await sequelize.transaction(async (t) => {
 
 
       // creating a user with parameters given 
@@ -41,11 +42,12 @@ const LoginController = () => {
         password: body.password,
         permissions: JSON.parse(body.permissions),
         is_active: body.is_active
-      });
+      } , { transaction : t});
       // validating using joi Schema 
 
       // 200 ok! 
       return res.status(200).json({ msg: 'User created successfully!!' });
+    })
     } catch (err) {
       console.log(err);
       return res.status(500).json({ msg: 'Internal server error' });
@@ -65,13 +67,14 @@ const LoginController = () => {
     // we find username entered in the database to verify 
     if (username && password) {
       try {
+        const result = await sequelize.transaction(async (t) => {
         const user = await User
           .findOne({
             where: {
               username,
               is_active: true
             },
-          });
+          }, { transaction : t});
         if (!user) {
           return res.status(400).json({ msg: 'Bad Request: User not found' });
         }
@@ -91,6 +94,7 @@ const LoginController = () => {
         }
 
         return res.status(401).json({ msg: 'Unauthorized' });
+      })
       } catch (err) {
         console.log(err);
         return res.status(500).json({ msg: 'Internal server error' });
@@ -128,6 +132,7 @@ const LoginController = () => {
    */
 
     try {
+      const result = await sequelize.transaction(async (t) => {
       // gets all the users who are active
       var today = new Date();
       var dd = today.getDate();
@@ -149,6 +154,7 @@ const LoginController = () => {
       left join (select * from user_kyc_log where kyc_date = '${today}') as u on login.user_id = u.user_id) where login.is_active = true  group by (login.user_id) ;`)
 
       return res.status(200).json({ users: users[0] });
+      })
     } catch (err) {
       console.log(err);
       return res.status(500).json({ msg: 'Internal server error' });
@@ -157,6 +163,7 @@ const LoginController = () => {
 
   const disableUser = async (req, res) => {
     try {
+      const result = await sequelize.transaction(async (t) => {
       /**
        * Disabling a user.
        * @constructor
@@ -176,7 +183,7 @@ const LoginController = () => {
             username,
             is_active: true
           },
-        });
+        }, { transaction : t});
       if (!admin) {
         return res.status(400).json({ msg: 'Bad Request: Admin not found' });
       }
@@ -193,6 +200,7 @@ const LoginController = () => {
       }
 
       return res.status(401).json({ msg: 'Unauthorized' });
+    })
     } catch (err) {
 
       res.status(500).json({ msg: err })
@@ -201,11 +209,13 @@ const LoginController = () => {
 
   const getAccessKeys = async (req, res) => {
     try {
+      const result = await sequelize.transaction(async (t) => {
 
       const access_id = '5f67a59fdf25606eb13ade1e';
       const access_key = '005c81366d1bd668580392f299b676f0d2cc69b2b53e107f841be2fbcc1a4893'
 
       return res.status(200).json({ access_id, access_key });
+      })
     } catch (err) {
 
       res.status(500).json({ msg: err })
