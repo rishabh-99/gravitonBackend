@@ -75,6 +75,8 @@ const authService = () => {
       mode: CryptoJS.mode.CBC,
       padding: CryptoJS.pad.Pkcs7
     }).toString(CryptoJS.enc.Utf8);
+    console.log({encPassword})
+    console.log({password})
     const res = bcryptService().comparePassword(password, user.password)
     return res;
   };

@@ -522,7 +522,37 @@ const CarController = () => {
     };
 
     const getPreSignedUrl = async (req, res) => {
+        const profile_id = req.query.profile_id;
+        const loan_id = req.query.__loan_id
+        const filename = req.query.filename
         try {
+
+            let profile = await UserProfile.findOne({
+                where: {
+                    user_id: profile_id
+                }
+            });
+            let counter = 0;
+            let loanNumber = 0;
+            for (let loan of profile.details_json[profile_id].loans) {
+                if (loan.__loan_id == loan_id) {
+                    loanNumber = counter;
+                }
+                counter++;
+            }
+
+            if(profile.details_json[profile_id].inkredoFiles instanceof Array) {
+                profile.details_json[profile_id].inkredoFiles.push(`${filename}`)
+            }
+            else {
+                profile.details_json[profile_id].inkredoFiles = [`${filename}`]
+            }
+
+            console.log(profile.details_json[profile_id].inkredoFiles)
+
+            await UserProfile.update({
+                'details_json': profile.details_json
+              }, { where: { 'user_id': profile_id}})
             // console.log(JSON.parse(process.env.S3_BUCKET))
             const preSignedUrl = await s3.getSignedUrlPromise('putObject', {
                 Bucket: 'my-express-application-dev-s3bucket-18eh6dlfu6qih',
@@ -533,6 +563,7 @@ const CarController = () => {
             // const storageUrl = `https://my-express-application-dev-s3bucket-18eh6dlfu6qih.s3.ap-south-1.amazonaws.com/${req.query.filename}`
             return res.status(200).json(preSignedUrl)
         } catch (err) {
+            console.log(err)
             return res.status(500).json({ msg: err });
         }
     };
@@ -721,6 +752,42 @@ const CarController = () => {
         }
     };
 
+    const finishLoan = async (req, res) => {
+        const profile_id = req.query.profile_id;
+        const loan_id = req.query.loan_id;
+
+
+        try {
+            let profile = await UserProfile.findOne({
+                where: {
+                    user_id: profile_id
+                }
+            });
+
+            let counter = 0;
+            let loanNumber = 0;
+            for (let loan of profile.details_json[profile_id].loans) {
+                if (loan.__loan_id == loan_id) {
+                    loanNumber = counter;
+                }
+                counter++;
+            }
+
+            profile.details_json[profile_id].loans[loanNumber].stages.current_stage = 'Completed';
+            profile.details_json[profile_id].loans[loanNumber].loanStatus = { status: 'Completed' };
+
+            await UserProfile.update({
+                'details_json': profile.details_json
+            }, { where: { 'user_id': profile_id } })
+
+
+            return res.status(200).send('Operation successfull!');
+
+
+        } catch (err) {
+            return res.status(500).json({ msg: err });
+        }
+    };
     return {
         // returning all the functions form the controller
         register,
@@ -739,7 +806,8 @@ const CarController = () => {
         approveKYC,
         getAgentNameForKYC,
         terminateLoan,
-        resubmitKYC
+        resubmitKYC,
+        finishLoan
     };
 };
 
