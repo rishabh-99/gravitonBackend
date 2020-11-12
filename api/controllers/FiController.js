@@ -344,6 +344,8 @@ const FIController = () => {
         }
       });
 
+      console.log({profile})
+      console.log(profile.details_json)
       let counter = 0;
       let loanNumber = 0;
       for (let loan of profile.details_json[profile_id].loans) {
@@ -356,7 +358,7 @@ const FIController = () => {
       profile.details_json[profile_id].loans[loanNumber].documentJSON = documentJSON;
       profile.details_json[profile_id].loans[loanNumber].stages.document_check_upload.status = true;
       profile.details_json[profile_id].loans[loanNumber].stages.document_check_upload.time_stamp = date.toLocaleString();
-      profile.details_json[user_id].loans[loanNumber].stages.current_stage = 'document_check_upload';
+      profile.details_json[profile_id].loans[loanNumber].stages.current_stage = 'document_check_upload';
 
       await UserProfile.update({
         'details_json': profile.details_json
@@ -374,6 +376,7 @@ const FIController = () => {
       })
       return res.status(200).json({ msg: 'Operation Successful' })
     } catch (err) {
+      console.log(err)
       return res.status(500).json({ msg: err });
     }
   };
