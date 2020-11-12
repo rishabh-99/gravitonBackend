@@ -541,14 +541,14 @@ const CarController = () => {
                 counter++;
             }
 
-            if(profile.details_json[profile_id].inkredoFiles instanceof Array) {
-                profile.details_json[profile_id].inkredoFiles.push(`${filename}`)
+            if(profile.details_json[profile_id].loans[loanNumber].inkredoFiles instanceof Array) {
+                profile.details_json[profile_id].loans[loanNumber].inkredoFiles.push(`${filename}`)
             }
             else {
-                profile.details_json[profile_id].inkredoFiles = [`${filename}`]
+                profile.details_json[profile_id].loans[loanNumber].inkredoFiles = [`${filename}`]
             }
 
-            console.log(profile.details_json[profile_id].inkredoFiles)
+            console.log(profile.details_json[profile_id].loans[loanNumber].inkredoFiles)
 
             await UserProfile.update({
                 'details_json': profile.details_json
