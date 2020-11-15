@@ -344,7 +344,7 @@ const FIController = () => {
         }
       });
 
-      console.log({profile})
+      console.log({ profile })
       console.log(profile.details_json)
       let counter = 0;
       let loanNumber = 0;
@@ -589,7 +589,11 @@ const FIController = () => {
         profile_id, loan_id, user_id
       })
 
-      return res.status(200).json({msg: 'Operation Successfull'})
+      await DocumentCheckApprovePending.destroy({
+        where: { profile_id, loan_id, user_id }
+      })
+
+      return res.status(200).json({ msg: 'Operation Successfull' })
     } catch (err) {
       console.log(err)
       return res.status(500).json({ msg: err });
@@ -602,7 +606,7 @@ const FIController = () => {
     const remark = req.query.remark;
     const user_id = parseInt(req.query.user_id);
 
-    console.log({profile_id,loan_id, remark ,user_id})
+    console.log({ profile_id, loan_id, remark, user_id })
 
     try {
       let profile = await UserProfile.findOne({
@@ -626,11 +630,11 @@ const FIController = () => {
       profile.details_json[profile_id].loans[loanNumber].stages.fi_submitted.remark = remark;
       profile.details_json[profile_id].loans[loanNumber].stages.current_stage = 'fi_assigned';
 
-      
+
       await UserProfile.update({
         'details_json': profile.details_json
-      }, { where: { 'user_id': profile_id}})
-      
+      }, { where: { 'user_id': profile_id } })
+
       await FiApprovalPending.destroy({
         where: {
           profile_id, loan_id
@@ -641,7 +645,7 @@ const FIController = () => {
         profile_id, loan_id, user_id
       })
 
-      return res.status(200).json({msg:'Operation Successfull'})
+      return res.status(200).json({ msg: 'Operation Successfull' })
 
     } catch (err) {
       console.log(err)
