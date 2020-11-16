@@ -696,7 +696,7 @@ const FIController = () => {
 
 
       var dd = {
-        pageMargins: [40, 140, 40, 30],
+        pageMargins: [40, 140, 40, 60],
         pageSize: 'A4',
         header: {
 
@@ -717,7 +717,7 @@ const FIController = () => {
 
           ],
         },
-        footer: function(currentPage, pageCount) { return {text: currentPage.toString() + ' of ' + pageCount, margin:[0,10,0,0]} },
+        footer: function(currentPage, pageCount) { return {text: currentPage.toString() + ' of ' + pageCount, margin:[0,30,0,0]} },
         content: [
           {
             style: 'tableExample',
