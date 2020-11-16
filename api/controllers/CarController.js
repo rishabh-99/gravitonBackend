@@ -541,7 +541,7 @@ const CarController = () => {
                 counter++;
             }
 
-            if(profile.details_json[profile_id].loans[loanNumber].inkredoFiles instanceof Array) {
+            if (profile.details_json[profile_id].loans[loanNumber].inkredoFiles instanceof Array) {
                 profile.details_json[profile_id].loans[loanNumber].inkredoFiles.push(`${filename}`)
             }
             else {
@@ -552,7 +552,7 @@ const CarController = () => {
 
             await UserProfile.update({
                 'details_json': profile.details_json
-              }, { where: { 'user_id': profile_id}})
+            }, { where: { 'user_id': profile_id } })
             // console.log(JSON.parse(process.env.S3_BUCKET))
             const preSignedUrl = await s3.getSignedUrlPromise('putObject', {
                 Bucket: 'my-express-application-dev-s3bucket-18eh6dlfu6qih',
@@ -609,6 +609,10 @@ const CarController = () => {
             profile.details_json[user_id].loans[loanNumber].stages.kyc_approval.time_stamp = date.toLocaleString();
             profile.details_json[user_id].loans[loanNumber].stages.kyc_approval.remark = remark;
             profile.details_json[user_id].loans[loanNumber].stages.current_stage = 'kyc_approval';
+            if (approve_status === 'false') {
+                profile.details_json[user_id].loans[loanNumber].stages.current_stage = 'Terminated';
+                profile.details_json[user_id].loans[loanNumber].loanStatus = { status: 'Terminated', remark };
+            }
 
             await UserProfile.update({
                 'details_json': profile.details_json

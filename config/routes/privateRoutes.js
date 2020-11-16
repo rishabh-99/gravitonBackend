@@ -52,6 +52,7 @@ const privateRoutes = {
   'GET /FI/getDocumentCheckUploadPendingForUser': 'FiController.getDocumentCheckUploadPendingForUser',
   'GET /FI/approveFI': 'FiController.approveFI',
   'GET /FI/resubmitFI': 'FiController.resubmitFI',
+  'GET /FI/makePdf': 'FiController.makePdf',
 
   'GET /Document/getPreSignedUrl': 'FiController.getPreSignedUrlDocument',
   'GET /Document/getPreSignedUrlForRetrieval': 'FiController.getPreSignedUrlForRetrievalDocument',
