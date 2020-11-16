@@ -522,7 +522,7 @@ const FIController = () => {
             user_id: profile_id
           }
         });
-
+ 
         let counter = 0;
         let loanNumber = 0;
         for (let loan of profile.details_json[profile_id].loans) {
