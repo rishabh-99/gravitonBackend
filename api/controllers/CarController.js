@@ -609,10 +609,7 @@ const CarController = () => {
             profile.details_json[user_id].loans[loanNumber].stages.kyc_approval.time_stamp = date.toLocaleString();
             profile.details_json[user_id].loans[loanNumber].stages.kyc_approval.remark = remark;
             profile.details_json[user_id].loans[loanNumber].stages.current_stage = 'kyc_approval';
-            if (approve_status === 'false') {
-                profile.details_json[user_id].loans[loanNumber].stages.current_stage = 'Terminated';
-                profile.details_json[user_id].loans[loanNumber].loanStatus = { status: 'Terminated', remark };
-            }
+           
 
             await UserProfile.update({
                 'details_json': profile.details_json

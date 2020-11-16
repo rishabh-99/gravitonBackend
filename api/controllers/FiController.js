@@ -7,6 +7,7 @@ logs: 07/10/2020 - Added joi validation
 const FI = require('../models/Fi');
 const pdfmake = require('pdfmake')
 const fs = require('fs');
+const { parse, stringify } = require('flatted');
 
 // importing the database confifurations from the datavbase folder 
 const sequelize = require('../../config/database');
@@ -475,7 +476,6 @@ const FIController = () => {
     const loan_id = req.query.loan_id;
     const user_id = req.query.user_id;
     const remark = req.query.remark;
-    const status = req.query.status;
     const approve_status = req.query.approve_status;
 
     try {
@@ -484,7 +484,7 @@ const FIController = () => {
           profile_id, loan_id
         }
       });
-      if (status === 'true') {
+      if (approve_status === 'true') {
         let profile = await UserProfile.findOne({
           where: {
             user_id: profile_id
@@ -515,14 +515,13 @@ const FIController = () => {
         await EmiSchedulePending.create({
           profile_id, loan_id
         })
-      }
-      else if (status === 'false') {
+      } else if (approve_status === 'false') {
         let profile = await UserProfile.findOne({
           where: {
             user_id: profile_id
           }
         });
- 
+
         let counter = 0;
         let loanNumber = 0;
         for (let loan of profile.details_json[profile_id].loans) {
@@ -533,7 +532,7 @@ const FIController = () => {
         }
 
         const date = new Date();
-        profile.details_json[profile_id].loans[loanNumber].stages.document_check_approve.status = false;
+        profile.details_json[profile_id].loans[loanNumber].stages.document_check_approve.status = true;
         profile.details_json[profile_id].loans[loanNumber].stages.document_check_approve.approve_status = approve_status;
         profile.details_json[profile_id].loans[loanNumber].stages.document_check_approve.time_stamp = date.toLocaleString();
         profile.details_json[profile_id].loans[loanNumber].stages.document_check_approve.remark = remark;
@@ -697,7 +696,7 @@ const FIController = () => {
 
 
       var dd = {
-        pageMargins: [40, 100, 40, 60],
+        pageMargins: [40, 140, 40, 30],
         pageSize: 'A4',
         header: {
 
@@ -718,10 +717,12 @@ const FIController = () => {
 
           ],
         },
+        footer: function(currentPage, pageCount) { return {text: currentPage.toString() + ' of ' + pageCount, margin:[0,10,0,0]} },
         content: [
           {
             style: 'tableExample',
             table: {
+              dontBreakRows: true,
               widths: [
                 150, '*', '*'
               ],
@@ -825,48 +826,53 @@ const FIController = () => {
           '\n',
           '\n',
           '\n',
-          { text: 'Terms & Condition', style: 'leftHeader' },
           {
-            ol: [
-              { text: 'I understand the terms & conditions of the loan.', margin: [0, 5, 0, 5] },
-              { text: 'I will deposit the EMI before or as per the Schedule mentioned above.', margin: [0, 0, 0, 5] },
-              { text: 'Cheque Bounce Charges per presentation is ₹400.', margin: [0, 0, 0, 5] },
-              { text: 'EMI/ Cash Pick up charges are applicable and are ₹350.', margin: [0, 0, 0, 5] },
-              { text: 'Late Payment Fee is applicable and is ₹300.', margin: [0, 0, 0, 5] },
-              { text: 'No Objection certificate fee is ₹350.', margin: [0, 0, 0, 5] },
-            ],
-            style: 'leftData'
-          },
-          '\n',
-          '\n',
-          { text: 'नियम एवं शर्तें', style: 'leftHeaderHindi' },
-          {
-            ol: [
-              { text: 'मैं ऋण के नियमों और शर्तों को समझता हूं।', margin: [0, 5, 0, 5] },
-              { text: 'मैं ऊपर उल्लिखित अनुसूची के अनुसार या पहले ईएमआई जमा करूंगा।', margin: [0, 0, 0, 5] },
-              { text: 'चेक बाउंस शुल्क आरएस  ₹400 प्रति प्रस्तुति हैं।', margin: [0, 0, 0, 5] },
-              { text: 'कैश ईएमआई या कैश पिकअप शुल्क लागू हैं और ₹400 हैं।', margin: [0, 0, 0, 5] },
-              { text: 'लेट पेमेंट शुल्क लागू है और  ₹300 है।', margin: [0, 0, 0, 5] },
-              { text: '₹350 के शुल्क का भुगतान करने के बाद नो ऑब्जेक्शन सर्टिफिकेट  जारी किया जाएगा।', margin: [0, 0, 0, 5] },
-            ],
-            style: 'leftDataHindi'
-          },
-          '\n',
-          '\n',
-          '\n',
-          '\n',
-          '\n',
-          '\n',
-
-          {
-
-            columns: [
+            unbreakable: true,
+            stack: [
+              { text: 'Terms & Condition', style: 'leftHeader' },
               {
-                text: 'Signature of the Applicant', alignment: 'left'
+                ol: [
+                  { text: 'I understand the terms & conditions of the loan.', margin: [0, 5, 0, 5] },
+                  { text: 'I will deposit the EMI before or as per the Schedule mentioned above.', margin: [0, 0, 0, 5] },
+                  { text: 'Cheque Bounce Charges per presentation is ₹400.', margin: [0, 0, 0, 5] },
+                  { text: 'EMI/ Cash Pick up charges are applicable and are ₹350.', margin: [0, 0, 0, 5] },
+                  { text: 'Late Payment Fee is applicable and is ₹300.', margin: [0, 0, 0, 5] },
+                  { text: 'No Objection certificate fee is ₹350.', margin: [0, 0, 0, 5] },
+                ],
+                style: 'leftData'
               },
-              { text: 'Date', alignment: 'right' }
+              '\n',
+              '\n',
+              { text: 'नियम एवं शर्तें', style: 'leftHeaderHindi' },
+              {
+                ol: [
+                  { text: 'मैं ऋण के नियमों और शर्तों को समझता हूं।', margin: [0, 5, 0, 5] },
+                  { text: 'मैं ऊपर उल्लिखित अनुसूची के अनुसार या पहले ईएमआई जमा करूंगा।', margin: [0, 0, 0, 5] },
+                  { text: 'चेक बाउंस शुल्क आरएस ₹400 प्रति प्रस्तुति हैं।', margin: [0, 0, 0, 5] },
+                  { text: 'कैश ईएमआई या कैश पिकअप शुल्क लागू हैं और ₹400 हैं।', margin: [0, 0, 0, 5] },
+                  { text: 'लेट पेमेंट शुल्क लागू है और ₹300 है।', margin: [0, 0, 0, 5] },
+                  { text: '₹350 के शुल्क का भुगतान करने के बाद नो ऑब्जेक्शन सर्टिफिकेट जारी किया जाएगा।', margin: [0, 0, 0, 5] },
+                ],
+                style: 'leftDataHindi'
+              },
+              '\n',
+              '\n',
+              '\n',
+              '\n',
+              '\n',
+              '\n',
+
+              {
+
+                columns: [
+                  {
+                    text: 'Signature of the Applicant', alignment: 'left'
+                  },
+                  { text: 'Date', alignment: 'right' }
+                ]
+              },
             ]
-          },
+          }
         ],
         styles: {
           leftHeader: {
@@ -976,7 +982,7 @@ const FIController = () => {
       pdfMake.on("data", chunk => {
         chunks.push(chunk);
       });
-
+      await fs.writeFile('a.json', stringify(dd))
       pdfMake.on("end", () => {
         const result = Buffer.concat(chunks);
 
@@ -997,6 +1003,7 @@ const FIController = () => {
         Bucket: 'my-express-application-dev-s3bucket-18eh6dlfu6qih',
         Key: `EMI/${profile_id}/${filename}`, // File name could come from queryParameters
       });
+
 
       return res.status(200).json(preSignedUrl)
 
