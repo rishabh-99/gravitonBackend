@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Home</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Home</h1>
+
+    
+
+
+
+    
+
+
+    <h3> </h3>
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+    <section>
+        <article><h1>express-rest-api-boilerplate</h1>
+<blockquote>
+<p>Express REST API with JWT Authentication and support for sqlite, mysql, and postgresql</p>
+</blockquote>
+<ul>
+<li>authentication via <a href="https://jwt.io/">JWT</a></li>
+<li>routes mapping via <a href="https://github.com/aichbauer/express-routes-mapper">express-routes-mapper</a></li>
+<li>support for <a href="https://www.sqlite.org/">sqlite</a>, <a href="https://www.mysql.com/">mysql</a>, and <a href="https://www.postgresql.org/">postgresql</a></li>
+<li>environments for <code>development</code>, <code>testing</code>, and <code>production</code></li>
+<li>linting via <a href="https://github.com/eslint/eslint">eslint</a></li>
+<li>integration tests running with <a href="https://github.com/facebook/jest">Jest</a></li>
+<li>built with <a href="#npm-scripts">npm sripts</a></li>
+<li>example for User model and User controller, with jwt authentication, simply type <code>npm i</code> and <code>npm start</code></li>
+</ul>
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#install-and-use">Install &amp; Use</a></li>
+<li><a href="#folder-structure">Folder Structure</a></li>
+<li><a href="#controllers">Controllers</a>
+<ul>
+<li><a href="#create-a-controller">Create a Controller</a></li>
+</ul>
+</li>
+<li><a href="#models">Models</a>
+<ul>
+<li><a href="#create-a-model">Create a Model</a></li>
+</ul>
+</li>
+<li><a href="#policies">Policies</a>
+<ul>
+<li><a href="#authpolicy">auth.policy</a></li>
+</ul>
+</li>
+<li><a href="#services">Services</a></li>
+<li><a href="#config">Config</a>
+<ul>
+<li><a href="#connection-and-database">Connection and Database</a></li>
+</ul>
+</li>
+<li><a href="#routes">Routes</a>
+<ul>
+<li><a href="#create-routes">Create Routes</a></li>
+</ul>
+</li>
+<li><a href="#test">Test</a>
+<ul>
+<li><a href="#setup">Setup</a></li>
+</ul>
+</li>
+<li><a href="#npm-scripts">npm Scripts</a></li>
+</ul>
+<h2>Install and Use</h2>
+<p>Start by cloning this repository</p>
+<pre class="prettyprint source lang-sh"><code># HTTPS
+$ git clone https://github.com/aichbauer/express-rest-api-boilerplate.git
+</code></pre>
+<p>then</p>
+<pre class="prettyprint source lang-sh"><code># cd into project root
+$ yarn
+# to use mysql
+$ yarn add mysql2
+# to use postgresql
+$ yarn add pg pg-hstore
+# start the api
+$ yarn start
+</code></pre>
+<p>or</p>
+<pre class="prettyprint source lang-sh"><code># cd into project root
+$ npm i
+# to use mysql
+$ npm i mysql2 -S
+# to use postgresql
+$ npm i -S pg pg-hstore
+# start the api
+$ npm start
+</code></pre>
+<p>sqlite is supported out of the box as it is the default.</p>
+<h2>Folder Structure</h2>
+<p>This boilerplate has 4 main directories:</p>
+<ul>
+<li>api - for controllers, models, services, etc.</li>
+<li>config - for routes, database, etc.</li>
+<li>db - this is only a dir for the sqlite db, the default for NODE_ENV development</li>
+<li>test - using <a href="https://github.com/facebook/jest">Jest</a></li>
+</ul>
+<h2>Controllers</h2>
+<h3>Create a Controller</h3>
+<p>Controllers in this boilerplate have a naming convention: <code>ModelnameController.js</code> and uses an object factory pattern.
+To use a model inside of your controller you have to require it.
+We use <a href="http://docs.sequelizejs.com/">Sequelize</a> as ORM, if you want further information read the <a href="http://docs.sequelizejs.com/">Docs</a>.</p>
+<p>Example Controller for all <strong>CRUD</strong> oparations:</p>
+<pre class="prettyprint source lang-js"><code>const Model = require('../models/Model');
+
+const ModelController = () => {
+  const create = async (req, res) => {
+    // body is part of a form-data
+    const { value } = req.body;
+
+    try {
+      const model = await Model.create({
+        key: value
+      });
+
+      if(!model) {
+        return res.status(400).json({ msg: 'Bad Request: Model not found' });
+      }
+
+      return res.status(200).json({ model });
+    } catch (err) {
+      // better save it to log file
+      console.error(err);
+
+      return res.status(500).json({ msg: 'Internal server error' });
+    }
+  };
+
+  const getAll = async (req, res) => {
+    try {
+      const model = await Model.findAll();
+
+      if(!models){
+        return res.status(400).json({ msg: 'Bad Request: Models not found' });
+      }
+
+      return res.status(200).json({ models });
+    } catch (err) {
+      // better save it to log file
+      console.error(err);
+
+      return res.status(500).json({ msg: 'Internal server error' });
+    }
+  };
+
+  const get = async (req, res) => {
+    // params is part of an url
+    const { id } = req.params;
+
+    try {
+      const model = await Model.findOne({
+        where: {
+          id,
+        },
+      });
+
+      if(!model) {
+        return res.status(400).json({ msg: 'Bad Request: Model not found' });
+      }
+
+      return res.status(200).json({ model });
+    } catch (err) {
+      // better save it to log file
+      console.error(err);
+
+      return res.status(500).json({ msg: 'Internal server error' });
+    }
+  };
+
+  const update = async (req, res) => {
+    // params is part of an url
+    const { id } = req.params;
+
+    // body is part of form-data
+    const { value } = req.body;
+
+    try {
+      const model = await Model.findById(id);
+
+      if(!model) {
+        return res.status(400).json({ msg: 'Bad Request: Model not found' });
+      }
+
+      const updatedModel = await model.update({
+        key: value,
+      )};
+
+      return res.status(200).json({ updatedModel });
+    } catch (err) {
+      // better save it to log file
+      console.error(err);
+
+      return res.status(500).json({ msg: 'Internal server error' });
+    }
+  };
+
+  const destroy = async (req, res) => {
+    // params is part of an url
+    const { id } = req.params;
+
+    try {
+      const model =  Model.findById(id);
+
+      if(!model) {
+        return res.status(400).json({ msg: 'Bad Request: Model not found' })
+      }
+
+      await model.destroy();
+
+      return res.status(200).json({ msg: 'Successfully destroyed model' });
+    } catch (err) {
+      // better save it to log file
+      console.error(err);
+
+      return res.status(500).json({ msg: 'Internal server error' });
+    }
+  };
+
+  // IMPORTANT
+  // don't forget to return the functions
+  return {
+    create,
+    getAll,
+    get,
+    update,
+    destroy,
+  };
+};
+
+model.exports = ModelController;
+</code></pre>
+<h2>Models</h2>
+<h3>Create a Model</h3>
+<p>Models in this boilerplate have a naming convention: <code>Model.js</code> and uses <a href="http://docs.sequelizejs.com/">Sequelize</a> to define our Models, if you want further information read the <a href="http://docs.sequelizejs.com/">Docs</a>.</p>
+<p>Example User Model:</p>
+<pre class="prettyprint source lang-js"><code>const Sequelize = require('sequelize');
+
+// for encrypting our passwords
+const bcryptSevice = require('../services/bcrypt.service');
+
+// the DB connection
+const sequelize = require('../../config/database');
+
+// hooks are functions that can run before or after a specific event
+const hooks = {
+  beforeCreate(user) {
+    user.password = bcryptSevice.password(user);
+  },
+};
+
+// naming the table in DB
+const tableName = 'users';
+
+// the actual model
+const User = sequelize.define('User', {
+  username: {
+    type: Sequelize.STRING,
+    unique: true,
+  },
+  password: {
+    type: Sequelize.STRING,
+  },
+}, { hooks, tableName });
+
+// instead of using instanceMethod
+// in sequelize > 4 we are writing the function
+// to the prototype object of our model.
+// as we do not want to share sensitive data, the password
+// field gets ommited before sending
+User.prototype.toJSON = function () {
+  const values = Object.assign({}, this.get());
+
+  delete values.password;
+
+  return values;
+};
+
+// IMPORTANT
+// don't forget to export the Model
+module.exports = User;
+</code></pre>
+<h2>Policies</h2>
+<p>Policies are middleware functions that can run before hitting a apecific or more specified route(s).</p>
+<p>Example policy:</p>
+<p>Only allow if the user is marked as admin.</p>
+<blockquote>
+<p>Note: this is not a secure example, only for presentation puposes</p>
+</blockquote>
+<pre class="prettyprint source lang-js"><code>module.exports = (req, res, next) => {
+  if(req.body.userrole === 'admin') {
+    // do some verification stuff
+    const verified = verifyAdmin(req.body.userid);
+
+    if(verified) {
+      return next();
+    }
+
+    return res.status(401).json({ msg: 'Unauthorized' });
+  }
+
+  return res.status(401).json({ msg: 'Unauthorized' });
+};
+</code></pre>
+<p>To use this policy on all routes that only admins are allowed:</p>
+<p>api.js</p>
+<pre class="prettyprint source lang-js"><code>const adminPolicy = require('./policies/admin.policy');
+
+app.all('/admin/*', (req, res, next) => adminPolicy(req,res,next));
+</code></pre>
+<p>Or for one specific route</p>
+<p>api.js</p>
+<pre class="prettyprint source lang-js"><code>const adminPolicy = require('./policies/admin.policy');
+
+app.get('/admin/myroute',
+  (req, res, next) => adminPolicy(req,res,next),
+  (req, res) => {
+  //do some fancy stuff
+});
+</code></pre>
+<h2>auth.policy</h2>
+<p>The <code>auth.policy</code> checks wether a <code>JSON Web Token</code> (<a href="https://jwt.io/">further information</a>) is send in the header of an request as <code>Authorization: Bearer [JSON Web Token]</code> or inside of the body of an request as <code>token: [JSON Web Token]</code>.
+The policy runs default on all api routes that are are prefixed with <code>/private</code>. To map multiple routes read the <a href="https://github.com/aichbauer/express-routes-mapper/blob/master/README.md">docs</a> from <code>express-routes-mapper</code>.</p>
+<p>To use this policy on all routes of a specific prefix:</p>
+<p>app.js</p>
+<pre class="prettyprint source lang-js"><code>app.use('/prefix', yourRoutes);
+app.all('/prefix', (req, res, next) => auth(req, res, next));
+</code></pre>
+<p>or to use this policy on one specific route:</p>
+<p>app.js</p>
+<pre class="prettyprint source lang-js"><code>app.get('/specificRoute',
+  (req, res, next) => auth(req, res, next),
+  (req, res) => {
+  // do some fancy stuff
+});
+</code></pre>
+<h2>Services</h2>
+<p>Services are little useful snippets, or calls to another API that are not the main focus of your API.</p>
+<p>Example service:</p>
+<p>Get comments from another API:</p>
+<pre class="prettyprint source lang-js"><code>const commentService = () => {
+  const getComments = async () => {
+    try {
+      const res = await fetch('https://jsonplaceholder.typicode.com/comments', {
+        method: 'get'
+      });
+
+      // do some fancy stuff with the response
+    } catch (err) {
+      // handle a error
+    }
+  };
+
+  return {
+    getComments,
+  };
+};
+
+module.exports = commentService;
+</code></pre>
+<h2>Config</h2>
+<p>Holds all the server configurations.</p>
+<h2>Connection and Database</h2>
+<blockquote>
+<p>Note: if you use msql make sure mysql server is running on the machine</p>
+</blockquote>
+<blockquote>
+<p>Note: if you use postgres make sure postgres server is running on the machine</p>
+</blockquote>
+<p>This two files are the way to establish a connaction to a database.</p>
+<p>You only need to touch connection.js, default for <code>development</code> is sqlite, but it is easy as typing <code>mysql</code> or <code>postgres</code> to switch to another db.</p>
+<blockquote>
+<p>Note: to run a mysql db install these package with: <code>yarn add mysql2</code> or <code>npm i mysql2 -S</code></p>
+</blockquote>
+<blockquote>
+<p>Note: to run a postgres db run these package with: <code>yarn add pg pg-hstore</code> or <code>npm i -S pg pg-hstore</code></p>
+</blockquote>
+<p>Now simple configure the keys with your credentials.</p>
+<pre class="prettyprint source lang-js"><code>{
+  database: 'databasename',
+  username: 'username',
+  password: 'password',
+  host: 'localhost',
+  dialect: 'sqlite' || 'mysql' || 'postgres',
+}
+</code></pre>
+<p>To not configure the production code.</p>
+<p>To start the DB, add the credentials for production. add <code>environment variables</code> by typing e.g. <code>export DB_USER=yourusername</code> before starting the api.</p>
+<h2>Routes</h2>
+<p>Here you define all your routes for your api. It doesn't matter how you structure them. By default they are mapped on <code>privateRoutes</code> and <code>publicRoutes</code>. You can define as much routes files as you want e.g. for every model or for specific use cases, e.g. normal user and admins.</p>
+<h2>Create Routes</h2>
+<p>For further information read the <a href="https://github.com/aichbauer/express-routes-mapper/blob/master/README.md">docs</a> of express-routes-mapper.</p>
+<p>Example for User Model:</p>
+<blockquote>
+<p>Note: Only supported Methods are <strong>POST</strong>, <strong>GET</strong>, <strong>PUT</strong>, and <strong>DELETE</strong>.</p>
+</blockquote>
+<p>userRoutes.js</p>
+<pre class="prettyprint source lang-js"><code>const userRoutes = {
+  'POST /user': 'UserController.create',
+  'GET /users': 'UserController.getAll',
+  'GET /user/:id': 'UserController.get',
+  'PUT /user/:id': 'UserController.update',
+  'DELETE /user/': 'UserController.destroy',
+};
+
+module.exports = userRoutes;
+</code></pre>
+<p>To use these routes in your application, require them in the config/index.js and export them.</p>
+<pre class="prettyprint source lang-js"><code>const userRoutes = require('./userRoutes');
+
+const config = {
+  allTheOtherStuff,
+  userRoutes,
+};
+
+module.exports = config;
+</code></pre>
+<p>api.js</p>
+<pre class="prettyprint source lang-js"><code>const mappedUserRoutes = mapRoutes(config.userRoutes, 'api/controllers/');
+
+app.use('/prefix', mappedUserRoutes);
+
+// to protect them with authentication
+app.all('/prefix/*', (req, res, next) => auth(req, res, next));
+</code></pre>
+<h2>Test</h2>
+<p>All test for this boilerplate uses <a href="https://github.com/facebook/jest">Jest</a> and <a href="https://github.com/visionmedia/superagent">supertest</a> for integration testing. So read their docs on further information.</p>
+<h3>Setup</h3>
+<p>The setup directory holds the <code>_setup.js</code> which holds <code>beforeAction</code> which starts a test express application and connects to your test database, and a <code>afterAction</code> which closes the db connection.</p>
+<h3>Controller</h3>
+<blockquote>
+<p>Note: those request are asynchronous, we use <code>async await</code> syntax.</p>
+</blockquote>
+<blockquote>
+<p>Note: As we don't use import statements inside the api we also use the require syntax for tests</p>
+</blockquote>
+<p>To test a Controller we create <code>fake requests</code> to our api routes.</p>
+<p>Example <code>GET /user</code> from last example with prefix <code>prefix</code>:</p>
+<pre class="prettyprint source lang-js"><code>const request = require('supertest');
+const {
+  beforeAction,
+  afterAction,
+} = require('../setup/_setup');
+
+let api;
+
+beforeAll(async () => {
+  api = await beforeAction();
+});
+
+afterAll(() => {
+  afterAction();
+});
+
+test('test', async () => {
+  const token = 'this-should-be-a-valid-token';
+
+  const res = await request(api)
+    .get('/prefix/user')
+    .set('Accept', /json/)
+    // if auth is needed
+    .set('Authorization', `Bearer ${token}`)
+    .set('Content-Type', 'application/json')
+    .expect(200);
+
+  // read the docs of jest for further information
+  expect(res.body.user).toBe('something');
+});
+</code></pre>
+<h3>Models</h3>
+<p>Are usually automatically tested in the integration tests as the Controller uses the Models, but you can test them separatly.</p>
+<h2>npm scripts</h2>
+<p>There are no automation tool or task runner like <a href="https://gruntjs.com/">grunt</a> or <a href="http://gulpjs.com/">gulp</a> used for this boilerplate. These boilerplate only uses npm scripts for automatization.</p>
+<h3>npm start</h3>
+<p>This is the entry for a developer. This command:</p>
+<p>By default it uses a sqlite databse, if you want to migrate the sqlite db by each start, disable the <code>prestart</code> and <code>poststart</code> command. Also mind if you are using a sqlite database to delete the <code>drop-sqlite-db</code> in the prepush hook.</p>
+<ul>
+<li>runs <strong>nodemon watch task</strong> for the all files conected to <code>.api/api.js</code></li>
+<li>sets the <strong>environment variable</strong> <code>NODE_ENV</code> to <code>development</code></li>
+<li>opens the db connection for <code>development</code></li>
+<li>starts the server on 127.0.0.1:2017</li>
+</ul>
+<h3>npm test</h3>
+<p>This command:</p>
+<ul>
+<li>runs <code>npm run lint</code> (<a href="http://eslint.org/">eslint</a>) with the <a href="https://github.com/airbnb/javascript">airbnb styleguide</a> without arrow-parens rule for <strong>better readability</strong></li>
+<li>sets the <strong>environment variable</strong> <code>NODE_ENV</code> to <code>testing</code></li>
+<li>creates the <code>database.sqlite</code> for the test</li>
+<li>runs <code>jest --coverage</code> for testing with <a href="https://github.com/facebook/jest">Jest</a> and the coverage</li>
+<li>drops the <code>database.sqlite</code> after the test</li>
+</ul>
+<h2>npm run production</h2>
+<p>This command:</p>
+<ul>
+<li>sets the <strong>environment variable</strong> to <code>production</code></li>
+<li>opens the db connection for <code>production</code></li>
+<li>starts the server on 127.0.0.1:2017 or on 127.0.0.1:PORT_ENV</li>
+</ul>
+<p>Before running on production you have to set the <strong>environment vaiables</strong>:</p>
+<ul>
+<li>DB_NAME - database name for production</li>
+<li>DB_USER - database username for production</li>
+<li>DB_PASS - database password for production</li>
+<li>DB_HOST - database host for production</li>
+<li>JWT_SECERT - secret for json web token</li>
+</ul>
+<p>Optional:</p>
+<ul>
+<li>PORT - the port your api on 127.0.0.1, default to 2017</li>
+</ul>
+<h3>other commands</h3>
+<ul>
+<li><code>npm run dev</code> - simply start the server withou a watcher</li>
+<li><code>npm run create-sqlite-db</code> - creates the sqlite database</li>
+<li><code>npm run drop-sqlite-db</code> - drops <strong>ONLY</strong> the sqlite database</li>
+<li><code>npm run lint</code> - linting with <a href="http://eslint.org/">eslint</a></li>
+<li><code>npm run nodemon</code> - same as `npm start``</li>
+<li><code>npm run prepush</code> - a hook wich runs before pushing to a repository, runs <code>npm test</code> and <code>npm run dropDB</code></li>
+<li><code>pretest</code> - runs linting before <code>npm test</code></li>
+<li><code>test-ci</code> - only runs tests, nothing in pretest, nothing in posttest, for better use with ci tools</li>
+</ul>
+<h2>LICENSE</h2>
+<p>MIT © Lukas Aichbauer</p></article>
+    </section>
+
+
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-Login.html">Login</a></li><li><a href="module-LoginController.html">LoginController</a></li></ul><h3>Classes</h3><ul><li><a href="module-LoginController-findAll.html">findAll</a></li><li><a href="module-LoginController-register.html">register</a></li></ul><h3>Global</h3><ul><li><a href="global.html#app">app</a></li><li><a href="global.html#bodyParser">bodyParser</a></li><li><a href="global.html#config">config</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Thu Nov 19 2020 20:53:00 GMT+0530 (India Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

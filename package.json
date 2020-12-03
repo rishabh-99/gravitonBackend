@@ -14,7 +14,7 @@
     "lint": "eslint ./api/. ./config/. ./test/.",
     "pretes": "npm run lint",
     "production": "cross-env NODE_ENV=production node ./api/api.js",
-    "test": "cross-env NODE_ENV=testing jest --coverage --watchAll",
+    "test": "cross-env NODE_ENV=testing jest --coverage --watchAll --colors",
     "test-ci": "jest --coverage --forceExit"
   },
   "jest": {

@@ -126,7 +126,7 @@ const FIController = () => {
     try {
       // console.log(JSON.parse(process.env.S3_BUCKET))
       const preSignedUrl = await s3.getSignedUrl('putObject', {
-        Bucket: 'my-express-application-dev-s3bucket-18eh6dlfu6qih',
+        Bucket: 'my-express-application-dev-s3bucket-1eil6gs9s5nx2',
         Key: `FI/${req.query.loan_type}/${req.query.profile_id}/${req.query.__loan_id}/${req.query.filename}`, // File name could come from queryParameters
         Metadata: {}
       });
@@ -141,7 +141,7 @@ const FIController = () => {
     try {
       // console.log(JSON.parse(process.env.S3_BUCKET))
       const preSignedUrl = await s3.getSignedUrl('getObject', {
-        Bucket: 'my-express-application-dev-s3bucket-18eh6dlfu6qih',
+        Bucket: 'my-express-application-dev-s3bucket-1eil6gs9s5nx2',
         Key: `FI/${req.query.loan_type}/${req.query.profile_id}/${req.query.__loan_id}/${req.query.filename}`, // File name could come from queryParameters
       });
 
@@ -227,7 +227,7 @@ const FIController = () => {
     try {
       // console.log(JSON.parse(process.env.S3_BUCKET))
       const preSignedUrl = await s3.getSignedUrl('putObject', {
-        Bucket: 'my-express-application-dev-s3bucket-18eh6dlfu6qih',
+        Bucket: 'my-express-application-dev-s3bucket-1eil6gs9s5nx2',
         Key: `Document/${req.query.profile_id}/${req.query.filename}`, // File name could come from queryParameters
         Metadata: {}
       });
@@ -242,7 +242,7 @@ const FIController = () => {
     try {
       // console.log(JSON.parse(process.env.S3_BUCKET))
       const preSignedUrl = await s3.getSignedUrl('getObject', {
-        Bucket: 'my-express-application-dev-s3bucket-18eh6dlfu6qih',
+        Bucket: 'my-express-application-dev-s3bucket-1eil6gs9s5nx2',
         Key: `Document/${req.query.profile_id}/${req.query.filename}`, // File name could come from queryParameters
       });
 
@@ -982,17 +982,18 @@ const FIController = () => {
       pdfMake.on("data", chunk => {
         chunks.push(chunk);
       });
-      await fs.writeFile('a.json', stringify(dd))
       pdfMake.on("end", () => {
         const result = Buffer.concat(chunks);
 
         s3.putObject(
           {
-            Bucket: 'my-express-application-dev-s3bucket-18eh6dlfu6qih',
+            Bucket: 'my-express-application-dev-s3bucket-1eil6gs9s5nx2',
             Key: `EMI/${profile_id}/${filename}`,
             Body: result
           },
-          function (resp) { }
+          function (resp) {
+            console.log(resp)
+           }
         );
       });
 
@@ -1000,7 +1001,7 @@ const FIController = () => {
 
       pdfMake.end();
       const preSignedUrl = await s3.getSignedUrl('getObject', {
-        Bucket: 'my-express-application-dev-s3bucket-18eh6dlfu6qih',
+        Bucket: 'my-express-application-dev-s3bucket-1eil6gs9s5nx2',
         Key: `EMI/${profile_id}/${filename}`, // File name could come from queryParameters
       });
 

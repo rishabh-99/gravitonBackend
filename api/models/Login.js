@@ -1,8 +1,12 @@
-/*
-File Description: Defining the Login model and creating the Schema  table for 
-same with respective fields 
-Author: Rishabh Merhotra 
-*/
+/**
+ * This File is a part of Graviton.
+ * (c) 2019 Kugelblitz Technologies LLP
+ * 
+ * ---------------------------------------
+ * 
+ * @module Login
+ * @author Rishabh Mehrotra <mehrotra.rishab@gmail.com>
+ */
 //importing the sequelize package
 const Sequelize = require('sequelize');
 const bcryptService = require('../services/bcrypt.service');

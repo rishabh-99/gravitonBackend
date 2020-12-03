@@ -1,0 +1,20 @@
+{
+    "source": {
+      "include": ["api", "README.md"],
+      "includePattern": "\\.js$"
+    },
+    "plugins": [
+      "plugins/markdown"
+    ],
+    "templates": {
+      "referenceTitle": "Graviton v1.0.0",
+      "collapse": false,
+      "disableSort": false
+    },
+    "opts": {
+      "destination": "./docs/",
+      "encoding": "utf8",
+      "private": true,
+      "recurse": true
+    }
+  }

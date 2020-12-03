@@ -48,12 +48,30 @@ const beforeAction = async () => {
   })
  
   // await database.drop({force: true});
-  await database.sync().then(() => console.log('Connection to the database has been established successfully'));
+  // await database.sync().then(() => console.log('Connection to the database has been established successfully'));
 
   return testapp;
 };
 
 const afterAction = async () => {
+  await database.query(`DELETE FROM public.account WHERE true;
+  DELETE FROM public.applicant WHERE true;
+  DELETE FROM public.fi WHERE true;
+  DELETE FROM public.gurantor WHERE true;
+  DELETE FROM public.user_kyc_log WHERE true;
+  DELETE FROM public.loan WHERE true;
+  DELETE FROM public.document WHERE true;
+  DELETE FROM public.document_check_approve_pending WHERE true;
+  DELETE FROM public.document_check_upload_pending WHERE true;
+  DELETE FROM public.emi_schedule WHERE true;
+  DELETE FROM public.emi_schedule_pending WHERE true;
+  DELETE FROM public.fi_approval_pending WHERE true;
+  DELETE FROM public.fi_assigned_pending WHERE true;
+  DELETE FROM public.fi_submitted_pending WHERE true;
+  DELETE FROM public.kyc_approval_pending WHERE true;
+  DELETE FROM public.loan WHERE true;
+  DELETE FROM public.login WHERE true;
+  DELETE FROM public.user_profile WHERE true;`);
   await database.close();
 };
 

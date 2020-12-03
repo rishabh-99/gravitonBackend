@@ -1,28 +1,23 @@
 /*
-File Description: Tests for the Login controllers using the models 
-Author: Rishabh Merhotra 
+File Description: Tests for the endpoints in Login Controller
+Author: Rishabh Mehrotra 
 */
 
-// importing the super test for unit-testing the api 
+/**
+ * Library Imports
+ */
 const request = require('supertest');
-const {
-  beforeAction,
-  afterAction,
-} = require('../setup/_setup');
-// importing the login model from the models folder
-const Login = require('../../api/models/Login');
-// cryptoJs for the enryption techniques
-// jwt for authentication of the users
 const CryptoJS = require("crypto-js");
-const jwt = require('jsonwebtoken');
-// encryptsecret varies depending on the Environment
-const encryptSecret = process.env.NODE_ENV === 'production' ? process.env.ENCRYPT_SECRET : 'b14ca5898a4e4133bbce2ea2315a1916';
-var key = CryptoJS.enc.Utf8.parse(encryptSecret);
-var iv = CryptoJS.enc.Utf8.parse('b14ca5898a4e4133');
 
-//UTF-8 is a variable-width character encoding 
+/**
+ * Self defined Imports
+ */
+const { beforeAction, afterAction } = require('../setup/_setup');
+const Login = require('../../api/models/Login');
 
 let api;
+let token;
+let admin;
 
 beforeAll(async () => {
   api = await beforeAction();
@@ -31,165 +26,203 @@ beforeAll(async () => {
 afterAll(() => {
   afterAction();
 });
-
-test('Login | create', async () => {
-
-  /**
- * Creating a login user
- * @constructor
- * @param {response} = req.api 
- * @param Login created using - full_name, username, password , designation, user_mobile 
- * and permissions
- * Created the login user
+ 
+console.log(`%c--------------------------------------------------
+Login Controller Tests
+--------------------------------------------------`,'background: #222; color: #bada55');
+/**
+ * Register Function Tests
  */
+test('Login | create (Successful)', async () => {
 
-  // post request with details to register
   const res = await request(api)
     .post('/public/register')
     .set('Accept', /json/)
     .send({
-      "full_name": "Rime",
-      "username": "rimet",
+      "full_name": "Rishabh Mehrotra",
+      "username": "rishabh",
       "designation": "Boss",
       "user_mobile": "8299213792",
       "password": "Alfanzo@001",
       "password2": "Alfanzo@001",
       "permissions": "{\"Admin\": true, \"Employee\": false}",
       "is_active": true
-    })
-    // 200 to be ok! 
-    // .expect(200);
-  console.log(res.body)
+    }).expect(200)
   expect(res.body.msg).toBe('User created successfully!!');
 
   const login = await Login.findOne({
-    // finding the user with given username 
     where: {
-      username: 'rimet',
+      username: 'rishabh',
     }
   })
-  expect(login.full_name).toBe('Rime');
-  // cleaning the database before next test 
-  await login.destroy();
+  admin = login;
+  expect(login.full_name).toBe('Rishabh Mehrotra');
+
+  // const ress = await Login.destroy({
+  //   where: {
+  //     username: 'rishabh',
+  //   }
+  // });
+
 });
 
-test('Login | login', async () => {
-
-  // post request tp create a login of a user 
-  const login = await Login.create({
-    "full_name": "Rime",
-    "username": "rimet",
-    "designation": "Boss",
-    "user_mobile": "8299213792",
-    "password": "Alfanzo@001",
-    "password2": "Alfanzo@001",
-    "permissions": "{\"Admin\": true, \"Employee\": false}",
-    "is_active": true
-  });
+test('Login | create (Unsuccessful)', async () => {
 
   const res = await request(api)
-  /**
- * Login of the user .
- * @constructor
- * @param {req} api - login the user 
- * @param Login using the following details - Username and password
- * After veriying with token the login is done
+    .post('/public/register')
+    .set('Accept', /json/)
+    .send({
+      "full_name": "Rishabh Mehrotra",
+      "username": "rishabh2",
+      "designation": "Boss",
+      "user_mobile": "8299213792",
+      "password": "Alfanzo@001",
+      "password2": "Alfanzo@001",
+      "permissions": "{Admin\": true, \"Employee\": false}",
+      "is_active": true
+    }).expect(500)
+
+  const login = await Login.findOne({
+    where: {
+      username: 'rishabh2',
+    }
+  })
+  expect(login).toBe(null);
+});
+
+// -------------------------------------------------
+
+/**
+ * Login Function Tests
+ */
+test('Login | login (Successful)', async () => {
+
+  const res = await request(api)
+    .post('/public/login')
+    .set('Accept', /json/)
+    .send({
+      "username": "rishabh",
+      "password": "Alfanzo@001"
+    }).expect(200)
+
+  expect(res.body.token).toBeTruthy();
+  token = res.body.token;
+});
+
+test('Login | login (User Not Found)', async () => {
+
+  const res = await request(api)
+    .post('/public/login')
+    .set('Accept', /json/)
+    .send({
+      "username": "rishabh2",
+      "password": "Alfanzo@001"
+    }).expect(400)
+
+  expect(res.body.msg).toBe('Bad Request: User not found');
+});
+
+test('Login | login (Unauthorized)', async () => {
+
+  const res = await request(api)
+    .post('/public/login')
+    .set('Accept', /json/)
+    .send({
+      "username": "rishabh",
+      "password": "Alfanzo@00"
+    }).expect(401)
+
+  expect(res.body.msg).toBe('Unauthorized');
+});
+
+// -------------------------------------------------
+
+/**
+ * GetAll Function Tests
  */
 
-    .post('/public/login')
-    // post request using the login details 
-    .set('Accept', /json/)
-    .send({
-      "username": "rimet",
-      "password": "Alfanzo@001"
-    })
-    .expect(200);
-   // body with token is verified 
-  expect(res.body.token).toBeTruthy();
-
-  expect(login).toBeTruthy();
-  // cleaning the database before next test 
-  await login.destroy();
-});
-
-test('Login | get all (auth)', async () => {
-  // post request the login credentials 
-  const login = await Login.create({
-    "full_name": "Rime",
-    "username": "rimet",
-    "designation": "Boss",
-    "user_mobile": "8299213792",
-    "password": "Alfanzo@001",
-    "password2": "Alfanzo@001",
-    "permissions": "{\"Admin\": true, \"Employee\": false}",
-    "is_active": true
-  });
+test('Login | getAll (Successfull)', async () => {
 
   const res = await request(api)
-  // post request the detials to login 
-    .post('/public/login')
-    .set('Accept', /json/)
-    .send({
-      username: 'rimet',
-      password: 'Alfanzo@001',
-    })
-    .expect(200);
-
-  expect(res.body.token).toBeTruthy();
-
-  // verifying using the Bearer token 
-  const res2 = await request(api)
     .get('/private/User/logins')
     .set('Accept', /json/)
-    .set('Authorization', `Bearer ${res.body.token}`)
+    .set('Authorization', `Bearer ${token}`)
     .set('Content-Type', 'application/json')
-    .expect(200);
-  // expecting the user to be truthy 
-  expect(res2.body.users).toBeTruthy();
-  expect(res2.body.users.length).toBeGreaterThanOrEqual(1);
-  // cleaning the database before next test 
-  await login.destroy();
+    .expect(200)
+
+  expect(res.body.users).toBeTruthy();
 });
 
-test('Login | DisableUser (auth)', async () => {
-  // post request with the login credentials 
-  const login = await Login.create({
-    "full_name": "Rime",
-    "username": "rimet",
-    "designation": "Boss",
-    "user_mobile": "8299213792",
-    "password": "Alfanzo@001",
-    "password2": "Alfanzo@001",
-    "permissions": "{\"Admin\": true, \"Employee\": false}",
-    "is_active": true
-  });
+// -------------------------------------------------
+
+/**
+ * GetAccessKeys Function Tests
+ */
+test('Login | GetAccessKeys (Successfull)', async () => {
 
   const res = await request(api)
-  /**
- * Disabling a user
- * Accepts the responses and requests from the api
- * @param Login with the usename and password and verification starts
- * @param login_id is used and the user gets disabled 
- */
-  /// logging in using username and password 
-    .post('/public/login')
+    .get('/private/Security/getInkredoAccessKeys')
     .set('Accept', /json/)
-    .send({
-      username: 'rimet',
-      password: 'Alfanzo@001',
-    })
-    .expect(200);
-  // verifying using token 
-  expect(res.body.token).toBeTruthy();
-  //using the login, disable a user with their id.
-  const res2 = await request(api)
-    .post(`/private/User/disableUser?user_id=${login.user_id}&username=rimet&password=Alfanzo@001`)
-    .set('Accept', /json/)
-    .set('Authorization', `Bearer ${res.body.token}`)
+    .set('Authorization', `Bearer ${token}`)
     .set('Content-Type', 'application/json')
-    .expect(200);
+    .expect(200)
 
-  expect(res2.body.msg).toBe('User disabled successfully!');
-  // cleaning the database before next test 
-  await login.destroy();
+  expect(res.body.access_id).toBeTruthy();
+  expect(res.body.access_key).toBeTruthy();
 });
+
+// -------------------------------------------------
+
+/**
+ * DisableUser Function Tests
+ */
+test('Login | DisableUser (Unauthorized)', async () => {
+  const res = await request(api)
+    .post('/private/User/disableUser')
+    .set('Accept', /json/)
+    .set('Authorization', `Bearer ${token}`)
+    .set('Content-Type', 'application/json')
+    .query({
+      username: 'rishabh',
+      password: 'Alfanzo@00',
+      user_id: admin.user_id
+    })
+    .expect(401)
+  expect(res.body.msg).toBe('Unauthorized')
+});
+
+test('Login | DisableUser (Successfull)', async () => {
+  const res = await request(api)
+    .post('/private/User/disableUser')
+    .set('Accept', /json/)
+    .set('Authorization', `Bearer ${token}`)
+    .set('Content-Type', 'application/json')
+    .query({
+      username: 'rishabh',
+      password: 'Alfanzo@001',
+      user_id: admin.user_id
+    })
+    .expect(200)
+  expect(res.body.msg).toBe('User disabled successfully!')
+
+  const user = await Login.findByPk(admin.user_id);
+  expect(user.is_active).toBe(false)
+});
+
+test('Login | DisableUser (Bad Request: Admin not found)', async () => {
+  const res = await request(api)
+    .post('/private/User/disableUser')
+    .set('Accept', /json/)
+    .set('Authorization', `Bearer ${token}`)
+    .set('Content-Type', 'application/json')
+    .query({
+      username: 'rishabh2',
+      password: 'Alfanzo@001',
+      user_id: admin.user_id
+    })
+    .expect(400)
+
+  expect(res.body.msg).toBe('Bad Request: Admin not found')
+});
+
+// -------------------------------------------------
