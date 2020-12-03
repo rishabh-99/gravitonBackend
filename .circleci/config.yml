@@ -23,7 +23,7 @@ jobs:
       # run tests
       - run: 
           name: Run tests with code coverage
-          command: npm test --coverage
+          command: npm test-ci --coverage
 
       # deploy app            
       - run:
