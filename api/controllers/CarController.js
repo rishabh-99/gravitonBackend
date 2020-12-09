@@ -33,6 +33,7 @@ const Login = require('../models/Login');
 const KycApprovalPending = require('../models/Kyc_approval_pending');
 const FiAssignedPending = require('../models/Fi_assigned_pending');
 const authService = require('../services/auth.service');
+const DisbursedLoan = require('../models/DisbursedLoan');
 
 
 
@@ -609,7 +610,7 @@ const CarController = () => {
             profile.details_json[user_id].loans[loanNumber].stages.kyc_approval.time_stamp = date.toLocaleString();
             profile.details_json[user_id].loans[loanNumber].stages.kyc_approval.remark = remark;
             profile.details_json[user_id].loans[loanNumber].stages.current_stage = 'kyc_approval';
-           
+
 
             await UserProfile.update({
                 'details_json': profile.details_json
@@ -781,6 +782,9 @@ const CarController = () => {
                 'details_json': profile.details_json
             }, { where: { 'user_id': profile_id } })
 
+            await DisbursedLoan.create({
+                profile_id, loan_id
+            })
 
             return res.status(200).send('Operation successfull!');
 
@@ -789,6 +793,31 @@ const CarController = () => {
             return res.status(500).json({ msg: err });
         }
     };
+
+    const getAdminPanelData = async (req, res) => {
+
+        try {
+            const countOfProfiles = await UserProfile.count({
+                where:{}
+            });
+            const q1 = await sequelize.query(`select up.user_id, ap.applicant_firstname, ukl.full_name from 
+            (SELECT user_id, related_aadhar FROM user_profile as up LIMIT 5 OFFSET 
+             (select count(*) from user_profile)-5) as up,
+             applicant as ap,
+             (select * from user_kyc_log as ukli, login as li where ukli.user_id = li.user_id) as ukl
+             where up.related_aadhar = ap.applicant_aadhar and up.related_aadhar = ukl.related_aadhar`)
+             
+             const newestKYC = q1[0];
+             const countOfDisbursedLoan = await DisbursedLoan.count({
+                 where:{}
+             })
+            return res.status(200).json({countOfProfiles, newestKYC, countOfDisbursedLoan});
+        } catch (err) {
+            console.log(err)
+            return res.status(500).json({ msg: err });
+        }
+    };
+
     return {
         // returning all the functions form the controller
         register,
@@ -808,7 +837,8 @@ const CarController = () => {
         getAgentNameForKYC,
         terminateLoan,
         resubmitKYC,
-        finishLoan
+        finishLoan,
+        getAdminPanelData
     };
 };
 

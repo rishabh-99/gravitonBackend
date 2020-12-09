@@ -974,37 +974,43 @@ const FIController = () => {
         ])
 
       }
+      const pdfBuffer = await new Promise(resolve => {
+        const pdfMake = printer.createPdfKitDocument(dd);
 
-      const pdfMake = printer.createPdfKitDocument(dd);
+        let chunks = [];
+  
+        pdfMake.on("data", chunk => {
+          chunks.push(chunk);
+        });
+        pdfMake.on("end",() => {
+          const result = Buffer.concat(chunks);
+  
+          s3.putObject(
+            {
+              Bucket: 'my-express-application-dev-s3bucket-1eil6gs9s5nx2',
+              Key: `EMI/${profile_id}/${filename}`,
+              Body: result
+            },
+            function (resp, d) {
+              console.log('First')
+              resolve(result)
+              console.log({resp,d})
+             }
+          )
+        });
+  
+  
+        pdfMake.end();
+      })
 
-      let chunks = [];
+      const a = pdfBuffer
 
-      pdfMake.on("data", chunk => {
-        chunks.push(chunk);
-      });
-      pdfMake.on("end", () => {
-        const result = Buffer.concat(chunks);
-
-        s3.putObject(
-          {
-            Bucket: 'my-express-application-dev-s3bucket-1eil6gs9s5nx2',
-            Key: `EMI/${profile_id}/${filename}`,
-            Body: result
-          },
-          function (resp) {
-            console.log(resp)
-           }
-        );
-      });
-
-
-
-      pdfMake.end();
-      const preSignedUrl = await s3.getSignedUrl('getObject', {
+     
+      const preSignedUrl = await s3.getSignedUrlPromise('getObject', {
         Bucket: 'my-express-application-dev-s3bucket-1eil6gs9s5nx2',
         Key: `EMI/${profile_id}/${filename}`, // File name could come from queryParameters
       });
-
+      console.log('Second')
 
       return res.status(200).json(preSignedUrl)
 
