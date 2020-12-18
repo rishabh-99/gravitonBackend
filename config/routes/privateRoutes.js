@@ -30,10 +30,14 @@ const privateRoutes = {
   'GET /CAR/terminateLoan': 'CarController.terminateLoan',
   'GET /CAR/finishLoan': 'CarController.finishLoan',
   'GET /CAR/getAdminPanelData': 'CarController.getAdminPanelData',
+  'GET /CAR/getLeadForToken': 'CarController.getLeadForToken',
+  'GET /CAR/getAllLeads': 'CarController.getAllLeads',
+  'GET /CAR/getLeadForUserId': 'CarController.getLeadForUserId',
 
   'POST /CAR/create': 'CarController.register',
   'POST /CAR/insertNewInkredoDetails': 'CarController.insertBorrowerDetails',
   'POST /CAR/insertNewLoan': 'CarController.insertNewLoan',
+  'POST /CAR/createLead': 'CarController.createLead',
 
   // 'POST /createUserProfile': 'UserProfileController.create',
   // 'GET /userProfiles': 'UserProfileController.getAll'

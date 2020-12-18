@@ -34,6 +34,7 @@ const KycApprovalPending = require('../models/Kyc_approval_pending');
 const FiAssignedPending = require('../models/Fi_assigned_pending');
 const authService = require('../services/auth.service');
 const DisbursedLoan = require('../models/DisbursedLoan');
+const Leads = require('../models/Leads');
 
 
 
@@ -797,12 +798,16 @@ const CarController = () => {
     const getAdminPanelData = async (req, res) => {
 
         try {
+            let count = 5;
             const countOfProfiles = await UserProfile.count({
                 where:{}
             });
+            if(countOfProfiles < 5) {
+                count = countOfProfiles;
+            }
             const q1 = await sequelize.query(`select up.user_id, ap.applicant_firstname, ukl.full_name from 
-            (SELECT user_id, related_aadhar FROM user_profile as up LIMIT 5 OFFSET 
-             (select count(*) from user_profile)-5) as up,
+            (SELECT user_id, related_aadhar FROM user_profile as up LIMIT ${count} OFFSET 
+             (select count(*) from user_profile)-${count}) as up,
              applicant as ap,
              (select * from user_kyc_log as ukli, login as li where ukli.user_id = li.user_id) as ukl
              where up.related_aadhar = ap.applicant_aadhar and up.related_aadhar = ukl.related_aadhar`)
@@ -817,6 +822,62 @@ const CarController = () => {
             return res.status(500).json({ msg: err });
         }
     };
+
+    const createLead = async (req, res) => {
+        const user_id = req.body.user_id;
+        const data = req.body.data;
+        const name = req.body.name;
+        try {
+            await Leads.create({
+                user_id,data,name
+            })
+            return res.status(200).json({msg:'Operation Successful!'});
+        } catch (err) {
+            console.log(err)
+            return res.status(500).json({ msg: err });
+        }
+    };
+
+    const getLeadForToken = async (req, res) => {
+        const token = parseInt(req.query.token);
+        try {
+            const lead = await Leads.findOne({
+                attributes:['data'],
+                where:{token}
+            })
+            return res.status(200).json(lead.data);
+        } catch (err) {
+            console.log(err)
+            return res.status(500).json({ msg: err });
+        }
+    };
+
+    const getAllLeads = async (req, res) => {
+        try {
+            const lead = await Leads.findAll({
+                attributes:['token','name']
+            })
+            return res.status(200).json(lead);
+        } catch (err) {
+            console.log(err)
+            return res.status(500).json({ msg: err });
+        }
+    };
+
+    const getLeadForUserId = async (req, res) => {
+        const user_id = parseInt(req.query.user_id);
+        try {
+            const lead = await Leads.findAll({
+                attributes:['token','name'],
+                where: {user_id}
+            })
+            return res.status(200).json(lead);
+        } catch (err) {
+            console.log(err)
+            return res.status(500).json({ msg: err });
+        }
+    };
+
 
     return {
         // returning all the functions form the controller
@@ -838,7 +899,11 @@ const CarController = () => {
         terminateLoan,
         resubmitKYC,
         finishLoan,
-        getAdminPanelData
+        getAdminPanelData,
+        createLead,
+        getLeadForToken,
+        getAllLeads,
+        getLeadForUserId
     };
 };
 

@@ -696,7 +696,7 @@ const FIController = () => {
 
 
       var dd = {
-        pageMargins: [40, 140, 40, 60],
+        pageMargins: [40, 140, 40, 150],
         pageSize: 'A4',
         header: {
 
@@ -717,7 +717,23 @@ const FIController = () => {
 
           ],
         },
-        footer: function (currentPage, pageCount) { return { text: currentPage.toString() + ' of ' + pageCount, margin: [0, 30, 0, 0] } },
+        footer: function (currentPage, pageCount) {
+          if (currentPage === pageCount) {
+            return {
+              columns: [
+                { text: currentPage.toString() + ' of ' + pageCount, margin: [0, 110, 0, 0] },
+
+              ]
+            }
+          }
+          return {
+            columns: [
+              { text: 'Signature of the Applicant', alignment: 'left', margin: [35, 50, -100, 0] },
+              { text: currentPage.toString() + ' of ' + pageCount, margin: [0, 110, 0, 0], alignment: 'center' },
+              { text: 'Date', alignment: 'right', margin: [0, 50, 35, 0] }
+            ]
+          }
+        },
         content: [
           {
             style: 'tableExample',
@@ -726,7 +742,7 @@ const FIController = () => {
               widths: [
                 150, '*', '*'
               ],
-              heights: 25,
+              heights: 20,
               body: [
                 [
                   {
@@ -939,7 +955,7 @@ const FIController = () => {
           },
           tableHeader: {
             bold: true,
-            fontSize: 11.5,
+            fontSize: 8.5,
             color: 'black',
             margin: [
               0,
@@ -947,7 +963,7 @@ const FIController = () => {
             ]
           },
           tableContent: {
-            fontSize: 12,
+            fontSize: 9,
             margin: [
               0,
               5
@@ -978,39 +994,40 @@ const FIController = () => {
         const pdfMake = printer.createPdfKitDocument(dd);
 
         let chunks = [];
-  
+
         pdfMake.on("data", chunk => {
           chunks.push(chunk);
         });
-        pdfMake.on("end",() => {
+        pdfMake.on("end", () => {
           const result = Buffer.concat(chunks);
-  
+          var now = new Date();
+          now.setMinutes(now.getMinutes() + 30); // timestamp
+          now = new Date(now); // Date object
           s3.putObject(
             {
               Bucket: 'my-express-application-dev-s3bucket-1eil6gs9s5nx2',
               Key: `EMI/${profile_id}/${filename}`,
-              Body: result
+              Body: result,
+              Expires: now
             },
             function (resp, d) {
-              console.log('First')
               resolve(result)
-              console.log({resp,d})
-             }
+            }
           )
         });
-  
-  
+
+
         pdfMake.end();
       })
 
       const a = pdfBuffer
 
-     
+
       const preSignedUrl = await s3.getSignedUrlPromise('getObject', {
         Bucket: 'my-express-application-dev-s3bucket-1eil6gs9s5nx2',
         Key: `EMI/${profile_id}/${filename}`, // File name could come from queryParameters
       });
-      console.log('Second')
+
 
       return res.status(200).json(preSignedUrl)
 
