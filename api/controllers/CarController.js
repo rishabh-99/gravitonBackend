@@ -809,10 +809,9 @@ const CarController = () => {
 
     const getAllLeads = async (req, res) => {
         try {
-            const lead = await Leads.findAll({
-                attributes: ['token', 'name']
-            })
-            return res.status(200).json(lead);
+            const lead = await sequelize.query(`SELECT token, leads.user_id, created_at, name, loan_type, amount, full_name
+            FROM public.leads, public.login where leads.user_id = login.user_id;`)
+            return res.status(200).json(lead[0]);
         } catch (err) {
             console.log(err)
             return res.status(500).json({ msg: err });
