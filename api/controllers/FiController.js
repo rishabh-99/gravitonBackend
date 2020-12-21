@@ -1037,6 +1037,387 @@ const FIController = () => {
     }
   };
 
+  const makePdf = async (req, res) => {
+    const profile_id = req.query.profile_id;
+    const loan_id = req.query.loan_id;
+    const filename = req.query.filename;
+    try {
+      let profile = await UserProfile.findOne({
+        where: {
+          user_id: profile_id
+        }
+      });
+
+      let counter = 0;
+      let loanNumber = 0;
+      for (let loan of profile.details_json[profile_id].loans) {
+        if (loan.__loan_id == loan_id) {
+          loanNumber = counter;
+        }
+        counter++;
+      }
+
+      const date = new Date();
+      let schedules = profile.details_json[profile_id].loans[loanNumber].emi_schedule.EmiSchedules
+
+      var fonts = {
+        Courier: {
+          normal: 'fonts/cour.ttf',
+          bold: 'fonts/courbd.ttf',
+          italics: 'fonts/couri.ttf',
+          bolditalics: 'fonts/courbi.ttf'
+        },
+        Glegoo: {
+          normal: 'fonts/Glegoo-Regular.ttf',
+          bold: 'fonts/Glegoo-Bold.ttf',
+          italics: 'fonts/Glegoo-Regular.ttf',
+          bolditalics: 'fonts/Glegoo-Regular.ttf'
+        }
+      };
+      var printer = new pdfmake(fonts);
+
+
+      var dd = {
+        pageMargins: [40, 140, 40, 150],
+        pageSize: 'A4',
+        header: {
+
+          columns: [
+            {
+              stack: ['\n',
+                {
+                  text: 'Navya Enterprises', style: 'header'
+                },
+                {
+                  text: 'Prop Neel Sarin', style: 'content'
+                },
+                {
+                  text: '70/144 Patel Marg, Mansrovar Jaipur', style: 'content'
+                },
+              ]
+            }
+
+          ],
+        },
+        footer: function (currentPage, pageCount) {
+          if (currentPage === pageCount) {
+            return {
+              columns: [
+                { text: currentPage.toString() + ' of ' + pageCount, margin: [0, 110, 0, 0] },
+
+              ]
+            }
+          }
+          return {
+            columns: [
+              { text: 'Signature of the Applicant', alignment: 'left', margin: [35, 50, -100, 0] },
+              { text: currentPage.toString() + ' of ' + pageCount, margin: [0, 110, 0, 0], alignment: 'center' },
+              { text: 'Date', alignment: 'right', margin: [0, 50, 35, 0] }
+            ]
+          }
+        },
+        content: [
+          {
+            style: 'tableExample',
+            table: {
+              dontBreakRows: true,
+              widths: [
+                150, '*', '*'
+              ],
+              heights: 20,
+              body: [
+                [
+                  {
+                    text: 'Name of borrower', style: 'tableHeader'
+                  },
+                  {
+                    text: `${profile.details_json[profile_id].kyc.CarJSON.applicantModel.applicant_firstname} ${profile.details_json[profile_id].kyc.CarJSON.applicantModel.applicant_lastname}`, colSpan: 2, style: 'tableContent'
+                  },
+                  {}
+                ],
+                [
+                  {
+                    text: 'Address', style: 'tableHeader'
+                  },
+                  {
+                    text: `${profile.details_json[profile_id].kyc.CarJSON.applicantModel.applicant_currentaddress}`, colSpan: 2, style: 'tableContent'
+                  },
+                  {}
+                ],
+                [
+                  {
+                    text: 'Office Address', style: 'tableHeader'
+                  },
+                  {
+                    text: `${profile.details_json[profile_id].kyc.CarJSON.applicantModel.applicant_officeaddress}`, colSpan: 2, style: 'tableContent'
+                  },
+                  {}
+                ],
+                [
+                  {
+                    text: '', style: 'tableHeader'
+                  },
+                  {
+                    text: '', style: 'tableContent'
+                  },
+                  {
+                    text: '', style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'Mobile', style: 'tableHeader'
+                  },
+                  {
+                    text: 'Loan Amount', style: 'tableHeader'
+                  },
+                  {
+                    text: 'EMI Amount', style: 'tableHeader'
+                  }
+                ],
+                [
+                  {
+                    text: `${profile.details_json[profile_id].kyc.CarJSON.applicantModel.applicant_mobile}`, style: 'tableContent'
+                  },
+                  {
+                    text: `${profile.details_json[profile_id].loans[loanNumber].emi_schedule.TotalAmount}`, style: 'tableContent'
+                  },
+                  {
+                    text: `${profile.details_json[profile_id].loans[loanNumber].emi_schedule.MonthlyEmi}`, style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'Loan Account Number', style: 'tableHeader'
+                  },
+                  {
+                    text: `${profile_id}`, colSpan: 2, style: 'tableContent'
+                  },
+                  {}
+                ],
+                [
+                  {
+                    text: 'Loan EMI Schedule', style: 'tableHeader', colSpan: 3
+                  },
+                  {
+                    text: '', style: 'tableContent'
+                  },
+                  {
+                    text: '', style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'EMI Counter', style: 'tableHeader'
+                  },
+                  {
+                    text: 'Date', style: 'tableHeader'
+                  },
+                  {
+                    text: 'EMI Amount', style: 'tableHeader'
+                  }
+                ],
+              ]
+            },
+          },
+          '\n',
+          '\n',
+          '\n',
+          '\n',
+          {
+            unbreakable: true,
+            stack: [
+              { text: 'Terms & Condition', style: 'leftHeader' },
+              {
+                ol: [
+                  { text: 'I understand the terms & conditions of the loan.', margin: [0, 5, 0, 5] },
+                  { text: 'I will deposit the EMI before or as per the Schedule mentioned above.', margin: [0, 0, 0, 5] },
+                  { text: 'Cheque Bounce Charges per presentation is ₹400.', margin: [0, 0, 0, 5] },
+                  { text: 'EMI/ Cash Pick up charges are applicable and are ₹350.', margin: [0, 0, 0, 5] },
+                  { text: 'Late Payment Fee is applicable and is ₹300.', margin: [0, 0, 0, 5] },
+                  { text: 'No Objection certificate fee is ₹350.', margin: [0, 0, 0, 5] },
+                ],
+                style: 'leftData'
+              },
+              '\n',
+              '\n',
+              { text: 'नियम एवं शर्तें', style: 'leftHeaderHindi' },
+              {
+                ol: [
+                  { text: 'मैं ऋण के नियमों और शर्तों को समझता हूं।', margin: [0, 5, 0, 5] },
+                  { text: 'मैं ऊपर उल्लिखित अनुसूची के अनुसार या पहले ईएमआई जमा करूंगा।', margin: [0, 0, 0, 5] },
+                  { text: 'चेक बाउंस शुल्क आरएस ₹400 प्रति प्रस्तुति हैं।', margin: [0, 0, 0, 5] },
+                  { text: 'कैश ईएमआई या कैश पिकअप शुल्क लागू हैं और ₹400 हैं।', margin: [0, 0, 0, 5] },
+                  { text: 'लेट पेमेंट शुल्क लागू है और ₹300 है।', margin: [0, 0, 0, 5] },
+                  { text: '₹350 के शुल्क का भुगतान करने के बाद नो ऑब्जेक्शन सर्टिफिकेट जारी किया जाएगा।', margin: [0, 0, 0, 5] },
+                ],
+                style: 'leftDataHindi'
+              },
+              '\n',
+              '\n',
+              '\n',
+              '\n',
+              '\n',
+              '\n',
+
+              {
+
+                columns: [
+                  {
+                    text: 'Signature of the Applicant', alignment: 'left'
+                  },
+                  { text: 'Date', alignment: 'right' }
+                ]
+              },
+            ]
+          }
+        ],
+        styles: {
+          leftHeader: {
+            alignment: 'left',
+            fontSize: 13,
+            bold: true
+          },
+          leftData: {
+            alignment: 'left',
+            fontSize: 10,
+            lineHeight: 1.5,
+            margin: [15, 0, 0, 0]
+          },
+          leftHeaderHindi: {
+            alignment: 'left',
+            fontSize: 10,
+            bold: true,
+            font: 'Glegoo'
+          },
+          leftDataHindi: {
+            alignment: 'left',
+            fontSize: 10,
+            lineHeight: 1.15,
+            margin: [15, 0, 0, 0],
+            font: 'Glegoo'
+          },
+          header: {
+            fontSize: 28,
+            // 			bold: true,
+            margin: [
+              0,
+              0,
+              0,
+              10
+            ]
+          },
+          content: {
+            fontSize: 12,
+            margin: [
+              0,
+              0,
+              0,
+              4
+            ]
+          },
+          subheader: {
+            fontSize: 16,
+            bold: true,
+            margin: [
+              0,
+              10,
+              0,
+              5
+            ]
+          },
+          tableExample: {
+            margin: [
+              0,
+              5,
+              0,
+              5
+            ],
+            width: 400
+          },
+          tableHeader: {
+            bold: true,
+            fontSize: 8.5,
+            color: 'black',
+            margin: [
+              0,
+              5
+            ]
+          },
+          tableContent: {
+            fontSize: 9,
+            margin: [
+              0,
+              5
+            ]
+          }
+        },
+        defaultStyle: {
+          alignment: 'center',
+          font: 'Courier'
+        }
+      }
+
+      for (let schedule of schedules) {
+        dd.content[0].table.body.push([
+          {
+            text: `${schedule.Id}`, style: 'tableContent'
+          },
+          {
+            text: `${schedule.Date}`, style: 'tableContent'
+          },
+          {
+            text: `${schedule['EMI']}`, style: 'tableContent'
+          }
+        ])
+
+      }
+      const pdfBuffer = await new Promise(resolve => {
+        const pdfMake = printer.createPdfKitDocument(dd);
+
+        let chunks = [];
+
+        pdfMake.on("data", chunk => {
+          chunks.push(chunk);
+        });
+        pdfMake.on("end", () => {
+          const result = Buffer.concat(chunks);
+          var now = new Date();
+          now.setMinutes(now.getMinutes() + 30); // timestamp
+          now = new Date(now); // Date object
+          s3.putObject(
+            {
+              Bucket: 'my-express-application-dev-s3bucket-1eil6gs9s5nx2',
+              Key: `EMI/${profile_id}/${filename}`,
+              Body: result,
+              Expires: now
+            },
+            function (resp, d) {
+              resolve(result)
+            }
+          )
+        });
+
+
+        pdfMake.end();
+      })
+
+      const a = pdfBuffer
+
+
+      const preSignedUrl = await s3.getSignedUrlPromise('getObject', {
+        Bucket: 'my-express-application-dev-s3bucket-1eil6gs9s5nx2',
+        Key: `EMI/${profile_id}/${filename}`, // File name could come from queryParameters
+      });
+
+
+      return res.status(200).json(preSignedUrl)
+
+    } catch (err) {
+      console.log(err)
+      return res.status(500).json({ msg: err });
+    }
+  };
 
 
 

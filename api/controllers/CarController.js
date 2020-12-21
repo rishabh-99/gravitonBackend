@@ -383,7 +383,11 @@ const CarController = () => {
     const getUserProfileID = async (req, res) => {
         // profile_id, name, aadhar number
         try {
-            const profileList = await sequelize.query(`SELECT user_id, related_aadhar, applicant_firstname FROM public.user_profile, public.applicant where applicant.applicant_aadhar = user_profile.related_aadhar;`)
+            const profileList = await sequelize.query(`SELECT user_id, related_aadhar,
+            CASE WHEN applicant_middlename Like '' 
+                    THEN concat(applicant_firstname,' ', applicant_lastname)
+                    ELSE concat(applicant_firstname,' ',applicant_middlename,' ', applicant_lastname) 
+            END AS applicant_name FROM public.user_profile, public.applicant where applicant.applicant_aadhar = user_profile.related_aadhar;`)
 
             return res.status(200).send(profileList[0])
         } catch (err) {
