@@ -41,6 +41,14 @@ const Leads = sequelize.define('leads',
     name: {
       type: Sequelize.STRING,
       allowNull: false
+    },
+    loan_type: {
+      type: Sequelize.STRING,
+      allowNull: false
+    },
+    amount: {
+      type: Sequelize.INTEGER,
+      allowNull: false
     }
   }, { tableName, timestamps: false, });
 Leads.removeAttribute('id');

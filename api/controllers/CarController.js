@@ -42,12 +42,6 @@ const Leads = require('../models/Leads');
 
 // Defining a controller
 const CarController = () => {
-
-    /**
-     * Registerring a user 
-     * @param {query} user_id - taking user_id from query request 
-     */
-
     // defining a function inside a controller 
     const register = async (req, res) => {
         const { body } = req;   //req.body 
@@ -129,14 +123,6 @@ const CarController = () => {
                     'applicant_aadhar': body.applicantModel.applicant_aadhar
                 }, { transaction: t });
 
-                /**
-                 * Account creating.
-                 * @constructor 
-                 * @param {req} body 
-                 * @account - created using bankname, ifsc, inhandsalary, relatedpan
-                 * related adhaar
-                 * Account is created
-                 */
                 const account = await Account.create({
                     'account_bankname': body.accountModel.account_bankname,
                     'account_ifsc': body.accountModel.account_ifsc,
@@ -186,16 +172,9 @@ const CarController = () => {
 
                 // today = dd + '-' + mm + '-' + yyyy;
                 today = yyyy + '-' + mm + '-' + dd;
-                // loging the date detials on the console
-                console.log(today);
 
-                // creating a user_kyc_log with given parameters
-                /**
-                 * Making a User_KYC log
-                 * @constructor
-                 * @param {req} body - accepts req.body
-                 * @user_kyc_log using user_id , related adhaar, related pan and kyc_date 
-                 */
+
+
                 const log = await User_kyc_log.create({
                     'user_id': req.query.user_id,
                     'related_aadhar': body.documentModel.document_aadhar,
@@ -246,13 +225,6 @@ const CarController = () => {
         }
 
     };
-    /**
-     * get request, accepting reqest and response
-     * @param {req} body - Accepts he request
-     * @param finding - Documentmodel , Gurantor model, applicant model , 
-     * account model and loan model who has Adhaar as document
-     */
-
     // accepts a request and responds accordingly
     const get = async (req, res) => {
         // const { body } = req;
@@ -329,10 +301,7 @@ const CarController = () => {
             return res.status(500).json({ msg: err });
         }
     };
-    // Getting the first name of the aadhar 
-    //accepts the request and response 
 
-    //gets all the applicants with their firstname 
     const getFnameAndAadhar = async (req, res) => {
         try {
             const NameWithAadhar = await Applicant.findAll({
@@ -346,7 +315,7 @@ const CarController = () => {
             return res.status(500).json({ msg: err });
         }
     };
-    // Gets all the detials of their attributes 
+
     const getComboBoxData = async (req, res) => {
         try {
             const MaritalStatusModel = await MaritalStatus.findAll();
@@ -363,14 +332,6 @@ const CarController = () => {
         }
     };
 
-    // Gets the count of the KYC logs.
-
-    /**
- * Getting count of Kyc
- * Accepts request and responses
- * @param {req} body - accepts in the form of req.body
- * @Count user_kyc - using user_id and kyc_date
- */
     const getCountOfKyc = async (req, res) => {
         try {
             // Date info 
@@ -402,13 +363,6 @@ const CarController = () => {
             return res.status(500).json({ msg: err });
         }
     };
-    // inserting the borrower details 
-    /**
-* Borrower details 
-*Accepts requests and responses
-* @param {req} body - In the form of req.body
-* @param Borrower-details: created using borrower_id and borrower_details
-*/
 
     const insertBorrowerDetails = async (req, res) => {
         try {
@@ -425,7 +379,6 @@ const CarController = () => {
             return res.status(500).json({ msg: err });
         }
     };
-
 
     const getUserProfileID = async (req, res) => {
         // profile_id, name, aadhar number
@@ -798,23 +751,24 @@ const CarController = () => {
         try {
             let count = 5;
             const countOfProfiles = await UserProfile.count({
-                where:{}
+                where: {}
             });
-            if(countOfProfiles < 5) {
+            if (countOfProfiles < 5) {
                 count = countOfProfiles;
             }
-            const q1 = await sequelize.query(`select up.user_id, ap.applicant_firstname, ukl.full_name from 
+            //date and user_id
+            const q1 = await sequelize.query(`select up.user_id, ap.applicant_firstname, ukl.full_name, ukl.kyc_date from 
             (SELECT user_id, related_aadhar FROM user_profile as up LIMIT ${count} OFFSET 
              (select count(*) from user_profile)-${count}) as up,
              applicant as ap,
              (select * from user_kyc_log as ukli, login as li where ukli.user_id = li.user_id) as ukl
              where up.related_aadhar = ap.applicant_aadhar and up.related_aadhar = ukl.related_aadhar`)
-             
-             const newestKYC = q1[0];
-             const countOfDisbursedLoan = await DisbursedLoan.count({
-                 where:{}
-             })
-            return res.status(200).json({countOfProfiles, newestKYC, countOfDisbursedLoan});
+
+            const newestKYC = q1[0];
+            const countOfDisbursedLoan = await DisbursedLoan.count({
+                where: {}
+            })
+            return res.status(200).json({ countOfProfiles, newestKYC, countOfDisbursedLoan });
         } catch (err) {
             console.log(err)
             return res.status(500).json({ msg: err });
@@ -825,11 +779,14 @@ const CarController = () => {
         const user_id = parseInt(req.query.user_id);
         const data = req.body;
         const name = req.query.name;
+        const loan_type = req.query.loan_type;
+        const amount = req.query.amount;
+
         try {
             await Leads.create({
-                user_id,data,name
+                user_id, data, name, loan_type, amount
             })
-            return res.status(200).json({msg:'Operation Successful!'});
+            return res.status(200).json({ msg: 'Operation Successful!' });
         } catch (err) {
             console.log(err)
             return res.status(500).json({ msg: err });
@@ -840,10 +797,10 @@ const CarController = () => {
         const token = parseInt(req.query.token);
         try {
             const lead = await Leads.findOne({
-                attributes:['data'],
-                where:{token}
+                attributes: ['data', 'loan_type', 'amount'],
+                where: { token }
             })
-            return res.status(200).json(lead.data);
+            return res.status(200).json(lead);
         } catch (err) {
             console.log(err)
             return res.status(500).json({ msg: err });
@@ -853,7 +810,7 @@ const CarController = () => {
     const getAllLeads = async (req, res) => {
         try {
             const lead = await Leads.findAll({
-                attributes:['token','name']
+                attributes: ['token', 'name']
             })
             return res.status(200).json(lead);
         } catch (err) {
@@ -866,8 +823,8 @@ const CarController = () => {
         const user_id = parseInt(req.query.user_id);
         try {
             const lead = await Leads.findAll({
-                attributes:['token','name'],
-                where: {user_id}
+                attributes: ['token', 'name'],
+                where: { user_id }
             })
             return res.status(200).json(lead);
         } catch (err) {
@@ -875,7 +832,6 @@ const CarController = () => {
             return res.status(500).json({ msg: err });
         }
     };
-
 
     return {
         // returning all the functions form the controller
