@@ -1037,7 +1037,7 @@ const FIController = () => {
     }
   };
 
-  const makePdf = async (req, res) => {
+  const makePdfa = async (req, res) => {
     const profile_id = req.query.profile_id;
     const loan_id = req.query.loan_id;
     const filename = req.query.filename;
