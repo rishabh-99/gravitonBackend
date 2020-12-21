@@ -428,13 +428,11 @@ const CarController = () => {
 
 
     const getUserProfileID = async (req, res) => {
+        // profile_id, name, aadhar number
         try {
-            const profileList = await UserProfile.findAll({
-                attributes: ['user_id']
-            })
-                .then(profile => profile.map(profile => profile.user_id));
+            const profileList = await sequelize.query(`SELECT user_id, related_aadhar, applicant_firstname FROM public.user_profile, public.applicant where applicant.applicant_aadhar = user_profile.related_aadhar;`)
 
-            return res.status(200).send(profileList)
+            return res.status(200).send(profileList[0])
         } catch (err) {
             return res.status(500).json({ msg: err });
         }
@@ -824,9 +822,9 @@ const CarController = () => {
     };
 
     const createLead = async (req, res) => {
-        const user_id = req.body.user_id;
-        const data = req.body.data;
-        const name = req.body.name;
+        const user_id = parseInt(req.query.user_id);
+        const data = req.body;
+        const name = req.query.name;
         try {
             await Leads.create({
                 user_id,data,name
