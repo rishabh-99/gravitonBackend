@@ -836,6 +836,23 @@ const CarController = () => {
         }
     };
 
+    const getKYCData = async (req, res) => {
+
+        try {
+            
+            
+            const q1 = await sequelize.query(`select up.user_id, ap.applicant_firstname, ukl.full_name, ukl.kyc_date, ap.applicant_mobile from 
+            (SELECT user_id, related_aadhar FROM user_profile) as up,
+             applicant as ap,
+             (select * from user_kyc_log as ukli, login as li where ukli.user_id = li.user_id) as ukl
+             where up.related_aadhar = ap.applicant_aadhar and up.related_aadhar = ukl.related_aadhar;`)
+
+            return res.status(200).send(q1[0]);
+        } catch (err) {
+            console.log(err)
+            return res.status(500).json({ msg: err });
+        }
+    };
     return {
         // returning all the functions form the controller
         register,
@@ -860,7 +877,8 @@ const CarController = () => {
         createLead,
         getLeadForToken,
         getAllLeads,
-        getLeadForUserId
+        getLeadForUserId,
+        getKYCData
     };
 };
 

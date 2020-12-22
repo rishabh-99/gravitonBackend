@@ -33,6 +33,7 @@ const privateRoutes = {
   'GET /CAR/getLeadForToken': 'CarController.getLeadForToken',
   'GET /CAR/getAllLeads': 'CarController.getAllLeads',
   'GET /CAR/getLeadForUserId': 'CarController.getLeadForUserId',
+  'GET /CAR/getKYCData': 'CarController.getKYCData',
 
   'POST /CAR/create': 'CarController.register',
   'POST /CAR/insertNewInkredoDetails': 'CarController.insertBorrowerDetails',
@@ -58,6 +59,7 @@ const privateRoutes = {
   'GET /FI/approveFI': 'FiController.approveFI',
   'GET /FI/resubmitFI': 'FiController.resubmitFI',
   'GET /FI/makePdf': 'FiController.makePdf',
+  'GET /FI/makePdfForPersonalLoan': 'FiController.makePdfForPersonalLoan',
 
   'GET /Document/getPreSignedUrl': 'FiController.getPreSignedUrlDocument',
   'GET /Document/getPreSignedUrlForRetrieval': 'FiController.getPreSignedUrlForRetrievalDocument',

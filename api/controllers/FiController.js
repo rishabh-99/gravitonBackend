@@ -1037,7 +1037,7 @@ const FIController = () => {
     }
   };
 
-  const makePdfa = async (req, res) => {
+  const makePdfForPersonalLoan = async (req, res) => {
     const profile_id = req.query.profile_id;
     const loan_id = req.query.loan_id;
     const filename = req.query.filename;
@@ -1057,8 +1057,7 @@ const FIController = () => {
         counter++;
       }
 
-      const date = new Date();
-      let schedules = profile.details_json[profile_id].loans[loanNumber].emi_schedule.EmiSchedules
+      let fi_data = JSON.parse(profile.details_json[profile_id].loans[loanNumber].fi_data)
 
       var fonts = {
         Courier: {
@@ -1078,7 +1077,7 @@ const FIController = () => {
 
 
       var dd = {
-        pageMargins: [40, 140, 40, 150],
+        pageMargins: [40, 110, 40, 60],
         pageSize: 'A4',
         header: {
 
@@ -1100,176 +1099,292 @@ const FIController = () => {
           ],
         },
         footer: function (currentPage, pageCount) {
-          if (currentPage === pageCount) {
-            return {
-              columns: [
-                { text: currentPage.toString() + ' of ' + pageCount, margin: [0, 110, 0, 0] },
 
-              ]
-            }
-          }
           return {
             columns: [
-              { text: 'Signature of the Applicant', alignment: 'left', margin: [35, 50, -100, 0] },
-              { text: currentPage.toString() + ' of ' + pageCount, margin: [0, 110, 0, 0], alignment: 'center' },
-              { text: 'Date', alignment: 'right', margin: [0, 50, 35, 0] }
+              { text: currentPage.toString() + ' of ' + pageCount, margin: [0, 0, 0, 0] },
+
             ]
           }
         },
         content: [
           {
+            columns: [
+              {
+                text: 'Field Investigation Form', style: 'leftHeader', align: 'left'
+              },
+              {
+                text: `Account Number- ${profile_id}`, style: 'leftHeader', align: 'right'
+              }
+            ]
+          },
+          {
+            text: 'Personal Loan', style: 'leftHeader'
+          },
+          '\n',
+          {
             style: 'tableExample',
             table: {
               dontBreakRows: true,
               widths: [
-                150, '*', '*'
+                105, '*', 105, '*'
               ],
               heights: 20,
               body: [
                 [
                   {
-                    text: 'Name of borrower', style: 'tableHeader'
+                    text: 'General Details', style: 'tableHeader', colSpan: 4
                   },
                   {
-                    text: `${profile.details_json[profile_id].kyc.CarJSON.applicantModel.applicant_firstname} ${profile.details_json[profile_id].kyc.CarJSON.applicantModel.applicant_lastname}`, colSpan: 2, style: 'tableContent'
+                    text: '', style: 'tableContent'
                   },
-                  {}
+                  {
+                    text: '', style: 'tableContent'
+                  },
+                  {
+                    text: '', style: 'tableContent'
+                  }
                 ],
                 [
                   {
-                    text: 'Address', style: 'tableHeader'
+                    text: 'Full Name', style: 'tableHeader'
                   },
                   {
-                    text: `${profile.details_json[profile_id].kyc.CarJSON.applicantModel.applicant_currentaddress}`, colSpan: 2, style: 'tableContent'
+                    text: `${fi_data.GeneralDetails.FullName}`, style: 'tableContent'
                   },
-                  {}
+                  {
+                    text: 'Date of Creation', style: 'tableHeader'
+                  },
+                  {
+                    text: `${fi_data.GeneralDetails.Dob}`, style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'Loan Amount', style: 'tableHeader'
+                  },
+                  {
+                    text: `${new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(fi_data.GeneralDetails.LoanAmount)}`, style: 'tableContent'
+                  },
+                  {
+                    text: 'Mobile Number', style: 'tableHeader'
+                  },
+                  {
+                    text: `${fi_data.GeneralDetails.MobileNumber}`, style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'Residence Investigation Details', style: 'tableHeader', colSpan: 4
+                  },
+                  {
+                    text: '', style: 'tableContent'
+                  },
+                  {
+                    text: '', style: 'tableContent'
+                  },
+                  {
+                    text: '', style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'Residence Address', style: 'tableHeader'
+                  },
+                  {
+                    text: `${fi_data.ResidenceInvestigationData.HouseAddress}`, colSpan: 3, style: 'tableContent'
+                  },
+                  {}, {}
+                ],
+                [
+                  {
+                    text: 'Residence Landmark', style: 'tableHeader'
+                  },
+                  {
+                    text: `${fi_data.ResidenceInvestigationData.HouseLandmark}`, colSpan: 3, style: 'tableContent'
+                  },
+                  {}, {}
+                ],
+                [
+                  {
+                    text: 'Residence Accessibility', style: 'tableHeader'
+                  },
+                  {
+                    text: `${fi_data.ResidenceInvestigationData.HomeAccesibility}`, style: 'tableContent'
+                  },
+                  {
+                    text: 'Residence Condition', style: 'tableHeader'
+                  },
+                  {
+                    text: `${fi_data.ResidenceInvestigationData.HouseConndition}`, style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'Residence Duration', style: 'tableHeader'
+                  },
+                  {
+                    text: `${fi_data.ResidenceInvestigationData.ResidenceDuration}`, style: 'tableContent'
+                  },
+                  {
+                    text: 'Address Proof', style: 'tableHeader'
+                  },
+                  {
+                    text: `${fi_data.ResidenceInvestigationData.AddressProof}`, style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'Borrower Apprearance', style: 'tableHeader'
+                  },
+                  {
+                    text: `${fi_data.ResidenceInvestigationData.BorrowerAppearence}`, style: 'tableContent'
+                  },
+                  {
+                    text: 'Locality Type', style: 'tableHeader'
+                  },
+                  {
+                    text: `${fi_data.ResidenceInvestigationData.LocalityType}`, style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'Total Family Members', style: 'tableHeader'
+                  },
+                  {
+                    text: `${fi_data.ResidenceInvestigationData.TotalFamilyNumbers}`, style: 'tableContent'
+                  },
+                  {
+                    text: 'Earning Members', style: 'tableHeader'
+                  },
+                  {
+                    text: `${fi_data.ResidenceInvestigationData.EarningMembers}`, style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'Nearest Branch', style: 'tableHeader'
+                  },
+                  {
+                    text: `${fi_data.ResidenceInvestigationData.NearestBranch}`, style: 'tableContent'
+                  },
+                  {
+                    text: 'Acquaintance Relationship', style: 'tableHeader'
+                  },
+                  {
+                    text: `${fi_data.ResidenceInvestigationData.AcquaintanceRelationship}`, style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'Acquaintance Name', style: 'tableHeader'
+                  },
+                  {
+                    text: `${fi_data.ResidenceInvestigationData.AcquaintanceName}`, style: 'tableContent'
+                  },
+                  {
+                    text: 'Acquaintance Phone', style: 'tableHeader'
+                  },
+                  {
+                    text: `${fi_data.ResidenceInvestigationData.AcquaintancePhone}`, style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'Workplace Investigation Details', style: 'tableHeader', colSpan: 4
+                  },
+                  {
+                    text: '', style: 'tableContent'
+                  },
+                  {
+                    text: '', style: 'tableContent'
+                  },
+                  {
+                    text: '', style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'Employer Name', style: 'tableHeader'
+                  },
+                  {
+                    text: `${fi_data.WorkplaceInvestigationData.EmployerName}`, colSpan: 3, style: 'tableContent'
+                  }, {}, {}
                 ],
                 [
                   {
                     text: 'Office Address', style: 'tableHeader'
                   },
                   {
-                    text: `${profile.details_json[profile_id].kyc.CarJSON.applicantModel.applicant_officeaddress}`, colSpan: 2, style: 'tableContent'
-                  },
-                  {}
+                    text: `${fi_data.WorkplaceInvestigationData.OfficeAddress}`, colSpan: 3, style: 'tableContent'
+                  }, {}, {}
                 ],
                 [
+                  {
+                    text: 'Office Landmark', style: 'tableHeader'
+                  },
+                  {
+                    text: `${fi_data.WorkplaceInvestigationData.OfficeLandmark}`, colSpan: 3, style: 'tableContent'
+                  }, {}, {}
+                ],
+                [
+                  {
+                    text: 'Designation', style: 'tableHeader'
+                  },
+                  {
+                    text: `${fi_data.WorkplaceInvestigationData.Designation}`, style: 'tableContent'
+                  },
+                  {
+                    text: 'Job Duration', style: 'tableHeader'
+                  },
+                  {
+                    text: `${fi_data.WorkplaceInvestigationData.JobDuration}`, style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'Inhand Salary', style: 'tableHeader'
+                  },
+                  {
+                    text: `${new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(fi_data.WorkplaceInvestigationData.InHandSalary)}`, style: 'tableContent'
+                  },
+                  {
+                    text: 'Office Accessibility', style: 'tableHeader'
+                  },
+                  {
+                    text: `${fi_data.WorkplaceInvestigationData.OfficeAccesibility}`, style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'Office Condition', style: 'tableHeader'
+                  },
+                  {
+                    text: `${fi_data.WorkplaceInvestigationData.OfficeCondition}`, colSpan: 3, style: 'tableContent'
+                  },
                   {
                     text: '', style: 'tableHeader'
                   },
                   {
-                    text: '', style: 'tableContent'
-                  },
-                  {
-                    text: '', style: 'tableContent'
+                    text: ``, style: 'tableContent'
                   }
                 ],
                 [
                   {
-                    text: 'Mobile', style: 'tableHeader'
+                    text: 'Remarks', style: 'tableHeader'
                   },
                   {
-                    text: 'Loan Amount', style: 'tableHeader'
+                    text: `${fi_data.WorkplaceInvestigationData.Remarks}`, colSpan: 3, style: 'tableContent'
                   },
                   {
-                    text: 'EMI Amount', style: 'tableHeader'
+                    text: '', style: 'tableHeader'
+                  },
+                  {
+                    text: ``, style: 'tableContent'
                   }
-                ],
-                [
-                  {
-                    text: `${profile.details_json[profile_id].kyc.CarJSON.applicantModel.applicant_mobile}`, style: 'tableContent'
-                  },
-                  {
-                    text: `${profile.details_json[profile_id].loans[loanNumber].emi_schedule.TotalAmount}`, style: 'tableContent'
-                  },
-                  {
-                    text: `${profile.details_json[profile_id].loans[loanNumber].emi_schedule.MonthlyEmi}`, style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'Loan Account Number', style: 'tableHeader'
-                  },
-                  {
-                    text: `${profile_id}`, colSpan: 2, style: 'tableContent'
-                  },
-                  {}
-                ],
-                [
-                  {
-                    text: 'Loan EMI Schedule', style: 'tableHeader', colSpan: 3
-                  },
-                  {
-                    text: '', style: 'tableContent'
-                  },
-                  {
-                    text: '', style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'EMI Counter', style: 'tableHeader'
-                  },
-                  {
-                    text: 'Date', style: 'tableHeader'
-                  },
-                  {
-                    text: 'EMI Amount', style: 'tableHeader'
-                  }
-                ],
+                ]
               ]
             },
-          },
-          '\n',
-          '\n',
-          '\n',
-          '\n',
-          {
-            unbreakable: true,
-            stack: [
-              { text: 'Terms & Condition', style: 'leftHeader' },
-              {
-                ol: [
-                  { text: 'I understand the terms & conditions of the loan.', margin: [0, 5, 0, 5] },
-                  { text: 'I will deposit the EMI before or as per the Schedule mentioned above.', margin: [0, 0, 0, 5] },
-                  { text: 'Cheque Bounce Charges per presentation is ₹400.', margin: [0, 0, 0, 5] },
-                  { text: 'EMI/ Cash Pick up charges are applicable and are ₹350.', margin: [0, 0, 0, 5] },
-                  { text: 'Late Payment Fee is applicable and is ₹300.', margin: [0, 0, 0, 5] },
-                  { text: 'No Objection certificate fee is ₹350.', margin: [0, 0, 0, 5] },
-                ],
-                style: 'leftData'
-              },
-              '\n',
-              '\n',
-              { text: 'नियम एवं शर्तें', style: 'leftHeaderHindi' },
-              {
-                ol: [
-                  { text: 'मैं ऋण के नियमों और शर्तों को समझता हूं।', margin: [0, 5, 0, 5] },
-                  { text: 'मैं ऊपर उल्लिखित अनुसूची के अनुसार या पहले ईएमआई जमा करूंगा।', margin: [0, 0, 0, 5] },
-                  { text: 'चेक बाउंस शुल्क आरएस ₹400 प्रति प्रस्तुति हैं।', margin: [0, 0, 0, 5] },
-                  { text: 'कैश ईएमआई या कैश पिकअप शुल्क लागू हैं और ₹400 हैं।', margin: [0, 0, 0, 5] },
-                  { text: 'लेट पेमेंट शुल्क लागू है और ₹300 है।', margin: [0, 0, 0, 5] },
-                  { text: '₹350 के शुल्क का भुगतान करने के बाद नो ऑब्जेक्शन सर्टिफिकेट जारी किया जाएगा।', margin: [0, 0, 0, 5] },
-                ],
-                style: 'leftDataHindi'
-              },
-              '\n',
-              '\n',
-              '\n',
-              '\n',
-              '\n',
-              '\n',
-
-              {
-
-                columns: [
-                  {
-                    text: 'Signature of the Applicant', alignment: 'left'
-                  },
-                  { text: 'Date', alignment: 'right' }
-                ]
-              },
-            ]
           }
         ],
         styles: {
@@ -1358,20 +1473,7 @@ const FIController = () => {
         }
       }
 
-      for (let schedule of schedules) {
-        dd.content[0].table.body.push([
-          {
-            text: `${schedule.Id}`, style: 'tableContent'
-          },
-          {
-            text: `${schedule.Date}`, style: 'tableContent'
-          },
-          {
-            text: `${schedule['EMI']}`, style: 'tableContent'
-          }
-        ])
 
-      }
       const pdfBuffer = await new Promise(resolve => {
         const pdfMake = printer.createPdfKitDocument(dd);
 
@@ -1440,7 +1542,8 @@ const FIController = () => {
     approveDocument,
     resubmitDocument,
     resubmitFI,
-    makePdf
+    makePdf,
+    makePdfForPersonalLoan
   };
 };
 
