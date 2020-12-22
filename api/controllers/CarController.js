@@ -853,6 +853,26 @@ const CarController = () => {
             return res.status(500).json({ msg: err });
         }
     };
+
+    const deleteLead = async (req, res) => {
+
+        const token = parseInt(req.query.token);
+        try {
+            
+            
+             await Leads.destroy({
+                 where:{
+                     token
+                 }
+             })
+
+            return res.status(200).send({msg:'Operation successful'});
+        } catch (err) {
+            console.log(err)
+            return res.status(500).json({ msg: err });
+        }
+    };
+    
     return {
         // returning all the functions form the controller
         register,
@@ -878,7 +898,8 @@ const CarController = () => {
         getLeadForToken,
         getAllLeads,
         getLeadForUserId,
-        getKYCData
+        getKYCData,
+        deleteLead
     };
 };
 

@@ -1127,7 +1127,7 @@ const FIController = () => {
             table: {
               dontBreakRows: true,
               widths: [
-                105, '*', 105, '*'
+                105, 135, 105, 135
               ],
               heights: 20,
               body: [
@@ -1611,7 +1611,7 @@ const FIController = () => {
             table: {
               dontBreakRows: true,
               widths: [
-                105, '*', 105,'*'
+                105, 135, 105, 135
               ],
               heights: 20,
               body: [
