@@ -35,8 +35,9 @@ const privateRoutes = {
   'GET /CAR/getLeadForUserId': 'CarController.getLeadForUserId',
   'GET /CAR/getKYCData': 'CarController.getKYCData',
   'GET /CAR/deleteLead': 'CarController.deleteLead',
-  'GET /CAR/deleteLead': 'CarController.deleteLead',
+  'GET /CAR/getListOfProfileIdForUser': 'CarController.getListOfProfileIdForUser',
   'GET /CAR/getAdminPanelDataForUser': 'CarController.getAdminPanelDataForUser',
+  'GET /CAR/getKYCDataForUserId': 'CarController.getKYCDataForUserId',
 
   'POST /CAR/create': 'CarController.register',
   'POST /CAR/insertNewInkredoDetails': 'CarController.insertBorrowerDetails',

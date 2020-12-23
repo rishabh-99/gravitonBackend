@@ -190,7 +190,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/my-express-application/dev/1608709713422-2020-12-23T07:48:33.422Z/my-express-application.zip"
+                "S3Key": "serverless/my-express-application/dev/1608746927141-2020-12-23T18:08:47.141Z/my-express-application.zip"
               },
               "FunctionName": "my-express-application-dev-app",
               "Handler": "./api/api.handler",
@@ -216,14 +216,14 @@
               "AppLogGroup"
             ]
           },
-          "AppLambdaVersionJr83o8zbAY15Iq8zkjQlSvbURYNgiYjfYIzhjfAnU": {
+          "AppLambdaVersionYAmZtIDlFiifsJ5eZ0ccsv4lGUroa6YfcaQTWtJX3M": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "AppLambdaFunction"
               },
-              "CodeSha256": "UoNGXVnHofP9p7XBdHa4Jvg+wgwSWnHqcmMFbS7N7MI="
+              "CodeSha256": "408rbrRlGkMdLG8BB+vZzpG1WJEbIGXem8bGPS1CKMk="
             }
           },
           "ApiGatewayRestApi": {
@@ -342,7 +342,7 @@
               "MethodResponses": []
             }
           },
-          "ApiGatewayDeployment1608709687194": {
+          "ApiGatewayDeployment1608746901483": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -456,7 +456,7 @@
           "AppLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "AppLambdaVersionJr83o8zbAY15Iq8zkjQlSvbURYNgiYjfYIzhjfAnU"
+              "Ref": "AppLambdaVersionYAmZtIDlFiifsJ5eZ0ccsv4lGUroa6YfcaQTWtJX3M"
             }
           },
           "ServiceEndpoint": {
@@ -574,7 +574,7 @@
         "timeout": 6,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "AppLambdaVersionJr83o8zbAY15Iq8zkjQlSvbURYNgiYjfYIzhjfAnU"
+        "versionLogicalId": "AppLambdaVersionYAmZtIDlFiifsJ5eZ0ccsv4lGUroa6YfcaQTWtJX3M"
       }
     },
     "resources": {
@@ -689,7 +689,7 @@
     "artifact": "C:\\Users\\mehro\\OneDrive\\Desktop\\gravitonBackend\\.serverless\\my-express-application.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/my-express-application/dev/1608709713422-2020-12-23T07:48:33.422Z",
+    "artifactDirectoryName": "serverless/my-express-application/dev/1608746927141-2020-12-23T18:08:47.141Z",
     "artifact": "my-express-application.zip"
   }
 }
