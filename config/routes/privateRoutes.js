@@ -62,6 +62,7 @@ const privateRoutes = {
   'GET /FI/makePdf': 'FiController.makePdf',
   'GET /FI/makePdfForPersonalLoan': 'FiController.makePdfForPersonalLoan',
   'GET /FI/makePdfForAutoLoan': 'FiController.makePdfForAutoLoan',
+  'GET /FI/makePdfForKYC': 'FiController.makePdfForKYC',
 
   'GET /Document/getPreSignedUrl': 'FiController.getPreSignedUrlDocument',
   'GET /Document/getPreSignedUrlForRetrieval': 'FiController.getPreSignedUrlForRetrievalDocument',

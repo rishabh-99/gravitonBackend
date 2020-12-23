@@ -7,6 +7,7 @@ logs: 07/10/2020 - Added joi validation
 const FI = require('../models/Fi');
 const pdfmake = require('pdfmake')
 const fs = require('fs');
+const moment = require('moment')
 const { parse, stringify } = require('flatted');
 
 // importing the database confifurations from the datavbase folder 
@@ -1559,494 +1560,12 @@ const FIController = () => {
       };
       var printer = new pdfmake(fonts);
 
-      if(fi_data.VehicleInvestigationData.FinanceType !== 'Cash'){
-      var dd = {
-        pageMargins: [40, 120, 40, 60],
-        pageSize: 'A4',
-        header: {
-
-          columns: [
-            {
-              stack: ['\n',
-                {
-                  text: 'Navya Enterprises', style: 'header'
-                },
-                {
-                  text: 'Prop Neel Sarin', style: 'content'
-                },
-                {
-                  text: '70/144 Patel Marg, Mansrovar Jaipur', style: 'content'
-                },
-              ]
-            }
-
-          ],
-        },
-        footer: function (currentPage, pageCount) {
-          
-            return {
-              columns: [
-                { text: currentPage.toString() + ' of ' + pageCount, margin: [0, 20, 0, 0] },
-
-              ]
-            }
-        },
-        content: [ 
-          {
-            columns: [
-              {
-                text: 'Field Investigation Form', style: 'leftHeader', align: 'left'
-              },
-              {
-                text: `Account Number- ${profile_id}`, style: 'leftHeader', align: 'right'
-              }
-            ]
-          },
-          {
-              text:'Auto Loan', style:'leftHeader'
-          },
-          '\n',
-          { 
-            style: 'tableExample',
-            table: {
-              dontBreakRows: true,
-              widths: [
-                105, 135, 105, 135
-              ],
-              heights: 20,
-              body: [
-                  [
-                  {
-                    text: 'General Details', style: 'tableHeader', colSpan: 4
-                  },
-                  {
-                    text: '', style: 'tableContent'
-                  },
-                  {
-                    text: '', style: 'tableContent'
-                  },
-                  {
-                    text: '', style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'Full Name', style: 'tableHeader'
-                  },
-                  {
-                    text: `${fi_data.GeneralDetails.FullName}`, style: 'tableContent'
-                  },
-                  {
-                    text: 'Date of Creation', style: 'tableHeader' 
-                  },
-                  {
-                    text: `${fi_data.GeneralDetails.Dob}`, style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'Loan Amount', style: 'tableHeader'
-                  },
-                  {
-                    text: `${new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(fi_data.GeneralDetails.LoanAmount)}`, style: 'tableContent'
-                  },
-                  {
-                    text: 'Mobile Number', style: 'tableHeader' 
-                  },
-                  {
-                    text: `${fi_data.GeneralDetails.MobileNumber}`, style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'Residence Investigation Details', style: 'tableHeader', colSpan: 4
-                  },
-                  {
-                    text: '', style: 'tableContent'
-                  },
-                  {
-                    text: '', style: 'tableContent'
-                  },
-                  {
-                    text: '', style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'Residence Address', style: 'tableHeader'
-                  },
-                  {
-                    text: `${fi_data.ResidenceInvestigationData.HouseAddress}`, colSpan: 3, style: 'tableContent'
-                  },
-                  {},{}
-                ],
-                [
-                  {
-                    text: 'Residence Landmark', style: 'tableHeader'
-                  },
-                  {
-                    text: `${fi_data.ResidenceInvestigationData.HouseLandmark}`, colSpan: 3, style: 'tableContent'
-                  },
-                  {},{}
-                ],
-                [
-                  {
-                    text: 'Residence Accessibility', style: 'tableHeader'
-                  },
-                  {
-                    text: `${fi_data.ResidenceInvestigationData.HomeAccesibility}`, style: 'tableContent'
-                  },
-                  {
-                    text: 'Residence Condition', style: 'tableHeader' 
-                  },
-                  {
-                    text: `${fi_data.ResidenceInvestigationData.HouseConndition}`, style: 'tableContent'
-                  }
-                ],
-                [
-                   {
-                    text: 'Locality Type', style: 'tableHeader' 
-                  },
-                  {
-                    text: `${fi_data.ResidenceInvestigationData.LocalityType}`, style: 'tableContent'
-                  },
-                  {
-                    text: 'Address Proof', style: 'tableHeader' 
-                  },
-                  {
-                    text: `${fi_data.ResidenceInvestigationData.AddressProof}`, style: 'tableContent'
-                  }
-                ],
-                
-                [
-                  {
-                    text: 'Total Family Members', style: 'tableHeader'
-                  },
-                  {
-                    text: `${fi_data.ResidenceInvestigationData.TotalFamilyNumbers}`, style: 'tableContent'
-                  },
-                  {
-                    text: 'Earning Members', style: 'tableHeader' 
-                  },
-                  {
-                    text: `${fi_data.ResidenceInvestigationData.EarningMembers}`, style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'Acquaintance Name', style: 'tableHeader'
-                  },
-                  {
-                    text: `${fi_data.ResidenceInvestigationData.AcquaintanceName}`, style: 'tableContent'
-                  },
-                  {
-                    text: 'Acquaintance Phone', style: 'tableHeader' 
-                  },
-                  {
-                    text: `${fi_data.ResidenceInvestigationData.AcquaintancePhone}`, style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'Workplace Investigation Details', style: 'tableHeader', colSpan: 4
-                  },
-                  {
-                    text: '', style: 'tableContent'
-                  },
-                  {
-                    text: '', style: 'tableContent'
-                  },
-                  {
-                    text: '', style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'Employer Name', style: 'tableHeader'
-                  },
-                  {
-                    text: `${fi_data.WorkplaceInvestigationData.EmployerName}`, colSpan: 3, style: 'tableContent'
-                  },{},{}
-                ],
-                [
-                  {
-                    text: 'Office Address', style: 'tableHeader'
-                  },
-                  {
-                    text: `${fi_data.WorkplaceInvestigationData.OfficeAddress}`, colSpan: 3, style: 'tableContent'
-                  },{},{}
-                ],
-                [
-                  {
-                    text: 'Office Landmark', style: 'tableHeader'
-                  },
-                  {
-                    text: `${fi_data.WorkplaceInvestigationData.OfficeLandmark}`, colSpan: 3, style: 'tableContent'
-                  },{},{}
-                ],
-                [
-                  {
-                    text: 'Designation', style: 'tableHeader'
-                  },
-                  {
-                    text: `${fi_data.WorkplaceInvestigationData.Designation}`, style: 'tableContent'
-                  },
-                  {
-                    text: 'Job Duration', style: 'tableHeader' 
-                  },
-                  {
-                    text: `${fi_data.WorkplaceInvestigationData.JobDuration}`, style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'Inhand Salary', style: 'tableHeader'
-                  },
-                  {
-                    text: `${new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(fi_data.WorkplaceInvestigationData.InHandSalary)}`, style: 'tableContent'
-                  },
-                  {
-                    text: 'Office Accessibility', style: 'tableHeader' 
-                  },
-                  {
-                    text: `${fi_data.WorkplaceInvestigationData.OfficeAccesibility}`, style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'Office Condition', style: 'tableHeader'
-                  },
-                  {
-                    text: `${fi_data.WorkplaceInvestigationData.OfficeCondition}`,colSpan:3 ,style: 'tableContent'
-                  },
-                  {
-                    text: '', style: 'tableHeader' 
-                  },
-                  {
-                    text: ``, style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'Vehicle Investigation Details', style: 'tableHeader', colSpan: 4
-                  },
-                  {
-                    text: '', style: 'tableContent'
-                  },
-                  {
-                    text: '', style: 'tableContent'
-                  },
-                  {
-                    text: '', style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'Vehicle Number', style: 'tableHeader'
-                  },
-                  {
-                    text: `${fi_data.VehicleInvestigationData.VehicleNumber}`, style: 'tableContent'
-                  },
-                  {
-                    text: 'Vehicle Brand', style: 'tableHeader' 
-                  },
-                  {
-                    text: `${fi_data.VehicleInvestigationData.VehicleBrand}`, style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'Vehicle Model', style: 'tableHeader'
-                  },
-                  {
-                    text: `${fi_data.VehicleInvestigationData.VehicleModel}`, style: 'tableContent'
-                  },
-                  {
-                    text: 'Odometer Reading', style: 'tableHeader' 
-                  },
-                  {
-                    text: `${fi_data.VehicleInvestigationData.OdometerReading}`, style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'Chassis Number', style: 'tableHeader'
-                  },
-                  {
-                    text: `${fi_data.VehicleInvestigationData.ChasisNumber}`, style: 'tableContent'
-                  },
-                  {
-                    text: 'Engine Number', style: 'tableHeader' 
-                  },
-                  {
-                    text: `${fi_data.VehicleInvestigationData.RegistrationNumber}`, style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'Finance Type', style: 'tableHeader'
-                  },
-                  {
-                    text: `${fi_data.VehicleInvestigationData.FinanceType}`, style: 'tableContent'
-                  },
-                  {
-                    text: 'Financed From', style: 'tableHeader' 
-                  },
-                  {
-                    text: `${fi_data.VehicleInvestigationData.FinancedForm}`, style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'NOC Availability', style: 'tableHeader'
-                  },
-                  {
-                    text: `${fi_data.VehicleInvestigationData.NOCAvailibility}`, style: 'tableContent'
-                  },
-                  {
-                    text: 'Vehicle Valuation', style: 'tableHeader' 
-                  },
-                  {
-                    text: `${new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(fi_data.VehicleInvestigationData.VehicleValuation)}`, style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'Finance Capability', style: 'tableHeader'
-                  },
-                  {
-                    text: `${new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(fi_data.VehicleInvestigationData.FinanceCapability)}`, style: 'tableContent'
-                  },
-                  {
-                    text: 'Loan Amount Required', style: 'tableHeader' 
-                  },
-                  {
-                    text: `${fi_data.VehicleInvestigationData.LoanAmountRequired}`, style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'Physical Condition', style: 'tableHeader'
-                  },
-                  {
-                    text: `${fi_data.VehicleInvestigationData.PhysicalCondition}`, style: 'tableContent'
-                  },
-                  {
-                    text: 'Ride Quality', style: 'tableHeader' 
-                  },
-                  {
-                    text: `${fi_data.VehicleInvestigationData.RideQuality}`, style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'Remarks', style: 'tableHeader'
-                  },
-                  {
-                    text: `${fi_data.VehicleInvestigationData.Remarks}`,colSpan:3 ,style: 'tableContent'
-                  },
-                  {
-                    text: '', style: 'tableHeader' 
-                  },
-                  {
-                    text: ``, style: 'tableContent'
-                  }
-                ]
-              ]
-            },
-          }
-        ],
-        styles: {
-          leftHeader: {
-            alignment: 'left',
-            fontSize: 13,
-            bold: true
-          },
-          leftData: {
-            alignment: 'left',
-            fontSize: 10,
-            lineHeight: 1.5,
-            margin: [15, 0, 0, 0]
-          },
-          leftHeaderHindi: {
-            alignment: 'left',
-            fontSize: 10,
-            bold: true,
-            font: 'Glegoo'
-          },
-          leftDataHindi: {
-            alignment: 'left',
-            fontSize: 10,
-            lineHeight: 1.15,
-            margin: [15, 0, 0, 0],
-            font: 'Glegoo'
-          },
-          header: {
-            fontSize: 28,
-            // 			bold: true,
-            margin: [
-              0,
-              0,
-              0,
-              10
-            ]
-          },
-          content: {
-            fontSize: 12,
-            margin: [
-              0,
-              0,
-              0,
-              4
-            ]
-          },
-          subheader: {
-            fontSize: 16,
-            bold: true,
-            margin: [
-              0,
-              10,
-              0,
-              5
-            ]
-          },
-          tableExample: {
-            margin: [
-              0,
-              5,
-              0,
-              5
-            ],
-            width: 400
-          },
-          tableHeader: {
-            bold: true,
-            fontSize: 8.5,
-            color: 'black',
-            margin: [
-              0,
-              5
-            ]
-          },
-          tableContent: {
-            fontSize: 9,
-            margin: [
-              0,
-              5
-            ]
-          }
-        },
-        defaultStyle: {
-          alignment: 'center',
-          font: 'Courier'
-        }
-      }}
-      else {
+      if (fi_data.VehicleInvestigationData.FinanceType !== 'Cash') {
         var dd = {
           pageMargins: [40, 120, 40, 60],
           pageSize: 'A4',
           header: {
-  
+
             columns: [
               {
                 stack: ['\n',
@@ -2061,19 +1580,19 @@ const FIController = () => {
                   },
                 ]
               }
-  
+
             ],
           },
           footer: function (currentPage, pageCount) {
-            
-              return {
-                columns: [
-                  { text: currentPage.toString() + ' of ' + pageCount, margin: [0, 20, 0, 0] },
-  
-                ]
-              }
+
+            return {
+              columns: [
+                { text: currentPage.toString() + ' of ' + pageCount, margin: [0, 20, 0, 0] },
+
+              ]
+            }
           },
-          content: [ 
+          content: [
             {
               columns: [
                 {
@@ -2085,19 +1604,19 @@ const FIController = () => {
               ]
             },
             {
-                text:'Auto Loan', style:'leftHeader'
+              text: 'Auto Loan', style: 'leftHeader'
             },
             '\n',
-            { 
+            {
               style: 'tableExample',
               table: {
                 dontBreakRows: true,
                 widths: [
-                  105, '*', 105,'*'
+                  105, 135, 105, 135
                 ],
                 heights: 20,
                 body: [
-                    [
+                  [
                     {
                       text: 'General Details', style: 'tableHeader', colSpan: 4
                     },
@@ -2119,7 +1638,7 @@ const FIController = () => {
                       text: `${fi_data.GeneralDetails.FullName}`, style: 'tableContent'
                     },
                     {
-                      text: 'Date of Creation', style: 'tableHeader' 
+                      text: 'Date of Creation', style: 'tableHeader'
                     },
                     {
                       text: `${fi_data.GeneralDetails.Dob}`, style: 'tableContent'
@@ -2133,7 +1652,7 @@ const FIController = () => {
                       text: `${new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(fi_data.GeneralDetails.LoanAmount)}`, style: 'tableContent'
                     },
                     {
-                      text: 'Mobile Number', style: 'tableHeader' 
+                      text: 'Mobile Number', style: 'tableHeader'
                     },
                     {
                       text: `${fi_data.GeneralDetails.MobileNumber}`, style: 'tableContent'
@@ -2160,7 +1679,7 @@ const FIController = () => {
                     {
                       text: `${fi_data.ResidenceInvestigationData.HouseAddress}`, colSpan: 3, style: 'tableContent'
                     },
-                    {},{}
+                    {}, {}
                   ],
                   [
                     {
@@ -2169,7 +1688,7 @@ const FIController = () => {
                     {
                       text: `${fi_data.ResidenceInvestigationData.HouseLandmark}`, colSpan: 3, style: 'tableContent'
                     },
-                    {},{}
+                    {}, {}
                   ],
                   [
                     {
@@ -2179,27 +1698,27 @@ const FIController = () => {
                       text: `${fi_data.ResidenceInvestigationData.HomeAccesibility}`, style: 'tableContent'
                     },
                     {
-                      text: 'Residence Condition', style: 'tableHeader' 
+                      text: 'Residence Condition', style: 'tableHeader'
                     },
                     {
                       text: `${fi_data.ResidenceInvestigationData.HouseConndition}`, style: 'tableContent'
                     }
                   ],
                   [
-                     {
-                      text: 'Locality Type', style: 'tableHeader' 
+                    {
+                      text: 'Locality Type', style: 'tableHeader'
                     },
                     {
                       text: `${fi_data.ResidenceInvestigationData.LocalityType}`, style: 'tableContent'
                     },
                     {
-                      text: 'Address Proof', style: 'tableHeader' 
+                      text: 'Address Proof', style: 'tableHeader'
                     },
                     {
                       text: `${fi_data.ResidenceInvestigationData.AddressProof}`, style: 'tableContent'
                     }
                   ],
-                  
+
                   [
                     {
                       text: 'Total Family Members', style: 'tableHeader'
@@ -2208,7 +1727,7 @@ const FIController = () => {
                       text: `${fi_data.ResidenceInvestigationData.TotalFamilyNumbers}`, style: 'tableContent'
                     },
                     {
-                      text: 'Earning Members', style: 'tableHeader' 
+                      text: 'Earning Members', style: 'tableHeader'
                     },
                     {
                       text: `${fi_data.ResidenceInvestigationData.EarningMembers}`, style: 'tableContent'
@@ -2222,7 +1741,7 @@ const FIController = () => {
                       text: `${fi_data.ResidenceInvestigationData.AcquaintanceName}`, style: 'tableContent'
                     },
                     {
-                      text: 'Acquaintance Phone', style: 'tableHeader' 
+                      text: 'Acquaintance Phone', style: 'tableHeader'
                     },
                     {
                       text: `${fi_data.ResidenceInvestigationData.AcquaintancePhone}`, style: 'tableContent'
@@ -2248,7 +1767,7 @@ const FIController = () => {
                     },
                     {
                       text: `${fi_data.WorkplaceInvestigationData.EmployerName}`, colSpan: 3, style: 'tableContent'
-                    },{},{}
+                    }, {}, {}
                   ],
                   [
                     {
@@ -2256,7 +1775,7 @@ const FIController = () => {
                     },
                     {
                       text: `${fi_data.WorkplaceInvestigationData.OfficeAddress}`, colSpan: 3, style: 'tableContent'
-                    },{},{}
+                    }, {}, {}
                   ],
                   [
                     {
@@ -2264,7 +1783,7 @@ const FIController = () => {
                     },
                     {
                       text: `${fi_data.WorkplaceInvestigationData.OfficeLandmark}`, colSpan: 3, style: 'tableContent'
-                    },{},{}
+                    }, {}, {}
                   ],
                   [
                     {
@@ -2274,7 +1793,7 @@ const FIController = () => {
                       text: `${fi_data.WorkplaceInvestigationData.Designation}`, style: 'tableContent'
                     },
                     {
-                      text: 'Job Duration', style: 'tableHeader' 
+                      text: 'Job Duration', style: 'tableHeader'
                     },
                     {
                       text: `${fi_data.WorkplaceInvestigationData.JobDuration}`, style: 'tableContent'
@@ -2288,7 +1807,7 @@ const FIController = () => {
                       text: `${new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(fi_data.WorkplaceInvestigationData.InHandSalary)}`, style: 'tableContent'
                     },
                     {
-                      text: 'Office Accessibility', style: 'tableHeader' 
+                      text: 'Office Accessibility', style: 'tableHeader'
                     },
                     {
                       text: `${fi_data.WorkplaceInvestigationData.OfficeAccesibility}`, style: 'tableContent'
@@ -2299,10 +1818,10 @@ const FIController = () => {
                       text: 'Office Condition', style: 'tableHeader'
                     },
                     {
-                      text: `${fi_data.WorkplaceInvestigationData.OfficeCondition}`,colSpan:3 ,style: 'tableContent'
+                      text: `${fi_data.WorkplaceInvestigationData.OfficeCondition}`, colSpan: 3, style: 'tableContent'
                     },
                     {
-                      text: '', style: 'tableHeader' 
+                      text: '', style: 'tableHeader'
                     },
                     {
                       text: ``, style: 'tableContent'
@@ -2330,7 +1849,7 @@ const FIController = () => {
                       text: `${fi_data.VehicleInvestigationData.VehicleNumber}`, style: 'tableContent'
                     },
                     {
-                      text: 'Vehicle Brand', style: 'tableHeader' 
+                      text: 'Vehicle Brand', style: 'tableHeader'
                     },
                     {
                       text: `${fi_data.VehicleInvestigationData.VehicleBrand}`, style: 'tableContent'
@@ -2344,7 +1863,7 @@ const FIController = () => {
                       text: `${fi_data.VehicleInvestigationData.VehicleModel}`, style: 'tableContent'
                     },
                     {
-                      text: 'Odometer Reading', style: 'tableHeader' 
+                      text: 'Odometer Reading', style: 'tableHeader'
                     },
                     {
                       text: `${fi_data.VehicleInvestigationData.OdometerReading}`, style: 'tableContent'
@@ -2358,7 +1877,7 @@ const FIController = () => {
                       text: `${fi_data.VehicleInvestigationData.ChasisNumber}`, style: 'tableContent'
                     },
                     {
-                      text: 'Engine Number', style: 'tableHeader' 
+                      text: 'Engine Number', style: 'tableHeader'
                     },
                     {
                       text: `${fi_data.VehicleInvestigationData.RegistrationNumber}`, style: 'tableContent'
@@ -2372,12 +1891,25 @@ const FIController = () => {
                       text: `${fi_data.VehicleInvestigationData.FinanceType}`, style: 'tableContent'
                     },
                     {
-                      text: 'Vehicle Valuation', style: 'tableHeader' 
+                      text: 'Financed From', style: 'tableHeader'
+                    },
+                    {
+                      text: `${fi_data.VehicleInvestigationData.FinancedForm}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'NOC Availability', style: 'tableHeader'
+                    },
+                    {
+                      text: `${fi_data.VehicleInvestigationData.NOCAvailibility}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Vehicle Valuation', style: 'tableHeader'
                     },
                     {
                       text: `${new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(fi_data.VehicleInvestigationData.VehicleValuation)}`, style: 'tableContent'
                     }
-                    
                   ],
                   [
                     {
@@ -2387,7 +1919,7 @@ const FIController = () => {
                       text: `${new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(fi_data.VehicleInvestigationData.FinanceCapability)}`, style: 'tableContent'
                     },
                     {
-                      text: 'Loan Amount Required', style: 'tableHeader' 
+                      text: 'Loan Amount Required', style: 'tableHeader'
                     },
                     {
                       text: `${fi_data.VehicleInvestigationData.LoanAmountRequired}`, style: 'tableContent'
@@ -2401,7 +1933,7 @@ const FIController = () => {
                       text: `${fi_data.VehicleInvestigationData.PhysicalCondition}`, style: 'tableContent'
                     },
                     {
-                      text: 'Ride Quality', style: 'tableHeader' 
+                      text: 'Ride Quality', style: 'tableHeader'
                     },
                     {
                       text: `${fi_data.VehicleInvestigationData.RideQuality}`, style: 'tableContent'
@@ -2412,10 +1944,480 @@ const FIController = () => {
                       text: 'Remarks', style: 'tableHeader'
                     },
                     {
-                      text: `${fi_data.VehicleInvestigationData.Remarks}`,colSpan:3 ,style: 'tableContent'
+                      text: `${fi_data.VehicleInvestigationData.Remarks}`, colSpan: 3, style: 'tableContent'
                     },
                     {
-                      text: '', style: 'tableHeader' 
+                      text: '', style: 'tableHeader'
+                    },
+                    {
+                      text: ``, style: 'tableContent'
+                    }
+                  ]
+                ]
+              },
+            }
+          ],
+          styles: {
+            leftHeader: {
+              alignment: 'left',
+              fontSize: 13,
+              bold: true
+            },
+            leftData: {
+              alignment: 'left',
+              fontSize: 10,
+              lineHeight: 1.5,
+              margin: [15, 0, 0, 0]
+            },
+            leftHeaderHindi: {
+              alignment: 'left',
+              fontSize: 10,
+              bold: true,
+              font: 'Glegoo'
+            },
+            leftDataHindi: {
+              alignment: 'left',
+              fontSize: 10,
+              lineHeight: 1.15,
+              margin: [15, 0, 0, 0],
+              font: 'Glegoo'
+            },
+            header: {
+              fontSize: 28,
+              // 			bold: true,
+              margin: [
+                0,
+                0,
+                0,
+                10
+              ]
+            },
+            content: {
+              fontSize: 12,
+              margin: [
+                0,
+                0,
+                0,
+                4
+              ]
+            },
+            subheader: {
+              fontSize: 16,
+              bold: true,
+              margin: [
+                0,
+                10,
+                0,
+                5
+              ]
+            },
+            tableExample: {
+              margin: [
+                0,
+                5,
+                0,
+                5
+              ],
+              width: 400
+            },
+            tableHeader: {
+              bold: true,
+              fontSize: 8.5,
+              color: 'black',
+              margin: [
+                0,
+                5
+              ]
+            },
+            tableContent: {
+              fontSize: 9,
+              margin: [
+                0,
+                5
+              ]
+            }
+          },
+          defaultStyle: {
+            alignment: 'center',
+            font: 'Courier'
+          }
+        }
+      }
+      else {
+        var dd = {
+          pageMargins: [40, 120, 40, 60],
+          pageSize: 'A4',
+          header: {
+
+            columns: [
+              {
+                stack: ['\n',
+                  {
+                    text: 'Navya Enterprises', style: 'header'
+                  },
+                  {
+                    text: 'Prop Neel Sarin', style: 'content'
+                  },
+                  {
+                    text: '70/144 Patel Marg, Mansrovar Jaipur', style: 'content'
+                  },
+                ]
+              }
+
+            ],
+          },
+          footer: function (currentPage, pageCount) {
+
+            return {
+              columns: [
+                { text: currentPage.toString() + ' of ' + pageCount, margin: [0, 20, 0, 0] },
+
+              ]
+            }
+          },
+          content: [
+            {
+              columns: [
+                {
+                  text: 'Field Investigation Form', style: 'leftHeader', align: 'left'
+                },
+                {
+                  text: `Account Number- ${profile_id}`, style: 'leftHeader', align: 'right'
+                }
+              ]
+            },
+            {
+              text: 'Auto Loan', style: 'leftHeader'
+            },
+            '\n',
+            {
+              style: 'tableExample',
+              table: {
+                dontBreakRows: true,
+                widths: [
+                  105, '*', 105, '*'
+                ],
+                heights: 20,
+                body: [
+                  [
+                    {
+                      text: 'General Details', style: 'tableHeader', colSpan: 4
+                    },
+                    {
+                      text: '', style: 'tableContent'
+                    },
+                    {
+                      text: '', style: 'tableContent'
+                    },
+                    {
+                      text: '', style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Full Name', style: 'tableHeader'
+                    },
+                    {
+                      text: `${fi_data.GeneralDetails.FullName}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Date of Creation', style: 'tableHeader'
+                    },
+                    {
+                      text: `${fi_data.GeneralDetails.Dob}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Loan Amount', style: 'tableHeader'
+                    },
+                    {
+                      text: `${new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(fi_data.GeneralDetails.LoanAmount)}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Mobile Number', style: 'tableHeader'
+                    },
+                    {
+                      text: `${fi_data.GeneralDetails.MobileNumber}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Residence Investigation Details', style: 'tableHeader', colSpan: 4
+                    },
+                    {
+                      text: '', style: 'tableContent'
+                    },
+                    {
+                      text: '', style: 'tableContent'
+                    },
+                    {
+                      text: '', style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Residence Address', style: 'tableHeader'
+                    },
+                    {
+                      text: `${fi_data.ResidenceInvestigationData.HouseAddress}`, colSpan: 3, style: 'tableContent'
+                    },
+                    {}, {}
+                  ],
+                  [
+                    {
+                      text: 'Residence Landmark', style: 'tableHeader'
+                    },
+                    {
+                      text: `${fi_data.ResidenceInvestigationData.HouseLandmark}`, colSpan: 3, style: 'tableContent'
+                    },
+                    {}, {}
+                  ],
+                  [
+                    {
+                      text: 'Residence Accessibility', style: 'tableHeader'
+                    },
+                    {
+                      text: `${fi_data.ResidenceInvestigationData.HomeAccesibility}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Residence Condition', style: 'tableHeader'
+                    },
+                    {
+                      text: `${fi_data.ResidenceInvestigationData.HouseConndition}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Locality Type', style: 'tableHeader'
+                    },
+                    {
+                      text: `${fi_data.ResidenceInvestigationData.LocalityType}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Address Proof', style: 'tableHeader'
+                    },
+                    {
+                      text: `${fi_data.ResidenceInvestigationData.AddressProof}`, style: 'tableContent'
+                    }
+                  ],
+
+                  [
+                    {
+                      text: 'Total Family Members', style: 'tableHeader'
+                    },
+                    {
+                      text: `${fi_data.ResidenceInvestigationData.TotalFamilyNumbers}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Earning Members', style: 'tableHeader'
+                    },
+                    {
+                      text: `${fi_data.ResidenceInvestigationData.EarningMembers}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Acquaintance Name', style: 'tableHeader'
+                    },
+                    {
+                      text: `${fi_data.ResidenceInvestigationData.AcquaintanceName}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Acquaintance Phone', style: 'tableHeader'
+                    },
+                    {
+                      text: `${fi_data.ResidenceInvestigationData.AcquaintancePhone}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Workplace Investigation Details', style: 'tableHeader', colSpan: 4
+                    },
+                    {
+                      text: '', style: 'tableContent'
+                    },
+                    {
+                      text: '', style: 'tableContent'
+                    },
+                    {
+                      text: '', style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Employer Name', style: 'tableHeader'
+                    },
+                    {
+                      text: `${fi_data.WorkplaceInvestigationData.EmployerName}`, colSpan: 3, style: 'tableContent'
+                    }, {}, {}
+                  ],
+                  [
+                    {
+                      text: 'Office Address', style: 'tableHeader'
+                    },
+                    {
+                      text: `${fi_data.WorkplaceInvestigationData.OfficeAddress}`, colSpan: 3, style: 'tableContent'
+                    }, {}, {}
+                  ],
+                  [
+                    {
+                      text: 'Office Landmark', style: 'tableHeader'
+                    },
+                    {
+                      text: `${fi_data.WorkplaceInvestigationData.OfficeLandmark}`, colSpan: 3, style: 'tableContent'
+                    }, {}, {}
+                  ],
+                  [
+                    {
+                      text: 'Designation', style: 'tableHeader'
+                    },
+                    {
+                      text: `${fi_data.WorkplaceInvestigationData.Designation}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Job Duration', style: 'tableHeader'
+                    },
+                    {
+                      text: `${fi_data.WorkplaceInvestigationData.JobDuration}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Inhand Salary', style: 'tableHeader'
+                    },
+                    {
+                      text: `${new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(fi_data.WorkplaceInvestigationData.InHandSalary)}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Office Accessibility', style: 'tableHeader'
+                    },
+                    {
+                      text: `${fi_data.WorkplaceInvestigationData.OfficeAccesibility}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Office Condition', style: 'tableHeader'
+                    },
+                    {
+                      text: `${fi_data.WorkplaceInvestigationData.OfficeCondition}`, colSpan: 3, style: 'tableContent'
+                    },
+                    {
+                      text: '', style: 'tableHeader'
+                    },
+                    {
+                      text: ``, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Vehicle Investigation Details', style: 'tableHeader', colSpan: 4
+                    },
+                    {
+                      text: '', style: 'tableContent'
+                    },
+                    {
+                      text: '', style: 'tableContent'
+                    },
+                    {
+                      text: '', style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Vehicle Number', style: 'tableHeader'
+                    },
+                    {
+                      text: `${fi_data.VehicleInvestigationData.VehicleNumber}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Vehicle Brand', style: 'tableHeader'
+                    },
+                    {
+                      text: `${fi_data.VehicleInvestigationData.VehicleBrand}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Vehicle Model', style: 'tableHeader'
+                    },
+                    {
+                      text: `${fi_data.VehicleInvestigationData.VehicleModel}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Odometer Reading', style: 'tableHeader'
+                    },
+                    {
+                      text: `${fi_data.VehicleInvestigationData.OdometerReading}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Chassis Number', style: 'tableHeader'
+                    },
+                    {
+                      text: `${fi_data.VehicleInvestigationData.ChasisNumber}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Engine Number', style: 'tableHeader'
+                    },
+                    {
+                      text: `${fi_data.VehicleInvestigationData.RegistrationNumber}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Finance Type', style: 'tableHeader'
+                    },
+                    {
+                      text: `${fi_data.VehicleInvestigationData.FinanceType}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Vehicle Valuation', style: 'tableHeader'
+                    },
+                    {
+                      text: `${new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(fi_data.VehicleInvestigationData.VehicleValuation)}`, style: 'tableContent'
+                    }
+
+                  ],
+                  [
+                    {
+                      text: 'Finance Capability', style: 'tableHeader'
+                    },
+                    {
+                      text: `${new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(fi_data.VehicleInvestigationData.FinanceCapability)}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Loan Amount Required', style: 'tableHeader'
+                    },
+                    {
+                      text: `${fi_data.VehicleInvestigationData.LoanAmountRequired}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Physical Condition', style: 'tableHeader'
+                    },
+                    {
+                      text: `${fi_data.VehicleInvestigationData.PhysicalCondition}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Ride Quality', style: 'tableHeader'
+                    },
+                    {
+                      text: `${fi_data.VehicleInvestigationData.RideQuality}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Remarks', style: 'tableHeader'
+                    },
+                    {
+                      text: `${fi_data.VehicleInvestigationData.Remarks}`, colSpan: 3, style: 'tableContent'
+                    },
+                    {
+                      text: '', style: 'tableHeader'
                     },
                     {
                       text: ``, style: 'tableContent'
@@ -2560,6 +2562,571 @@ const FIController = () => {
     }
   };
 
+  const makePdfForKYC = async (req, res) => {
+    const profile_id = req.query.profile_id;
+    // const loan_id = req.query.loan_id;
+    const filename = req.query.filename;
+    try {
+      let profile = await UserProfile.findOne({
+        where: {
+          user_id: profile_id
+        }
+      });
+
+     
+
+      let kyc = profile.details_json[profile_id].kyc
+
+      var fonts = {
+        Courier: {
+          normal: 'fonts/cour.ttf',
+          bold: 'fonts/courbd.ttf',
+          italics: 'fonts/couri.ttf',
+          bolditalics: 'fonts/courbi.ttf'
+        },
+        Glegoo: {
+          normal: 'fonts/Glegoo-Regular.ttf',
+          bold: 'fonts/Glegoo-Bold.ttf',
+          italics: 'fonts/Glegoo-Regular.ttf',
+          bolditalics: 'fonts/Glegoo-Regular.ttf'
+        }
+      };
+      var printer = new pdfmake(fonts);
+      const age = moment().diff(`${kyc.CarJSON.applicantModel.applicant_dob}`, 'years', false)
+      const otherDetailsArray = await sequelize.query(`SELECT acquaintance.acquaintance_name, maritalstatus.maritalstatus_name, caste.caste_name, category.category_name, documenttype.documenttype_name
+      FROM public.acquaintance, public.maritalstatus, public.caste, public.category, public.documenttype
+      where acquaintance.acquaintance_id= ${kyc.CarJSON.applicantModel.applicant_acquaintanceid} and maritalstatus.maritalstatus_id=${kyc.CarJSON.applicantModel.applicant_maritalstatusid} and caste.caste_id=${kyc.CarJSON.applicantModel.applicant_casteid} and category.category_id=${kyc.CarJSON.applicantModel.applicant_categoryid} and documenttype.documenttype_id=${kyc.CarJSON.documentModel.document_id};`)
+      console.log(otherDetailsArray)
+      const otherDetails = otherDetailsArray[0][0];
+      console.log(otherDetails)
+      var dd = {
+        pageMargins: [40, 120, 40, 60],
+        pageSize: 'A4',
+        header: {
+
+          columns: [
+            {
+              stack: ['\n',
+                {
+                  text: 'Navya Enterprises', style: 'header'
+                },
+                {
+                  text: 'Prop Neel Sarin', style: 'content'
+                },
+                {
+                  text: '70/144 Patel Marg, Mansrovar Jaipur', style: 'content'
+                },
+              ]
+            }
+
+          ],
+        },
+        footer: function (currentPage, pageCount) {
+          
+            return {
+              columns: [
+                { text: currentPage.toString() + ' of ' + pageCount, margin: [0, 20, 0, 0] },
+
+              ]
+            }
+        },
+        content: [ 
+          {
+            columns: [
+              {
+                text: 'Applicant Details Form', style: 'leftHeader', align: 'left'
+              },
+              {
+                text: `Account Number- ${profile_id}`, style: '', align: 'right'
+              }
+            ]
+          },
+          '\n',
+          { 
+            style: 'tableExample',
+            table: {
+              dontBreakRows: true,
+              widths: [
+                105, 135, 105,135
+              ],
+              heights: 20,
+              body: [
+                  [
+                  {
+                    text: 'Applicant Details', style: 'tableHeader', colSpan: 4
+                  },
+                  {
+                    text: '', style: 'tableContent'
+                  },
+                  {
+                    text: '', style: 'tableContent'
+                  },
+                  {
+                    text: '', style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'First Name', style: 'tableHeader'
+                  },
+                  {
+                    text: `${kyc.CarJSON.applicantModel.applicant_firstname}`, style: 'tableContent'
+                  },
+                  {
+                    text: 'Middle Name', style: 'tableHeader' 
+                  },
+                  {
+                    text: `${kyc.CarJSON.applicantModel.applicant_middlename}`, style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'Last Name', style: 'tableHeader'
+                  },
+                  {
+                    text: `${kyc.CarJSON.applicantModel.applicant_lastname}`, style: 'tableContent'
+                  },
+                  {
+                    text: 'Acquaintance', style: 'tableHeader' 
+                  },
+                  {
+                    text: `${otherDetails.acquaintance_name}`, style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'Acquaintance Name', style: 'tableHeader'
+                  },
+                  {
+                    text: `${kyc.CarJSON.applicantModel.applicant_acquaintancename}`, style: 'tableContent'
+                  },
+                  {
+                    text: 'Date of Birth', style: 'tableHeader' 
+                  },
+                  {
+                    text: `${kyc.CarJSON.applicantModel.applicant_dob}`, style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'Age', style: 'tableHeader'
+                  },
+                  {
+                    text: `${age}`, style: 'tableContent'
+                  },
+                  {
+                    text: 'Marital Status', style: 'tableHeader' 
+                  },
+                  {
+                    text: `${otherDetails.maritalstatus_name}`, style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'Caste', style: 'tableHeader'
+                  },
+                  {
+                    text: `${otherDetails.caste_name}`, style: 'tableContent'
+                  },
+                  {
+                    text: 'Category', style: 'tableHeader' 
+                  },
+                  {
+                    text: `${otherDetails.category_name}`, style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'State', style: 'tableHeader'
+                  },
+                  {
+                    text: `${kyc.CarJSON.applicantModel.applicant_state}`, style: 'tableContent'
+                  },
+                  {
+                    text: 'District', style: 'tableHeader' 
+                  },
+                  {
+                    text: `${kyc.CarJSON.applicantModel.applicant_district}`, style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'Pincode', style: 'tableHeader'
+                  },
+                  {
+                    text: `${kyc.CarJSON.applicantModel.applicant_pincode}`, style: 'tableContent'
+                  },
+                  {
+                    text: 'Mobile Number', style: 'tableHeader' 
+                  },
+                  {
+                    text: `${kyc.CarJSON.applicantModel.applicant_mobile}`, style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'Office Number', style: 'tableHeader'
+                  },
+                  {
+                    text: `${kyc.CarJSON.applicantModel.applicant_officeno}`, style: 'tableContent'
+                  },
+                  {
+                    text: 'Designation', style: 'tableHeader' 
+                  },
+                  {
+                    text: `${kyc.CarJSON.applicantModel.applicant_desgination}`, style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'Education', style: 'tableHeader'
+                  },
+                  {
+                    text: `${kyc.CarJSON.applicantModel.applicant_education}`, style: 'tableContent'
+                  },
+                  {
+                    text: 'Employer Name', style: 'tableHeader' 
+                  },
+                  {
+                    text: `${kyc.CarJSON.applicantModel.applicant_employername}`, style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'Distance To NE', style: 'tableHeader'
+                  },
+                  {
+                    text: `${kyc.CarJSON.applicantModel.applicant_distance}`, style: 'tableContent'
+                  },
+                  {
+                    text: 'Nearest Branch', style: 'tableHeader' 
+                  },
+                  {
+                    text: `${kyc.CarJSON.applicantModel.applicant_nearestbranch}`, style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'Office Address', style: 'tableHeader'
+                  },
+                  {
+                    text: `${kyc.CarJSON.applicantModel.applicant_officeaddress}`, style: 'tableContent', colSpan: 3
+                  },
+                  {
+                    text: '', style: 'tableHeader' 
+                  },
+                  {
+                    text: ``, style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'Home Address', style: 'tableHeader'
+                  },
+                  {
+                    text: `${kyc.CarJSON.applicantModel.applicant_currentaddress}`, style: 'tableContent', colSpan: 3
+                  },
+                  {
+                    text: '', style: 'tableHeader' 
+                  },
+                  {
+                    text: ``, style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'Co-Applicant Details', style: 'tableHeader', colSpan: 4
+                  },
+                  {
+                    text: '', style: 'tableContent'
+                  },
+                  {
+                    text: '', style: 'tableContent'
+                  },
+                  {
+                    text: '', style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'First Name', style: 'tableHeader'
+                  },
+                  {
+                    text: `${kyc.CarJSON.gurantorModel.gurantor_firstname}`, style: 'tableContent'
+                  },
+                  {
+                    text: 'Middle Name', style: 'tableHeader' 
+                  },
+                  {
+                    text: `${kyc.CarJSON.gurantorModel.gurantor_middlename}`, style: 'tableContent'
+                  }
+                ],
+                [
+                   {
+                    text: 'Last Name', style: 'tableHeader' 
+                  },
+                  {
+                    text: `${kyc.CarJSON.gurantorModel.gurantor_lastname}`, style: 'tableContent'
+                  },
+                  {
+                    text: 'Mobile Number', style: 'tableHeader' 
+                  },
+                  {
+                    text: `${kyc.CarJSON.gurantorModel.gurantor_mobile}`, style: 'tableContent'
+                  }
+                ],
+                
+                [
+                  {
+                    text: 'Relationship', style: 'tableHeader'
+                  },
+                  {
+                    text: `${kyc.CarJSON.gurantorModel.gurantor_relation}`, style: 'tableContent'
+                  },
+                  {
+                    text: '', style: 'tableHeader' 
+                  },
+                  {
+                    text: ``, style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'Co-Applicant/Guarantor Address', style: 'tableHeader'
+                  },
+                  {
+                    text: `${kyc.CarJSON.gurantorModel.gurantor_currentaddress}`, style: 'tableContent', colSpan:3
+                  },
+                  {
+                    text: '', style: 'tableHeader' 
+                  },
+                  {
+                    text: ``, style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'Financial Details', style: 'tableHeader', colSpan: 4
+                  },
+                  {
+                    text: '', style: 'tableContent'
+                  },
+                  {
+                    text: '', style: 'tableContent'
+                  },
+                  {
+                    text: '', style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'Aadhar Number', style: 'tableHeader'
+                  },
+                  {
+                    text: `${kyc.CarJSON.documentModel.document_aadhar}`, style: 'tableContent'
+                  },
+                  {
+                    text: 'Pan Number', style: 'tableHeader' 
+                  },
+                  {
+                    text: `${kyc.CarJSON.documentModel.document_pan}`, style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'Cibil Score', style: 'tableHeader'
+                  },
+                  {
+                    text: `${kyc.CarJSON.documentModel.document_cibil}`, style: 'tableContent'
+                  },
+                  {
+                    text: 'Optional ID Type', style: 'tableHeader' 
+                  },
+                  {
+                    text: `${otherDetails.documenttype_name}`, style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'Optional ID Details', style: 'tableHeader'
+                  },
+                  {
+                    text: `${kyc.CarJSON.documentModel.document_optional}`, style: 'tableContent'
+                  },
+                  {
+                    text: 'Monthly Inhand Income', style: 'tableHeader' 
+                  },
+                  {
+                    text: `${kyc.CarJSON.accountModel.account_inhandsalary}`, style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'Bank Name', style: 'tableHeader'
+                  },
+                  {
+                    text: `${kyc.CarJSON.accountModel.account_bankname}`, style: 'tableContent'
+                  },
+                  {
+                    text: 'Account Number', style: 'tableHeader' 
+                  },
+                  {
+                    text: `${kyc.CarJSON.accountModel.account_number}`, style: 'tableContent'
+                  }
+                ],
+                [
+                  {
+                    text: 'IFSC', style: 'tableHeader'
+                  },
+                  {
+                    text: `${kyc.CarJSON.accountModel.account_ifsc}`, style: 'tableContent', colSpan:3
+                  },
+                  {
+                    text: '', style: 'tableHeader' 
+                  },
+                  {
+                    text: ``, style: 'tableContent'
+                  }
+                ]
+              ]
+            },
+          }
+        ],
+        styles: {
+          leftHeader: {
+            alignment: 'left',
+            fontSize: 16,
+            bold: true
+          },
+          leftData: {
+            alignment: 'left',
+            fontSize: 10,
+            lineHeight: 1.5,
+            margin: [15, 0, 0, 0]
+          },
+          leftHeaderHindi: {
+            alignment: 'left',
+            fontSize: 10,
+            bold: true,
+            font: 'Glegoo'
+          },
+          leftDataHindi: {
+            alignment: 'left',
+            fontSize: 10,
+            lineHeight: 1.15,
+            margin: [15, 0, 0, 0],
+            font: 'Glegoo'
+          },
+          header: {
+            fontSize: 28,
+            // 			bold: true,
+            margin: [
+              0,
+              0,
+              0,
+              10
+            ]
+          },
+          content: {
+            fontSize: 12,
+            margin: [
+              0,
+              0,
+              0,
+              4
+            ]
+          },
+          subheader: {
+            fontSize: 16,
+            bold: true,
+            margin: [
+              0,
+              10,
+              0,
+              5
+            ]
+          },
+          tableExample: {
+            margin: [
+              0,
+              5,
+              0,
+              5
+            ],
+            width: 400
+          },
+          tableHeader: {
+            bold: true,
+            fontSize: 8.5,
+            color: 'black',
+            margin: [
+              0,
+              5
+            ]
+          },
+          tableContent: {
+            fontSize: 9,
+            margin: [
+              0,
+              5
+            ]
+          }
+        },
+        defaultStyle: {
+          alignment: 'center',
+          font: 'Courier'
+        }
+      }
+
+
+
+      const pdfBuffer = await new Promise(resolve => {
+        const pdfMake = printer.createPdfKitDocument(dd);
+
+        let chunks = [];
+
+        pdfMake.on("data", chunk => {
+          chunks.push(chunk);
+        });
+        pdfMake.on("end", () => {
+          const result = Buffer.concat(chunks);
+          var now = new Date();
+          now.setMinutes(now.getMinutes() + 30); // timestamp
+          now = new Date(now); // Date object
+          s3.putObject(
+            {
+              Bucket: 'my-express-application-dev-s3bucket-1eil6gs9s5nx2',
+              Key: `KYCPdf/${profile_id}/${filename}`,
+              Body: result,
+              Expires: now
+            },
+            function (resp, d) {
+              resolve(result)
+            }
+          )
+        });
+
+
+        pdfMake.end();
+      })
+
+      const a = pdfBuffer
+
+
+      const preSignedUrl = await s3.getSignedUrlPromise('getObject', {
+        Bucket: 'my-express-application-dev-s3bucket-1eil6gs9s5nx2',
+        Key: `KYCPdf/${profile_id}/${filename}`, // File name could come from queryParameters
+      });
+
+
+      return res.status(200).json(preSignedUrl)
+
+    } catch (err) {
+      console.log(err)
+      return res.status(500).json({ msg: err });
+    }
+  };
+
 
 
   return {
@@ -2583,7 +3150,8 @@ const FIController = () => {
     resubmitFI,
     makePdf,
     makePdfForPersonalLoan,
-    makePdfForAutoLoan
+    makePdfForAutoLoan,
+    makePdfForKYC
   };
 };
 
