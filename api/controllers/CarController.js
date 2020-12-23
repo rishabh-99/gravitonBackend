@@ -839,8 +839,8 @@ const CarController = () => {
     const getKYCData = async (req, res) => {
 
         try {
-            
-            
+
+
             const q1 = await sequelize.query(`select up.user_id, ap.applicant_firstname, ukl.full_name, ukl.kyc_date, ap.applicant_mobile from 
             (SELECT user_id, related_aadhar FROM user_profile) as up,
              applicant as ap,
@@ -858,21 +858,84 @@ const CarController = () => {
 
         const token = parseInt(req.query.token);
         try {
-            
-            
-             await Leads.destroy({
-                 where:{
-                     token
-                 }
-             })
 
-            return res.status(200).send({msg:'Operation successful'});
+
+            await Leads.destroy({
+                where: {
+                    token
+                }
+            })
+
+            return res.status(200).send({ msg: 'Operation successful' });
         } catch (err) {
             console.log(err)
             return res.status(500).json({ msg: err });
         }
     };
-    
+
+    const getListOfProfileIdForUser = async (req, res) => {
+
+        const user_id = parseInt(req.query.user_id);
+        try {
+            const r = await sequelize.query(`SELECT user_profile.user_id, user_profile.related_aadhar,
+            CASE WHEN applicant_middlename Like '' 
+                    THEN concat(applicant_firstname,' ', applicant_lastname)
+                    ELSE concat(applicant_firstname,' ',applicant_middlename,' ', applicant_lastname) 
+            END AS applicant_name FROM public.user_profile, public.applicant,public.user_kyc_log where applicant.applicant_aadhar = user_profile.related_aadhar
+			and applicant_aadhar = user_kyc_log.related_aadhar and user_kyc_log.user_id =${user_id}`)
+            return res.status(200).send(r[0]);
+        } catch (err) {
+            console.log(err)
+            return res.status(500).json({ msg: err });
+        }
+    };
+
+    const getAdminPanelDataForUser = async (req, res) => {
+
+        const user_id = req.query.user_id
+        try {
+            let count = 5;
+            const countOfProfiles = await User_kyc_log.count({
+                where: {user_id}
+            });
+            if (countOfProfiles < 5) {
+                count = countOfProfiles;
+            }
+            //date and user_id
+            const q1 = await sequelize.query(`select up.user_id, ap.applicant_firstname, ukl.kyc_date
+            from user_profile as up, (select * from user_kyc_log where user_id = ${user_id}) as ukl, applicant as ap
+            where up.related_aadhar = ukl.related_aadhar and ukl.related_aadhar = ap.applicant_aadhar limit ${count} offset (select count(*) from user_kyc_log where user_id = ${user_id})-${count};
+                       `)
+
+            const newestKYC = q1[0];
+            const cdl = await sequelize.query(`select count(*) from public."disbursedLoan" as dl, public.user_profile as up, public.user_kyc_log as ukl where dl.profile_id = up.user_id and up.related_aadhar = ukl.related_aadhar and ukl.user_id = ${user_id}`);
+            const countOfDisbursedLoan = cdl[0][0].count
+            return res.status(200).json({ countOfProfiles, newestKYC, countOfDisbursedLoan });
+        } catch (err) {
+            console.log(err)
+            return res.status(500).json({ msg: err });
+        }
+    };
+
+    const getKYCDataForUserId = async (req, res) => {
+        const user_id = req.query.user_id;
+        try {
+
+
+            const q1 = await sequelize.query(`select up.user_id, ap.applicant_firstname, ukl.full_name, ukl.kyc_date, ap.applicant_mobile from 
+            (SELECT user_id, related_aadhar FROM user_profile) as up,
+             applicant as ap,
+             (select * from user_kyc_log as ukli, login as li where ukli.user_id = li.user_id and ukli.user_id=${user_id}) as ukl
+             where up.related_aadhar = ap.applicant_aadhar and up.related_aadhar = ukl.related_aadhar;`)
+
+            return res.status(200).send(q1[0]);
+        } catch (err) {
+            console.log(err)
+            return res.status(500).json({ msg: err });
+        }
+    };
+
+
     return {
         // returning all the functions form the controller
         register,
@@ -899,7 +962,10 @@ const CarController = () => {
         getAllLeads,
         getLeadForUserId,
         getKYCData,
-        deleteLead
+        deleteLead,
+        getListOfProfileIdForUser,
+        getAdminPanelDataForUser,
+        getKYCDataForUserId
     };
 };
 

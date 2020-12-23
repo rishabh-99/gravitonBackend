@@ -2596,9 +2596,10 @@ const FIController = () => {
       const otherDetailsArray = await sequelize.query(`SELECT acquaintance.acquaintance_name, maritalstatus.maritalstatus_name, caste.caste_name, category.category_name, documenttype.documenttype_name
       FROM public.acquaintance, public.maritalstatus, public.caste, public.category, public.documenttype
       where acquaintance.acquaintance_id= ${kyc.CarJSON.applicantModel.applicant_acquaintanceid} and maritalstatus.maritalstatus_id=${kyc.CarJSON.applicantModel.applicant_maritalstatusid} and caste.caste_id=${kyc.CarJSON.applicantModel.applicant_casteid} and category.category_id=${kyc.CarJSON.applicantModel.applicant_categoryid} and documenttype.documenttype_id=${kyc.CarJSON.documentModel.document_id};`)
-      console.log(otherDetailsArray)
+      
       const otherDetails = otherDetailsArray[0][0];
-      console.log(otherDetails)
+      
+      // if(kyc.CarJSON.applicantModel.applicant_firstname)
       var dd = {
         pageMargins: [40, 120, 40, 60],
         pageSize: 'A4',
@@ -2667,10 +2668,10 @@ const FIController = () => {
                 ],
                 [
                   {
-                    text: 'First Name', style: 'tableHeader'
+                    text: 'FullName Name', style: 'tableHeader'
                   },
                   {
-                    text: `${kyc.CarJSON.applicantModel.applicant_firstname}`, style: 'tableContent'
+                    text: `${ fullname }`, style: 'tableContent'
                   },
                   {
                     text: 'Middle Name', style: 'tableHeader' 
@@ -3126,6 +3127,8 @@ const FIController = () => {
       return res.status(500).json({ msg: err });
     }
   };
+
+  
 
 
 
