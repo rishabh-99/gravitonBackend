@@ -894,7 +894,7 @@ const CarController = () => {
         try {
             let count = 5;
             const countOfProfiles = await User_kyc_log.count({
-                where: {user_id}
+                where: { user_id }
             });
             if (countOfProfiles < 5) {
                 count = countOfProfiles;
@@ -920,13 +920,27 @@ const CarController = () => {
         try {
 
 
-            const q1 = await sequelize.query(`select up.user_id, ap.applicant_firstname, ukl.full_name, ukl.kyc_date, ap.applicant_mobile from 
+            var q1 = await sequelize.query(`select up.user_id, ap.applicant_firstname, ukl.full_name, ukl.kyc_date, ap.applicant_mobile from 
             (SELECT user_id, related_aadhar FROM user_profile) as up,
              applicant as ap,
              (select * from user_kyc_log as ukli, login as li where ukli.user_id = li.user_id and ukli.user_id=${user_id}) as ukl
              where up.related_aadhar = ap.applicant_aadhar and up.related_aadhar = ukl.related_aadhar;`)
 
-            return res.status(200).send(q1[0]);
+            var q2 = await sequelize.query(`select up.user_id, ap.applicant_firstname, ukl.full_name, ukl.fi_date, ap.applicant_mobile from 
+            (SELECT user_id, related_aadhar FROM user_profile) as up,
+             applicant as ap,
+             (select * from user_fi_log as ukli, login as li where ukli.user_id = li.user_id and ukli.user_id=${user_id}) as ukl
+             where up.related_aadhar = ap.applicant_aadhar and up.related_aadhar = ukl.related_aadhar;`)
+
+            var resultArray = q1[0].filter(function (i) {
+                return q2[0].findIndex((j) => { return i.user_id === j.user_id }) === -1;
+            });
+
+            var resultArray2 = q2[0].filter(function (i) {
+                return q1[0].findIndex((j) => { return i.user_id === j.user_id }) === -1;
+            });
+            const finalArray = resultArray.concat(resultArray2)
+            return res.status(200).send(finalArray);
         } catch (err) {
             console.log(err)
             return res.status(500).json({ msg: err });
