@@ -36,6 +36,7 @@ const DocumentCheckUploadPending = require('../models/Document_check_upload_pend
 const EmiSchedulePending = require('../models/Emi_schedule_pending');
 const DocumentCheckApprovePending = require('../models/Document_check_approve_pending');
 const EmiSchedule = require('../models/Emi_Schedule');
+const UserFiLog = require('../models/UserFiLog');
 const s3 = new AWS.S3();
 
 
@@ -165,6 +166,22 @@ const FIController = () => {
         }
       });
 
+      var today = new Date();
+      var dd = today.getDate();
+
+      var mm = today.getMonth() + 1;
+      var yyyy = today.getFullYear();
+      if (dd < 10) {
+        dd = '0' + dd;
+      }
+
+      if (mm < 10) {
+        mm = '0' + mm;
+      }
+
+      // today = dd + '-' + mm + '-' + yyyy;
+      today = yyyy + '-' + mm + '-' + dd;
+
       let counter = 0;
       let loanNumber = 0;
       for (let loan of profile.details_json[user_id].loans) {
@@ -194,6 +211,14 @@ const FIController = () => {
         where: {
           'profile_id': user_id
         }
+      })
+
+      await UserFiLog.create({
+        'profile_id': user_id,
+        'loan_id': __loan_id,
+        'user_id': agent_id,
+        'related_aadhar': profile.related_aadhar,
+        "fi_date": today
       })
 
       return res.status(200).json({ msg: 'Operation Successful' });
@@ -2564,7 +2589,6 @@ const FIController = () => {
 
   const makePdfForKYC = async (req, res) => {
     const profile_id = req.query.profile_id;
-    // const loan_id = req.query.loan_id;
     const filename = req.query.filename;
     try {
       let profile = await UserProfile.findOne({
@@ -2573,7 +2597,7 @@ const FIController = () => {
         }
       });
 
-     
+
 
       let kyc = profile.details_json[profile_id].kyc
 
@@ -2596,486 +2620,909 @@ const FIController = () => {
       const otherDetailsArray = await sequelize.query(`SELECT acquaintance.acquaintance_name, maritalstatus.maritalstatus_name, caste.caste_name, category.category_name, documenttype.documenttype_name
       FROM public.acquaintance, public.maritalstatus, public.caste, public.category, public.documenttype
       where acquaintance.acquaintance_id= ${kyc.CarJSON.applicantModel.applicant_acquaintanceid} and maritalstatus.maritalstatus_id=${kyc.CarJSON.applicantModel.applicant_maritalstatusid} and caste.caste_id=${kyc.CarJSON.applicantModel.applicant_casteid} and category.category_id=${kyc.CarJSON.applicantModel.applicant_categoryid} and documenttype.documenttype_id=${kyc.CarJSON.documentModel.document_id};`)
-      
+
       const otherDetails = otherDetailsArray[0][0];
-      
-      // if(kyc.CarJSON.applicantModel.applicant_firstname)
-      var dd = {
-        pageMargins: [40, 120, 40, 60],
-        pageSize: 'A4',
-        header: {
+      var fullname;
+      var gurantorFullname;
+      if (kyc.CarJSON.applicantModel.applicant_middlename === '') {
+        fullname = kyc.CarJSON.applicantModel.applicant_firstname + ' ' + kyc.CarJSON.applicantModel.applicant_lastname
+      } else {
+        fullname = kyc.CarJSON.applicantModel.applicant_firstname + ' ' + kyc.CarJSON.applicantModel.applicant_middlename + ' ' + kyc.CarJSON.applicantModel.applicant_lastname
+      }
 
-          columns: [
-            {
-              stack: ['\n',
-                {
-                  text: 'Navya Enterprises', style: 'header'
-                },
-                {
-                  text: 'Prop Neel Sarin', style: 'content'
-                },
-                {
-                  text: '70/144 Patel Marg, Mansrovar Jaipur', style: 'content'
-                },
-              ]
-            }
+      if (kyc.CarJSON.gurantorModel.gurantor_middlename === '') {
+        gurantorFullname = kyc.CarJSON.gurantorModel.gurantor_firstname + ' ' + kyc.CarJSON.gurantorModel.gurantor_lastname
+      } else {
+        gurantorFullname = kyc.CarJSON.gurantorModel.gurantor_firstname + ' ' + kyc.CarJSON.gurantorModel.gurantor_middlename + ' ' + kyc.CarJSON.gurantorModel.gurantor_lastname
+      }
+      if (otherDetails.documenttype_name !== 'None') {
+        var dd = {
+          pageMargins: [40, 120, 40, 60],
+          pageSize: 'A4',
+          header: {
 
-          ],
-        },
-        footer: function (currentPage, pageCount) {
-          
+            columns: [
+              {
+                stack: ['\n',
+                  {
+                    text: 'Navya Enterprises', style: 'header'
+                  },
+                  {
+                    text: 'Prop Neel Sarin', style: 'content'
+                  },
+                  {
+                    text: '70/144 Patel Marg, Mansrovar Jaipur', style: 'content'
+                  },
+                ]
+              }
+
+            ],
+          },
+          footer: function (currentPage, pageCount) {
+
             return {
               columns: [
                 { text: currentPage.toString() + ' of ' + pageCount, margin: [0, 20, 0, 0] },
 
               ]
             }
-        },
-        content: [ 
-          {
-            columns: [
-              {
-                text: 'Applicant Details Form', style: 'leftHeader', align: 'left'
-              },
-              {
-                text: `Account Number- ${profile_id}`, style: '', align: 'right'
-              }
-            ]
           },
-          '\n',
-          { 
-            style: 'tableExample',
-            table: {
-              dontBreakRows: true,
-              widths: [
-                105, 135, 105,135
-              ],
-              heights: 20,
-              body: [
-                  [
-                  {
-                    text: 'Applicant Details', style: 'tableHeader', colSpan: 4
-                  },
-                  {
-                    text: '', style: 'tableContent'
-                  },
-                  {
-                    text: '', style: 'tableContent'
-                  },
-                  {
-                    text: '', style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'FullName Name', style: 'tableHeader'
-                  },
-                  {
-                    text: `${ fullname }`, style: 'tableContent'
-                  },
-                  {
-                    text: 'Middle Name', style: 'tableHeader' 
-                  },
-                  {
-                    text: `${kyc.CarJSON.applicantModel.applicant_middlename}`, style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'Last Name', style: 'tableHeader'
-                  },
-                  {
-                    text: `${kyc.CarJSON.applicantModel.applicant_lastname}`, style: 'tableContent'
-                  },
-                  {
-                    text: 'Acquaintance', style: 'tableHeader' 
-                  },
-                  {
-                    text: `${otherDetails.acquaintance_name}`, style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'Acquaintance Name', style: 'tableHeader'
-                  },
-                  {
-                    text: `${kyc.CarJSON.applicantModel.applicant_acquaintancename}`, style: 'tableContent'
-                  },
-                  {
-                    text: 'Date of Birth', style: 'tableHeader' 
-                  },
-                  {
-                    text: `${kyc.CarJSON.applicantModel.applicant_dob}`, style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'Age', style: 'tableHeader'
-                  },
-                  {
-                    text: `${age}`, style: 'tableContent'
-                  },
-                  {
-                    text: 'Marital Status', style: 'tableHeader' 
-                  },
-                  {
-                    text: `${otherDetails.maritalstatus_name}`, style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'Caste', style: 'tableHeader'
-                  },
-                  {
-                    text: `${otherDetails.caste_name}`, style: 'tableContent'
-                  },
-                  {
-                    text: 'Category', style: 'tableHeader' 
-                  },
-                  {
-                    text: `${otherDetails.category_name}`, style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'State', style: 'tableHeader'
-                  },
-                  {
-                    text: `${kyc.CarJSON.applicantModel.applicant_state}`, style: 'tableContent'
-                  },
-                  {
-                    text: 'District', style: 'tableHeader' 
-                  },
-                  {
-                    text: `${kyc.CarJSON.applicantModel.applicant_district}`, style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'Pincode', style: 'tableHeader'
-                  },
-                  {
-                    text: `${kyc.CarJSON.applicantModel.applicant_pincode}`, style: 'tableContent'
-                  },
-                  {
-                    text: 'Mobile Number', style: 'tableHeader' 
-                  },
-                  {
-                    text: `${kyc.CarJSON.applicantModel.applicant_mobile}`, style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'Office Number', style: 'tableHeader'
-                  },
-                  {
-                    text: `${kyc.CarJSON.applicantModel.applicant_officeno}`, style: 'tableContent'
-                  },
-                  {
-                    text: 'Designation', style: 'tableHeader' 
-                  },
-                  {
-                    text: `${kyc.CarJSON.applicantModel.applicant_desgination}`, style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'Education', style: 'tableHeader'
-                  },
-                  {
-                    text: `${kyc.CarJSON.applicantModel.applicant_education}`, style: 'tableContent'
-                  },
-                  {
-                    text: 'Employer Name', style: 'tableHeader' 
-                  },
-                  {
-                    text: `${kyc.CarJSON.applicantModel.applicant_employername}`, style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'Distance To NE', style: 'tableHeader'
-                  },
-                  {
-                    text: `${kyc.CarJSON.applicantModel.applicant_distance}`, style: 'tableContent'
-                  },
-                  {
-                    text: 'Nearest Branch', style: 'tableHeader' 
-                  },
-                  {
-                    text: `${kyc.CarJSON.applicantModel.applicant_nearestbranch}`, style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'Office Address', style: 'tableHeader'
-                  },
-                  {
-                    text: `${kyc.CarJSON.applicantModel.applicant_officeaddress}`, style: 'tableContent', colSpan: 3
-                  },
-                  {
-                    text: '', style: 'tableHeader' 
-                  },
-                  {
-                    text: ``, style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'Home Address', style: 'tableHeader'
-                  },
-                  {
-                    text: `${kyc.CarJSON.applicantModel.applicant_currentaddress}`, style: 'tableContent', colSpan: 3
-                  },
-                  {
-                    text: '', style: 'tableHeader' 
-                  },
-                  {
-                    text: ``, style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'Co-Applicant Details', style: 'tableHeader', colSpan: 4
-                  },
-                  {
-                    text: '', style: 'tableContent'
-                  },
-                  {
-                    text: '', style: 'tableContent'
-                  },
-                  {
-                    text: '', style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'First Name', style: 'tableHeader'
-                  },
-                  {
-                    text: `${kyc.CarJSON.gurantorModel.gurantor_firstname}`, style: 'tableContent'
-                  },
-                  {
-                    text: 'Middle Name', style: 'tableHeader' 
-                  },
-                  {
-                    text: `${kyc.CarJSON.gurantorModel.gurantor_middlename}`, style: 'tableContent'
-                  }
-                ],
-                [
-                   {
-                    text: 'Last Name', style: 'tableHeader' 
-                  },
-                  {
-                    text: `${kyc.CarJSON.gurantorModel.gurantor_lastname}`, style: 'tableContent'
-                  },
-                  {
-                    text: 'Mobile Number', style: 'tableHeader' 
-                  },
-                  {
-                    text: `${kyc.CarJSON.gurantorModel.gurantor_mobile}`, style: 'tableContent'
-                  }
-                ],
-                
-                [
-                  {
-                    text: 'Relationship', style: 'tableHeader'
-                  },
-                  {
-                    text: `${kyc.CarJSON.gurantorModel.gurantor_relation}`, style: 'tableContent'
-                  },
-                  {
-                    text: '', style: 'tableHeader' 
-                  },
-                  {
-                    text: ``, style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'Co-Applicant/Guarantor Address', style: 'tableHeader'
-                  },
-                  {
-                    text: `${kyc.CarJSON.gurantorModel.gurantor_currentaddress}`, style: 'tableContent', colSpan:3
-                  },
-                  {
-                    text: '', style: 'tableHeader' 
-                  },
-                  {
-                    text: ``, style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'Financial Details', style: 'tableHeader', colSpan: 4
-                  },
-                  {
-                    text: '', style: 'tableContent'
-                  },
-                  {
-                    text: '', style: 'tableContent'
-                  },
-                  {
-                    text: '', style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'Aadhar Number', style: 'tableHeader'
-                  },
-                  {
-                    text: `${kyc.CarJSON.documentModel.document_aadhar}`, style: 'tableContent'
-                  },
-                  {
-                    text: 'Pan Number', style: 'tableHeader' 
-                  },
-                  {
-                    text: `${kyc.CarJSON.documentModel.document_pan}`, style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'Cibil Score', style: 'tableHeader'
-                  },
-                  {
-                    text: `${kyc.CarJSON.documentModel.document_cibil}`, style: 'tableContent'
-                  },
-                  {
-                    text: 'Optional ID Type', style: 'tableHeader' 
-                  },
-                  {
-                    text: `${otherDetails.documenttype_name}`, style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'Optional ID Details', style: 'tableHeader'
-                  },
-                  {
-                    text: `${kyc.CarJSON.documentModel.document_optional}`, style: 'tableContent'
-                  },
-                  {
-                    text: 'Monthly Inhand Income', style: 'tableHeader' 
-                  },
-                  {
-                    text: `${kyc.CarJSON.accountModel.account_inhandsalary}`, style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'Bank Name', style: 'tableHeader'
-                  },
-                  {
-                    text: `${kyc.CarJSON.accountModel.account_bankname}`, style: 'tableContent'
-                  },
-                  {
-                    text: 'Account Number', style: 'tableHeader' 
-                  },
-                  {
-                    text: `${kyc.CarJSON.accountModel.account_number}`, style: 'tableContent'
-                  }
-                ],
-                [
-                  {
-                    text: 'IFSC', style: 'tableHeader'
-                  },
-                  {
-                    text: `${kyc.CarJSON.accountModel.account_ifsc}`, style: 'tableContent', colSpan:3
-                  },
-                  {
-                    text: '', style: 'tableHeader' 
-                  },
-                  {
-                    text: ``, style: 'tableContent'
-                  }
-                ]
+          content: [
+            {
+              columns: [
+                {
+                  text: 'Applicant Details Form', style: 'leftHeader', align: 'left'
+                },
+                {
+                  text: `Account Number- ${profile_id}`, style: '', align: 'right'
+                }
               ]
             },
+            '\n',
+            {
+              style: 'tableExample',
+              table: {
+                dontBreakRows: true,
+                widths: [
+                  105, 135, 105, 135
+                ],
+                heights: 20,
+                body: [
+                  [
+                    {
+                      text: 'Applicant Details', style: 'tableHeader', colSpan: 4
+                    },
+                    {
+                      text: '', style: 'tableContent'
+                    },
+                    {
+                      text: '', style: 'tableContent'
+                    },
+                    {
+                      text: '', style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Full Name', style: 'tableHeader'
+                    },
+                    {
+                      text: `${fullname}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Acquaintance', style: 'tableHeader'
+                    },
+                    {
+                      text: `${otherDetails.acquaintance_name}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Acquaintance Name', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.applicantModel.applicant_acquaintancename}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Date of Birth', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.applicantModel.applicant_dob}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Age', style: 'tableHeader'
+                    },
+                    {
+                      text: `${age}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Marital Status', style: 'tableHeader'
+                    },
+                    {
+                      text: `${otherDetails.maritalstatus_name}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Caste', style: 'tableHeader'
+                    },
+                    {
+                      text: `${otherDetails.caste_name}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Category', style: 'tableHeader'
+                    },
+                    {
+                      text: `${otherDetails.category_name}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'State', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.applicantModel.applicant_state}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'District', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.applicantModel.applicant_district}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Pincode', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.applicantModel.applicant_pincode}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Mobile Number', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.applicantModel.applicant_mobile}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Office Number', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.applicantModel.applicant_officeno}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Designation', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.applicantModel.applicant_desgination}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Education', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.applicantModel.applicant_education}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Employer Name', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.applicantModel.applicant_employername}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Distance To NE', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.applicantModel.applicant_distance}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Nearest Branch', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.applicantModel.applicant_nearestbranch}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Office Address', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.applicantModel.applicant_officeaddress}`, style: 'tableContent', colSpan: 3
+                    },
+                    {
+                      text: '', style: 'tableHeader'
+                    },
+                    {
+                      text: ``, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Home Address', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.applicantModel.applicant_currentaddress}`, style: 'tableContent', colSpan: 3
+                    },
+                    {
+                      text: '', style: 'tableHeader'
+                    },
+                    {
+                      text: ``, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Co-Applicant Details', style: 'tableHeader', colSpan: 4
+                    },
+                    {
+                      text: '', style: 'tableContent'
+                    },
+                    {
+                      text: '', style: 'tableContent'
+                    },
+                    {
+                      text: '', style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Full Name', style: 'tableHeader'
+                    },
+                    {
+                      text: `${gurantorFullname}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Mobile Number', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.gurantorModel.gurantor_mobile}`, style: 'tableContent'
+                    }
+
+                  ],
+                  [
+                    {
+                      text: 'Relationship', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.gurantorModel.gurantor_relation}`, colSpan: 3, style: 'tableContent'
+                    },
+                    {
+                      text: '', style: 'tableHeader'
+                    },
+                    {
+                      text: ``, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Co-Applicant/Guarantor Address', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.gurantorModel.gurantor_currentaddress}`, style: 'tableContent', colSpan: 3
+                    },
+                    {
+                      text: '', style: 'tableHeader'
+                    },
+                    {
+                      text: ``, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Financial Details', style: 'tableHeader', colSpan: 4
+                    },
+                    {
+                      text: '', style: 'tableContent'
+                    },
+                    {
+                      text: '', style: 'tableContent'
+                    },
+                    {
+                      text: '', style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Aadhar Number', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.documentModel.document_aadhar}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Pan Number', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.documentModel.document_pan}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Cibil Score', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.documentModel.document_cibil}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Optional ID Type', style: 'tableHeader'
+                    },
+                    {
+                      text: `${otherDetails.documenttype_name}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Optional ID Details', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.documentModel.document_optional}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Monthly Inhand Income', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.accountModel.account_inhandsalary}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Bank Name', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.accountModel.account_bankname}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Account Number', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.accountModel.account_number}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'IFSC', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.accountModel.account_ifsc}`, style: 'tableContent', colSpan: 3
+                    },
+                    {
+                      text: '', style: 'tableHeader'
+                    },
+                    {
+                      text: ``, style: 'tableContent'
+                    }
+                  ]
+                ]
+              },
+            }
+          ],
+          styles: {
+            leftHeader: {
+              alignment: 'left',
+              fontSize: 16,
+              bold: true
+            },
+            leftData: {
+              alignment: 'left',
+              fontSize: 10,
+              lineHeight: 1.5,
+              margin: [15, 0, 0, 0]
+            },
+            leftHeaderHindi: {
+              alignment: 'left',
+              fontSize: 10,
+              bold: true,
+              font: 'Glegoo'
+            },
+            leftDataHindi: {
+              alignment: 'left',
+              fontSize: 10,
+              lineHeight: 1.15,
+              margin: [15, 0, 0, 0],
+              font: 'Glegoo'
+            },
+            header: {
+              fontSize: 28,
+              // 			bold: true,
+              margin: [
+                0,
+                0,
+                0,
+                10
+              ]
+            },
+            content: {
+              fontSize: 12,
+              margin: [
+                0,
+                0,
+                0,
+                4
+              ]
+            },
+            subheader: {
+              fontSize: 16,
+              bold: true,
+              margin: [
+                0,
+                10,
+                0,
+                5
+              ]
+            },
+            tableExample: {
+              margin: [
+                0,
+                5,
+                0,
+                5
+              ],
+              width: 400
+            },
+            tableHeader: {
+              bold: true,
+              fontSize: 8.5,
+              color: 'black',
+              margin: [
+                0,
+                5
+              ]
+            },
+            tableContent: {
+              fontSize: 9,
+              margin: [
+                0,
+                5
+              ]
+            }
+          },
+          defaultStyle: {
+            alignment: 'center',
+            font: 'Courier'
           }
-        ],
-        styles: {
-          leftHeader: {
-            alignment: 'left',
-            fontSize: 16,
-            bold: true
-          },
-          leftData: {
-            alignment: 'left',
-            fontSize: 10,
-            lineHeight: 1.5,
-            margin: [15, 0, 0, 0]
-          },
-          leftHeaderHindi: {
-            alignment: 'left',
-            fontSize: 10,
-            bold: true,
-            font: 'Glegoo'
-          },
-          leftDataHindi: {
-            alignment: 'left',
-            fontSize: 10,
-            lineHeight: 1.15,
-            margin: [15, 0, 0, 0],
-            font: 'Glegoo'
-          },
+        }
+      } else {
+        var dd = {
+          pageMargins: [40, 120, 40, 60],
+          pageSize: 'A4',
           header: {
-            fontSize: 28,
-            // 			bold: true,
-            margin: [
-              0,
-              0,
-              0,
-              10
-            ]
-          },
-          content: {
-            fontSize: 12,
-            margin: [
-              0,
-              0,
-              0,
-              4
-            ]
-          },
-          subheader: {
-            fontSize: 16,
-            bold: true,
-            margin: [
-              0,
-              10,
-              0,
-              5
-            ]
-          },
-          tableExample: {
-            margin: [
-              0,
-              5,
-              0,
-              5
+
+            columns: [
+              {
+                stack: ['\n',
+                  {
+                    text: 'Navya Enterprises', style: 'header'
+                  },
+                  {
+                    text: 'Prop Neel Sarin', style: 'content'
+                  },
+                  {
+                    text: '70/144 Patel Marg, Mansrovar Jaipur', style: 'content'
+                  },
+                ]
+              }
+
             ],
-            width: 400
           },
-          tableHeader: {
-            bold: true,
-            fontSize: 8.5,
-            color: 'black',
-            margin: [
-              0,
-              5
-            ]
+          footer: function (currentPage, pageCount) {
+
+            return {
+              columns: [
+                { text: currentPage.toString() + ' of ' + pageCount, margin: [0, 20, 0, 0] },
+
+              ]
+            }
           },
-          tableContent: {
-            fontSize: 9,
-            margin: [
-              0,
-              5
-            ]
+          content: [
+            {
+              columns: [
+                {
+                  text: 'Applicant Details Form', style: 'leftHeader', align: 'left'
+                },
+                {
+                  text: `Account Number- ${profile_id}`, style: '', align: 'right'
+                }
+              ]
+            },
+            '\n',
+            {
+              style: 'tableExample',
+              table: {
+                dontBreakRows: true,
+                widths: [
+                  105, 135, 105, 135
+                ],
+                heights: 20,
+                body: [
+                  [
+                    {
+                      text: 'Applicant Details', style: 'tableHeader', colSpan: 4
+                    },
+                    {
+                      text: '', style: 'tableContent'
+                    },
+                    {
+                      text: '', style: 'tableContent'
+                    },
+                    {
+                      text: '', style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Full Name', style: 'tableHeader'
+                    },
+                    {
+                      text: `${fullname}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Acquaintance', style: 'tableHeader'
+                    },
+                    {
+                      text: `${otherDetails.acquaintance_name}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Acquaintance Name', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.applicantModel.applicant_acquaintancename}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Date of Birth', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.applicantModel.applicant_dob}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Age', style: 'tableHeader'
+                    },
+                    {
+                      text: `${age}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Marital Status', style: 'tableHeader'
+                    },
+                    {
+                      text: `${otherDetails.maritalstatus_name}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Caste', style: 'tableHeader'
+                    },
+                    {
+                      text: `${otherDetails.caste_name}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Category', style: 'tableHeader'
+                    },
+                    {
+                      text: `${otherDetails.category_name}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'State', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.applicantModel.applicant_state}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'District', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.applicantModel.applicant_district}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Pincode', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.applicantModel.applicant_pincode}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Mobile Number', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.applicantModel.applicant_mobile}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Office Number', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.applicantModel.applicant_officeno}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Designation', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.applicantModel.applicant_desgination}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Education', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.applicantModel.applicant_education}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Employer Name', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.applicantModel.applicant_employername}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Distance To NE', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.applicantModel.applicant_distance}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Nearest Branch', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.applicantModel.applicant_nearestbranch}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Office Address', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.applicantModel.applicant_officeaddress}`, style: 'tableContent', colSpan: 3
+                    },
+                    {
+                      text: '', style: 'tableHeader'
+                    },
+                    {
+                      text: ``, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Home Address', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.applicantModel.applicant_currentaddress}`, style: 'tableContent', colSpan: 3
+                    },
+                    {
+                      text: '', style: 'tableHeader'
+                    },
+                    {
+                      text: ``, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Co-Applicant Details', style: 'tableHeader', colSpan: 4
+                    },
+                    {
+                      text: '', style: 'tableContent'
+                    },
+                    {
+                      text: '', style: 'tableContent'
+                    },
+                    {
+                      text: '', style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Full Name', style: 'tableHeader'
+                    },
+                    {
+                      text: `${gurantorFullname}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Mobile Number', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.gurantorModel.gurantor_mobile}`, style: 'tableContent'
+                    }
+
+                  ],
+                  [
+                    {
+                      text: 'Relationship', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.gurantorModel.gurantor_relation}`, colSpan: 3, style: 'tableContent'
+                    },
+                    {
+                      text: '', style: 'tableHeader'
+                    },
+                    {
+                      text: ``, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Co-Applicant/Guarantor Address', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.gurantorModel.gurantor_currentaddress}`, style: 'tableContent', colSpan: 3
+                    },
+                    {
+                      text: '', style: 'tableHeader'
+                    },
+                    {
+                      text: ``, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Financial Details', style: 'tableHeader', colSpan: 4
+                    },
+                    {
+                      text: '', style: 'tableContent'
+                    },
+                    {
+                      text: '', style: 'tableContent'
+                    },
+                    {
+                      text: '', style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Aadhar Number', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.documentModel.document_aadhar}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Pan Number', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.documentModel.document_pan}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'Cibil Score', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.documentModel.document_cibil}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Monthly Inhand Income', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.accountModel.account_inhandsalary}`, style: 'tableContent'
+                    }
+
+                  ],
+                  [
+                    {
+                      text: 'Bank Name', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.accountModel.account_bankname}`, style: 'tableContent'
+                    },
+                    {
+                      text: 'Account Number', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.accountModel.account_number}`, style: 'tableContent'
+                    }
+                  ],
+                  [
+                    {
+                      text: 'IFSC', style: 'tableHeader'
+                    },
+                    {
+                      text: `${kyc.CarJSON.accountModel.account_ifsc}`, style: 'tableContent', colSpan: 3
+                    },
+                    {
+                      text: '', style: 'tableHeader'
+                    },
+                    {
+                      text: ``, style: 'tableContent'
+                    }
+                  ]
+                ]
+              },
+            }
+          ],
+          styles: {
+            leftHeader: {
+              alignment: 'left',
+              fontSize: 16,
+              bold: true
+            },
+            leftData: {
+              alignment: 'left',
+              fontSize: 10,
+              lineHeight: 1.5,
+              margin: [15, 0, 0, 0]
+            },
+            leftHeaderHindi: {
+              alignment: 'left',
+              fontSize: 10,
+              bold: true,
+              font: 'Glegoo'
+            },
+            leftDataHindi: {
+              alignment: 'left',
+              fontSize: 10,
+              lineHeight: 1.15,
+              margin: [15, 0, 0, 0],
+              font: 'Glegoo'
+            },
+            header: {
+              fontSize: 28,
+              // 			bold: true,
+              margin: [
+                0,
+                0,
+                0,
+                10
+              ]
+            },
+            content: {
+              fontSize: 12,
+              margin: [
+                0,
+                0,
+                0,
+                4
+              ]
+            },
+            subheader: {
+              fontSize: 16,
+              bold: true,
+              margin: [
+                0,
+                10,
+                0,
+                5
+              ]
+            },
+            tableExample: {
+              margin: [
+                0,
+                5,
+                0,
+                5
+              ],
+              width: 400
+            },
+            tableHeader: {
+              bold: true,
+              fontSize: 8.5,
+              color: 'black',
+              margin: [
+                0,
+                5
+              ]
+            },
+            tableContent: {
+              fontSize: 9,
+              margin: [
+                0,
+                5
+              ]
+            }
+          },
+          defaultStyle: {
+            alignment: 'center',
+            font: 'Courier'
           }
-        },
-        defaultStyle: {
-          alignment: 'center',
-          font: 'Courier'
         }
       }
 
@@ -3128,7 +3575,7 @@ const FIController = () => {
     }
   };
 
-  
+
 
 
 
