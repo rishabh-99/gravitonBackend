@@ -926,7 +926,7 @@ const CarController = () => {
              (select * from user_kyc_log as ukli, login as li where ukli.user_id = li.user_id and ukli.user_id=${user_id}) as ukl
              where up.related_aadhar = ap.applicant_aadhar and up.related_aadhar = ukl.related_aadhar;`)
 
-            var q2 = await sequelize.query(`select up.user_id, ap.applicant_firstname, ukl.full_name, ukl.fi_date, ap.applicant_mobile from 
+            var q2 = await sequelize.query(`select up.user_id, ap.applicant_firstname, ukl.full_name, ukl.fi_date as kyc_date, ap.applicant_mobile from 
             (SELECT user_id, related_aadhar FROM user_profile) as up,
              applicant as ap,
              (select * from user_fi_log as ukli, login as li where ukli.user_id = li.user_id and ukli.user_id=${user_id}) as ukl
