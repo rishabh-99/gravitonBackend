@@ -17,6 +17,7 @@ const Gurantortype = require('../models/Gurantortype');
 const Documenttype = require('../models/Documenttype');
 const Loantype = require('../models/Loantype');
 const User_kyc_log = require('../models/User_kyc_log');
+const UserFiLog = require('../models/UserFiLog');
 const AWS = require('aws-sdk');
 const s3 = new AWS.S3();
 
@@ -902,13 +903,26 @@ const CarController = () => {
             //date and user_id
             const q1 = await sequelize.query(`select up.user_id, ap.applicant_firstname, ukl.kyc_date
             from user_profile as up, (select * from user_kyc_log where user_id = ${user_id}) as ukl, applicant as ap
-            where up.related_aadhar = ukl.related_aadhar and ukl.related_aadhar = ap.applicant_aadhar limit ${count} offset (select count(*) from user_kyc_log where user_id = ${user_id})-${count};
-                       `)
+            where up.related_aadhar = ukl.related_aadhar and ukl.related_aadhar = ap.applicant_aadhar limit ${count} offset (select count(*) from user_kyc_log where user_id = ${user_id})-${count};`)
 
+            let count2 = 5;
+            const countOfProfiles2 = await UserFiLog.count({
+                where: { user_id }
+            });
+            if (countOfProfiles2 < 5) {
+                count2 = countOfProfiles2;
+            }
+            
+            const q2 = await sequelize.query(`select up.user_id, ap.applicant_firstname, ukl.fi_date as kyc_date
+            from user_profile as up, (select * from user_fi_log where user_id = ${user_id}) as ukl, applicant as ap
+            where up.related_aadhar = ukl.related_aadhar and ukl.related_aadhar = ap.applicant_aadhar limit ${count2} offset (select count(*) from user_fi_log where user_id = ${user_id})-${count2};`)
+
+            
             const newestKYC = q1[0];
+            const newestFI = q2[0];
             const cdl = await sequelize.query(`select count(*) from public."disbursedLoan" as dl, public.user_profile as up, public.user_kyc_log as ukl where dl.profile_id = up.user_id and up.related_aadhar = ukl.related_aadhar and ukl.user_id = ${user_id}`);
             const countOfDisbursedLoan = cdl[0][0].count
-            return res.status(200).json({ countOfProfiles, newestKYC, countOfDisbursedLoan });
+            return res.status(200).json({ countOfProfiles, newestKYC, countOfDisbursedLoan, newestFI });
         } catch (err) {
             console.log(err)
             return res.status(500).json({ msg: err });
