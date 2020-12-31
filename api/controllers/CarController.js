@@ -876,13 +876,30 @@ const CarController = () => {
 
         const user_id = parseInt(req.query.user_id);
         try {
-            const r = await sequelize.query(`SELECT user_profile.user_id, user_profile.related_aadhar,
+            const r1 = await sequelize.query(`SELECT user_profile.user_id, user_profile.related_aadhar,
             CASE WHEN applicant_middlename Like '' 
                     THEN concat(applicant_firstname,' ', applicant_lastname)
                     ELSE concat(applicant_firstname,' ',applicant_middlename,' ', applicant_lastname) 
             END AS applicant_name FROM public.user_profile, public.applicant,public.user_kyc_log where applicant.applicant_aadhar = user_profile.related_aadhar
-			and applicant_aadhar = user_kyc_log.related_aadhar and user_kyc_log.user_id =${user_id}`)
-            return res.status(200).send(r[0]);
+            and applicant_aadhar = user_kyc_log.related_aadhar and user_kyc_log.user_id =${user_id}`)
+            
+            const r2 = await sequelize.query(`SELECT user_profile.user_id, user_profile.related_aadhar,
+            CASE WHEN applicant_middlename Like '' 
+                    THEN concat(applicant_firstname,' ', applicant_lastname)
+                    ELSE concat(applicant_firstname,' ',applicant_middlename,' ', applicant_lastname) 
+            END AS applicant_name FROM public.user_profile, public.applicant,public.user_fi_log where applicant.applicant_aadhar = user_profile.related_aadhar
+            and applicant_aadhar = user_fi_log.related_aadhar and user_fi_log.user_id =${user_id}`)
+            
+            var resultArray = r1[0].filter(function (i) {
+                return r2[0].findIndex((j) => { return i.user_id === j.user_id }) === -1;
+            });
+
+            var resultArray2 = r2[0].filter(function (i) {
+                return r1[0].findIndex((j) => { return i.user_id === j.user_id }) === -1;
+            });
+            const finalArray = resultArray.concat(resultArray2)
+
+            return res.status(200).send(finalArray);
         } catch (err) {
             console.log(err)
             return res.status(500).json({ msg: err });
