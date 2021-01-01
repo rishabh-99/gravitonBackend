@@ -876,14 +876,14 @@ const CarController = () => {
 
         const user_id = parseInt(req.query.user_id);
         try {
-            const r1 = await sequelize.query(`SELECT user_profile.user_id, user_profile.related_aadhar,
+            const r1 = await sequelize.query(`SELECT distinct on (related_aadhar) user_profile.related_aadhar,user_profile.user_id,
             CASE WHEN applicant_middlename Like '' 
                     THEN concat(applicant_firstname,' ', applicant_lastname)
                     ELSE concat(applicant_firstname,' ',applicant_middlename,' ', applicant_lastname) 
             END AS applicant_name FROM public.user_profile, public.applicant,public.user_kyc_log where applicant.applicant_aadhar = user_profile.related_aadhar
             and applicant_aadhar = user_kyc_log.related_aadhar and user_kyc_log.user_id =${user_id}`)
             
-            const r2 = await sequelize.query(`SELECT user_profile.user_id, user_profile.related_aadhar,
+            const r2 = await sequelize.query(`SELECT distinct on (related_aadhar) user_profile.related_aadhar, user_profile.user_id,
             CASE WHEN applicant_middlename Like '' 
                     THEN concat(applicant_firstname,' ', applicant_lastname)
                     ELSE concat(applicant_firstname,' ',applicant_middlename,' ', applicant_lastname) 
@@ -919,7 +919,7 @@ const CarController = () => {
             }
             //date and user_id
             const q1 = await sequelize.query(`select up.user_id, ap.applicant_firstname, ukl.kyc_date
-            from user_profile as up, (select * from user_kyc_log where user_id = ${user_id}) as ukl, applicant as ap
+            from user_profile as up, (select distinct on (related_aadhar) related_aadhar, log_id, user_id, related_pan, kyc_date from user_kyc_log where user_id = ${user_id}) as ukl, applicant as ap
             where up.related_aadhar = ukl.related_aadhar and ukl.related_aadhar = ap.applicant_aadhar limit ${count} offset (select count(*) from user_kyc_log where user_id = ${user_id})-${count};`)
 
             let count2 = 5;
@@ -931,7 +931,7 @@ const CarController = () => {
             }
             
             const q2 = await sequelize.query(`select up.user_id, ap.applicant_firstname, ukl.fi_date as kyc_date
-            from user_profile as up, (select * from user_fi_log where user_id = ${user_id}) as ukl, applicant as ap
+            from user_profile as up, (select distinct on (profile_id) profile_id,log_id, user_id, related_aadhar, fi_date, loan_id from user_fi_log where user_id = ${user_id}) as ukl, applicant as ap
             where up.related_aadhar = ukl.related_aadhar and ukl.related_aadhar = ap.applicant_aadhar limit ${count2} offset (select count(*) from user_fi_log where user_id = ${user_id})-${count2};`)
 
             
@@ -952,15 +952,15 @@ const CarController = () => {
 
 
             var q1 = await sequelize.query(`select up.user_id, ap.applicant_firstname, ukl.full_name, ukl.kyc_date, ap.applicant_mobile from 
-            (SELECT user_id, related_aadhar FROM user_profile) as up,
+            (SELECT distinct on (user_id) user_id, related_aadhar FROM user_profile) as up,
              applicant as ap,
-             (select * from user_kyc_log as ukli, login as li where ukli.user_id = li.user_id and ukli.user_id=${user_id}) as ukl
+             (select distinct on (related_aadhar) ukli.related_aadhar,log_id, related_pan, kyc_date, full_name from user_kyc_log as ukli, login as li where ukli.user_id = li.user_id and ukli.user_id=${user_id}) as ukl
              where up.related_aadhar = ap.applicant_aadhar and up.related_aadhar = ukl.related_aadhar;`)
 
             var q2 = await sequelize.query(`select up.user_id, ap.applicant_firstname, ukl.full_name, ukl.fi_date as kyc_date, ap.applicant_mobile from 
-            (SELECT user_id, related_aadhar FROM user_profile) as up,
+            (SELECT distinct on (user_id) user_id, related_aadhar FROM user_profile) as up,
              applicant as ap,
-             (select * from user_fi_log as ukli, login as li where ukli.user_id = li.user_id and ukli.user_id=${user_id}) as ukl
+             (select distinct on (profile_id) ukli.user_id,log_id, related_aadhar, fi_date, full_name from user_fi_log as ukli, login as li where ukli.user_id = li.user_id and ukli.user_id=${user_id}) as ukl
              where up.related_aadhar = ap.applicant_aadhar and up.related_aadhar = ukl.related_aadhar;`)
 
             var resultArray = q1[0].filter(function (i) {
