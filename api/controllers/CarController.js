@@ -922,17 +922,10 @@ const CarController = () => {
             from user_profile as up, (select distinct on (related_aadhar) related_aadhar, log_id, user_id, related_pan, kyc_date from user_kyc_log where user_id = ${user_id}) as ukl, applicant as ap
             where up.related_aadhar = ukl.related_aadhar and ukl.related_aadhar = ap.applicant_aadhar limit ${count} offset (select count(*) from user_kyc_log where user_id = ${user_id})-${count};`)
 
-            let count2 = 5;
-            const countOfProfiles2 = await UserFiLog.count({
-                where: { user_id }
-            });
-            if (countOfProfiles2 < 5) {
-                count2 = countOfProfiles2;
-            }
             
-            const q2 = await sequelize.query(`select up.user_id, ap.applicant_firstname, ukl.fi_date as kyc_date
+            const q2 = await sequelize.query(`select up.user_id, ap.applicant_firstname, ukl.fi_date, ap.applicant_mobile
             from user_profile as up, (select distinct on (profile_id) profile_id,log_id, user_id, related_aadhar, fi_date, loan_id from user_fi_log where user_id = ${user_id}) as ukl, applicant as ap
-            where up.related_aadhar = ukl.related_aadhar and ukl.related_aadhar = ap.applicant_aadhar limit ${count2} offset (select count(*) from user_fi_log where user_id = ${user_id})-${count2};`)
+            where up.related_aadhar = ukl.related_aadhar and ukl.related_aadhar = ap.applicant_aadhar;`)
 
             
             const newestKYC = q1[0];
